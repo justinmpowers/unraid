@@ -7,6 +7,8 @@ services:
       - TZ=${TZ}
       # Cloudflare DNS challenge (recommended if using tunnels or no port-forward)
       - CF_DNS_API_TOKEN=${CLOUDFLARE_DNS_API_TOKEN}
+      - ACME_EMAIL=${ACME_EMAIL}
+      - TRAEFIK_DASHBOARD_AUTH=${TRAEFIK_DASHBOARD_AUTH}
     ports:
       - "8090:80"
       - "8443:443"
