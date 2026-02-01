@@ -3,6 +3,9 @@ services:
     image: traefik:v3.1
     container_name: traefik
     restart: always
+    command:
+      - "--log.level=INFO"
+      - "--log.filePath=/dev/stdout"
     environment:
       - TZ=${TZ}
       # Cloudflare DNS challenge (recommended if using tunnels or no port-forward)
@@ -26,6 +29,11 @@ services:
     networks:
       - public_net
       - docker_proxy_net
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 networks:
   public_net:
