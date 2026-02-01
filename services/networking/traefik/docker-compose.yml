@@ -8,8 +8,8 @@ services:
       # Cloudflare DNS challenge (recommended if using tunnels or no port-forward)
       - CF_DNS_API_TOKEN=${CLOUDFLARE_DNS_API_TOKEN}
     ports:
-      - "80:80"
-      - "443:443"
+      - "8080:80"
+      - "8443:443"
     volumes:
       - ./traefik.yml:/etc/traefik/traefik.yml:ro
       - ./dynamic.yml:/etc/traefik/dynamic.yml:ro
