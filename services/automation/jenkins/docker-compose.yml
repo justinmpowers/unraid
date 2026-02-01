@@ -16,8 +16,9 @@ services:
       # These tell Jenkins about the reverse proxy
       - JENKINS_UC=https://updates.jenkins.io
       - JENKINS_UC_INSECURE=false
+    networks:
+      - docker_proxy_net
     
 networks:
   docker_proxy_net:
     external: true
-      - docker_proxy_net
