@@ -21,14 +21,9 @@ services:
       - ${APPDATA_PATH}/traefik/logs:/var/log/traefik
     labels:
       - traefik.enable=true
-      # HTTP router (redirects to HTTPS)
-      - traefik.http.routers.traefik-http.rule=Host(`traefik.${DOMAIN}`)
-      - traefik.http.routers.traefik-http.entrypoints=web
-      - traefik.http.routers.traefik-http.middlewares=redirect-to-https@file
-      # HTTPS router
+      # Single HTTP router (tunnel handles TLS termination)
       - traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN}`)
-      - traefik.http.routers.traefik.entrypoints=websecure
-      - traefik.http.routers.traefik.tls.certresolver=letsencrypt
+      - traefik.http.routers.traefik.entrypoints=web
       - traefik.http.routers.traefik.service=api@internal
       - traefik.http.routers.traefik.middlewares=traefik-auth@file
     depends_on: []

@@ -19,14 +19,9 @@ services:
       - JENKINS_UC_INSECURE=false
     labels:
       - traefik.enable=true
-      # HTTP router (redirects to HTTPS)
-      - traefik.http.routers.jenkins-http.rule=Host(`jenkins.${DOMAIN}`)
-      - traefik.http.routers.jenkins-http.entrypoints=web
-      - traefik.http.routers.jenkins-http.middlewares=redirect-to-https@file
-      # HTTPS router
+      # Single HTTP router (tunnel handles TLS termination)
       - traefik.http.routers.jenkins.rule=Host(`jenkins.${DOMAIN}`)
-      - traefik.http.routers.jenkins.entrypoints=websecure
-      - traefik.http.routers.jenkins.tls.certresolver=letsencrypt
+      - traefik.http.routers.jenkins.entrypoints=web
       - traefik.http.services.jenkins.loadbalancer.server.port=8080
     networks:
       - docker_proxy_net
