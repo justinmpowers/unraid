@@ -2,6 +2,7 @@ services:
   jenkins:
     image: jenkins/jenkins:2.541.1-lts
     container_name: jenkins
+    restart: always
     ports:
       - '8080:8080'
       - '50000:50000'
@@ -15,28 +16,8 @@ services:
       # These tell Jenkins about the reverse proxy
       - JENKINS_UC=https://updates.jenkins.io
       - JENKINS_UC_INSECURE=false
-    # Allow Jenkins to manage Docker for ephemeral agents via the proxy
-    depends_on:
-      - docker-socket-proxy
-
-  docker-socket-proxy:
-    image: tecnativa/docker-socket-proxy:latest@sha256:bd2241b3bec83abcff25927a0a7ae518e0c5bef624b3cc247dcb31e68b53f417
-    container_name: docker-socket-proxy
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    environment:
-      # Restrict proxy capabilities to what Jenkins needs
-      - CONTAINERS=1
-      - IMAGES=1
-      - NETWORKS=1
-      - VOLUMES=1
-    ports:
-      - '2375:2375'
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 512M
-        reservations:
-          cpus: '0.1'
-          memory: 256M
+    
+networks:
+  docker_proxy_net:
+    external: true
+      - docker_proxy_net
