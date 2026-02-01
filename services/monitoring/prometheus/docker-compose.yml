@@ -19,20 +19,11 @@ services:
     volumes:
     - ${OBSERVABILITY_PATH}/prometheus/config:/etc/prometheus
     - ${OBSERVABILITY_PATH}/prometheus/data:/prometheus
-    ports:
-    - 9090:9090
-    networks:
-    - monitoring_net
-    user: ${PUID}:${PGID}
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 2G
-        reservations:
-          cpus: '0.5'
-          memory: 1G
     labels:
+    - traefik.enable=true
+    - traefik.http.routers.prometheus.rule=Host(`prometheus.${DOMAIN}`)
+    - traefik.http.routers.prometheus.entrypoints=web
+    - traefik.http.services.prometheus.loadbalancer.server.port=9090
     - kuma.prometheus.type=http
     - kuma.prometheus.url=http://prometheus:9090/-/healthy
     - kuma.prometheus.name=Prometheus
@@ -41,6 +32,8 @@ services:
     - kuma.prometheus.tags=monitoring,metrics
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/prometheus-icon.png
     - net.unraid.docker.webui=http://[IP]:[PORT:9090]
-networks:
-  monitoring_net:
-    external: true
+    networks:
+    - monitoring_net
+    - public_net
+    user: ${PUID}:${PGID}
+    deploy:

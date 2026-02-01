@@ -15,8 +15,6 @@ services:
     volumes:
     - /mnt/user/:/srv:rw
     - ${APPDATA_PATH}/filebrowser/:/db/:rw
-    ports:
-    - 8080:80
     deploy:
       resources:
         limits:
@@ -27,7 +25,12 @@ services:
           memory: 256M
     networks:
     - internal_net
+    - public_net
     labels:
+    - traefik.enable=true
+    - traefik.http.routers.filebrowser.rule=Host(`filebrowser.${DOMAIN}`)
+    - traefik.http.routers.filebrowser.entrypoints=web
+    - traefik.http.services.filebrowser.loadbalancer.server.port=80
     - kuma.filebrowser.type=http
     - kuma.filebrowser.url=http://FileBrowser:80
     - kuma.filebrowser.name=File Browser
@@ -45,4 +48,6 @@ services:
       start_period: 2s
 networks:
   internal_net:
+    external: true
+  public_net:
     external: true

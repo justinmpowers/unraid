@@ -109,10 +109,11 @@ services:
     volumes:
     - ${APPDATA_PATH}/authentik/media:/media
     - ${APPDATA_PATH}/authentik/templates:/templates
-    ports:
-    - 9000:9000
-    - 9443:9443
     labels:
+    - traefik.enable=true
+    - traefik.http.routers.authentik.rule=Host(`authentik.${DOMAIN}`)
+    - traefik.http.routers.authentik.entrypoints=web
+    - traefik.http.services.authentik.loadbalancer.server.port=9000
     - kuma.authentik.type=http
     - kuma.authentik.url=http://authentik:9000/-/health/live/
     - kuma.authentik.name=Authentik Server
@@ -132,6 +133,7 @@ services:
     networks:
     - db_net
     - internal_net
+    - public_net
     depends_on:
     - authentik-postgres
     - authentik-redis
@@ -223,4 +225,6 @@ networks:
   db_net:
     external: true
   internal_net:
+    external: true
+  public_net:
     external: true

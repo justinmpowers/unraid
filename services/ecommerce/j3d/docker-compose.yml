@@ -78,11 +78,6 @@ services:
     volumes:
       - ${APPDATA_PATH}/j3d/backend:/app/instance
       - ${APPDATA_PATH}/j3d/uploads:/app/instance/uploads
-    ports:
-      - "5000:5000"
-    networks:
-      - internal_net
-      - db_net
     deploy:
       resources:
         limits:
@@ -92,6 +87,10 @@ services:
           cpus: '0.25'
           memory: 256M
     labels:
+      - traefik.enable=true
+      - traefik.http.routers.j3d.rule=Host(`j3d.${DOMAIN}`)
+      - traefik.http.routers.j3d.entrypoints=web
+      - traefik.http.services.j3d.loadbalancer.server.port=5000
       - kuma.backend.type=http
       - kuma.backend.url=http://j3d-backend:5000/api/health
       - kuma.backend.name=J3D Backend
@@ -99,6 +98,10 @@ services:
       - kuma.backend.tags=j3d,api
       - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/flask-icon.png
       - net.unraid.docker.webui=http://[IP]:[PORT:5000]
+    networks:
+      - internal_net
+      - db_net
+      - public_net
 
   j3d-frontend:
     image: ghcr.io/justinmpowers/j3d-frontend:2.1.1
@@ -108,11 +111,6 @@ services:
       - j3d-backend
     environment:
       TZ: ${TZ}
-      HOST_OS: Unraid
-      HOST_HOSTNAME: ${HOST_HOSTNAME}
-      HOST_CONTAINERNAME: j3d-frontend
-      API_URL: ${J3D_API_URL}
-    ports:
       - "4200:4200"
     networks:
       - internal_net
@@ -131,6 +129,13 @@ services:
       - kuma.frontend.name=J3D Frontend
       - kuma.frontend.interval=60
       - kuma.frontend.tags=j3d,web
+      - traefik.enable=true
+      - traefik.http.routers.j3d-frontend.rule=Host(`j3d.${DOMAIN}`)
+    networks:
+      - internal_net
+      - public_net
+      - traefik.http.routers.j3d-frontend.entrypoints=web
+      - traefik.http.services.j3d-frontend.loadbalancer.server.port=4200
       - net.unraid.docker.icon=https://raw.githubusercontent.com/justinmpowers/j3d-frontend/main/src/assets/logo.png
       - net.unraid.docker.webui=http://[IP]:[PORT:4200]
 

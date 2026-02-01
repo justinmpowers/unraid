@@ -15,9 +15,11 @@ services:
     - GF_SECURITY_COOKIE_SECURE=true
     volumes:
     - ${OBSERVABILITY_PATH}/grafana:/var/lib/grafana
-    ports:
-    - 3006:3000
     labels:
+    - traefik.enable=true
+    - traefik.http.routers.grafana.rule=Host(`grafana.${DOMAIN}`)
+    - traefik.http.routers.grafana.entrypoints=web
+    - traefik.http.services.grafana.loadbalancer.server.port=3000
     - kuma.grafana.type=http
     - kuma.grafana.url=http://Grafana:3000/api/health
     - kuma.grafana.name=Grafana
@@ -29,6 +31,7 @@ services:
     networks:
     - monitoring_net
     - db_net
+    - public_net
     user: ${PUID}:${PGID}
     deploy:
       resources:
@@ -42,4 +45,6 @@ networks:
   monitoring_net:
     external: true
   db_net:
+    external: true
+  public_net:
     external: true

@@ -15,6 +15,10 @@ services:
     - DB_PASSWD=${ROMM_DB_PASSWORD}
     - ROMM_AUTH_SECRET_KEY=${ROMM_AUTH_SECRET_KEY}
     labels:
+    - traefik.enable=true
+    - traefik.http.routers.romm.rule=Host(`romm.${DOMAIN}`)
+    - traefik.http.routers.romm.entrypoints=web
+    - traefik.http.services.romm.loadbalancer.server.port=8080
     - kuma.romm.type=http
     - kuma.romm.url=http://romm:8080
     - kuma.romm.name=ROMM Game Library
@@ -39,6 +43,7 @@ services:
     networks:
     - internal_net
     - db_net
+    - public_net
     depends_on:
     - romm-mariadb
   romm-mariadb:
@@ -58,8 +63,6 @@ services:
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/mariadb-icon.png
     volumes:
     - ${ROMM_PATH}/romm/mariadb:/var/lib/mysql
-    ports:
-    - 3307:3306
     deploy:
       resources:
         limits:
@@ -74,4 +77,6 @@ networks:
   internal_net:
     external: true
   db_net:
+    external: true
+  public_net:
     external: true

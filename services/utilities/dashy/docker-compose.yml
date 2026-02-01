@@ -27,6 +27,10 @@ services:
       - BASE_URL=/                 # Static asset path
       
     labels:
+      - traefik.enable=true
+      - traefik.http.routers.dashy.rule=Host(`dashy.${DOMAIN}`)
+      - traefik.http.routers.dashy.entrypoints=web
+      - traefik.http.services.dashy.loadbalancer.server.port=8080
       - "kuma.dashy.type=http"
       - "kuma.dashy.url=http://dashy:8080"
       - "kuma.dashy.name=Dashy Dashboard"
@@ -39,10 +43,9 @@ services:
     volumes:
       - ${APPDATA_PATH}/dashy:/app/user-data
       - ${APPDATA_PATH}/dashy/icons:/app/user-data/item-icons
-    ports:
-      - "4000:8080"
     networks:
       - internal_net
+      - public_net
     
     # 🎯 RESOURCE LIMITS (should drop dramatically)
     deploy:
@@ -56,4 +59,6 @@ services:
 
 networks:
   internal_net:
+  public_net:
+    external: true
     external: true

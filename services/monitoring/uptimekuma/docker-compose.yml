@@ -11,8 +11,6 @@ services:
     - HOST_CONTAINERNAME=UptimeKuma
     volumes:
     - ${OBSERVABILITY_PATH}/uptimekuma:/app/data
-    ports:
-    - 3002:3001
     deploy:
       resources:
         limits:
@@ -22,6 +20,11 @@ services:
           cpus: '0.15'
           memory: 256M
     labels:
+    - traefik.enable=true
+    - traefik.http.routers.uptimekuma.rule=Host(`uptimekuma.${DOMAIN}`)
+    - traefik.http.routers.uptimekuma.entrypoints=web
+    - traefik.http.services.uptimekuma.loadbalancer.server.port=3001
+    - public_net
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/uptimekuma-icon.png
     - net.unraid.docker.webui=http://[IP]:[PORT:3002]
     networks:
@@ -66,4 +69,6 @@ networks:
   iot_net:
     external: true
   teslamate_net:
+  public_net:
+    external: true
     external: true

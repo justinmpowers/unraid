@@ -21,8 +21,6 @@ services:
     - TZ=America/New_York
     volumes:
     - ${APPDATA_PATH}/teslamate/import:/opt/app/import
-    ports:
-    - 4001:4000
     deploy:
       resources:
         limits:
@@ -32,6 +30,10 @@ services:
           cpus: '0.2'
           memory: 256M
     labels:
+    - traefik.enable=true
+    - traefik.http.routers.teslamate.rule=Host(`teslamate.${DOMAIN}`)
+    - traefik.http.routers.teslamate.entrypoints=web
+    - traefik.http.services.teslamate.loadbalancer.server.port=4000
     - kuma.teslamate.type=http
     - kuma.teslamate.url=http://TeslaMate:4000
     - kuma.teslamate.name=TeslaMate App
@@ -39,6 +41,7 @@ services:
     - kuma.teslamate.tags=automotive,tesla
     - net.unraid.docker.icon=https://raw.githubusercontent.com/adriankumpf/teslamate/master/priv/static/images/logo.svg
     - net.unraid.docker.webui=http://[IP]:[PORT:4001]
+    - public_net
     networks:
     - teslamate_net
     - db_net
@@ -121,4 +124,6 @@ networks:
   db_net:
     external: true
   iot_net:
+    external: true
+  public_net:
     external: true

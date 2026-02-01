@@ -22,13 +22,10 @@ services:
       
       # Optional: Import your compose files for viewing
       - /mnt/user/appdata/docker-compose:/compose:ro
-    ports:
-      - "9444:9443"   # HTTPS UI (recommended)
-      - "9002:9000"   # HTTP UI
-      - "8002:8000"   # Edge agent (optional)
     networks:
       - monitoring_net
       - internal_net
+      - public_net
     deploy:
       resources:
         limits:
@@ -38,9 +35,13 @@ services:
           cpus: '0.1'
           memory: 128M
     labels:
+      - traefik.enable=true
+      - traefik.http.routers.portainer.rule=Host(`portainer.${DOMAIN}`)
+      - traefik.http.routers.portainer.entrypoints=web
+      - traefik.http.services.portainer.loadbalancer.server.port=9000
       # Uptime Kuma monitoring
       - "kuma.portainer.type=http"
-      - "kuma.portainer.url=https://portainer:9443"
+      - "kuma.portainer.url=http://portainer:9000"
       - "kuma.portainer.name=Portainer"
       - "kuma.portainer.interval=60"
       - "kuma.portainer.keyword=Portainer"
@@ -48,7 +49,7 @@ services:
       
       # Unraid labels
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/portainer-icon.png"
-      - "net.unraid.docker.webui=https://[IP]:[PORT:9443]"
+      - "net.unraid.docker.webui=http://[IP]:[PORT:9000]"
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider https://localhost:9443 || exit 1"]
       interval: 30s
@@ -56,6 +57,14 @@ services:
       retries: 3
       start_period: 40s
     security_opt:
+
+networks:
+  monitoring_net:
+    external: true
+  internal_net:
+    external: true
+  public_net:
+    external: true
       - no-new-privileges:true
 
 networks:

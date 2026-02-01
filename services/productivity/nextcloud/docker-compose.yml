@@ -24,8 +24,6 @@ services:
     - ${APPDATA_PATH}/nextcloud/apps:/var/www/html/custom_apps
     - ${APPDATA_PATH}/nextcloud/config:/var/www/html/config
     - ${APPDATA_PATH}/nextcloud/data:/var/www/html/data
-    ports:
-    - 8666:80
     deploy:
       resources:
         limits:
@@ -35,6 +33,10 @@ services:
           cpus: '0.5'
           memory: 512M
     labels:
+    - traefik.enable=true
+    - traefik.http.routers.nextcloud.rule=Host(`nextcloud.${DOMAIN}`)
+    - traefik.http.routers.nextcloud.entrypoints=web
+    - traefik.http.services.nextcloud.loadbalancer.server.port=80
     - kuma.nextcloud.type=http
     - kuma.nextcloud.url=http://Nextcloud:80/status.php
     - kuma.nextcloud.name=Nextcloud
@@ -42,10 +44,10 @@ services:
     - kuma.nextcloud.keyword=installed
     - kuma.nextcloud.tags=productivity,cloud
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/nextcloud-icon.png
-    - net.unraid.docker.webui=http://[IP]:[PORT:8666]
     networks:
     - internal_net
     - db_net
+    - public_net
     depends_on:
     - nextcloud-postgres
   nextcloud-postgres:
@@ -88,4 +90,6 @@ networks:
   internal_net:
     external: true
   db_net:
+    external: true
+  public_net:
     external: true

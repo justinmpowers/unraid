@@ -13,8 +13,6 @@ services:
     - ACTUAL_UPLOAD_FILE_SIZE_IMPORT_MB=20
     volumes:
     - ${APPDATA_PATH}/actual-server:/data
-    ports:
-    - 5006:5006
     deploy:
       resources:
         limits:
@@ -25,7 +23,12 @@ services:
           memory: 256M
     networks:
     - internal_net
+    - public_net
     labels:
+    - traefik.enable=true
+    - traefik.http.routers.actualserver.rule=Host(`actual.${DOMAIN}`)
+    - traefik.http.routers.actualserver.entrypoints=web
+    - traefik.http.services.actualserver.loadbalancer.server.port=5006
     - kuma.actualserver.type=http
     - kuma.actualserver.url=http://ActualServer:5006
     - kuma.actualserver.name=Actual Budget Server
@@ -36,4 +39,6 @@ services:
     - net.unraid.docker.webui=http://[IP]:[PORT:5006]
 networks:
   internal_net:
+    external: true
+  public_net:
     external: true

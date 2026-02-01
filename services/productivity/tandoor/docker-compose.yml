@@ -44,9 +44,14 @@ services:
     networks:
     - internal_net
     - db_net
+    - public_net
     depends_on:
     - tandoor-postgres
     labels:
+    - traefik.enable=true
+    - traefik.http.routers.tandoor.rule=Host(`tandoor.${DOMAIN}`)
+    - traefik.http.routers.tandoor.entrypoints=web
+    - traefik.http.services.tandoor.loadbalancer.server.port=8080
     - kuma.tandoor.type=http
     - kuma.tandoor.url=http://tandoor:8080
     - kuma.tandoor.name=Tandoor Recipes
@@ -103,4 +108,6 @@ networks:
   internal_net:
     external: true
   db_net:
+    external: true
+  public_net:
     external: true

@@ -12,6 +12,10 @@ services:
       - SKIP_ARCHIVED_LOGS=${SKIP_ARCHIVED_LOGS:-False}
       - DEBUG=${DEBUG:-False}
     labels:
+      - traefik.enable=true
+      - traefik.http.routers.goaccess.rule=Host(`goaccess.${DOMAIN}`)
+      - traefik.http.routers.goaccess.entrypoints=web
+      - traefik.http.services.goaccess.loadbalancer.server.port=7880
       - "kuma.goaccess.type=http"
       - "kuma.goaccess.url=http://GoAccess-NPMLogs:7880"
       - "kuma.goaccess.name=GoAccess Analytics"
@@ -24,8 +28,6 @@ services:
     volumes:
       # Use the working log directory we found
       - ${APPDATA_PATH}/Nginx-Proxy-Manager-Official/data/nginx:/opt/log:ro
-    ports:
-      - "7881:7880"    # Use different port to avoid conflict
     deploy:
       resources:
         limits:

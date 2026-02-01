@@ -18,6 +18,10 @@ services:
     volumes:
     - ${APPDATA_PATH}/wikijs:/wiki/data
     labels:
+    - traefik.enable=true
+    - traefik.http.routers.wikijs.rule=Host(`wikijs.${DOMAIN}`)
+    - traefik.http.routers.wikijs.entrypoints=web
+    - traefik.http.services.wikijs.loadbalancer.server.port=3000
     - kuma.wikijs.type=http
     - kuma.wikijs.url=http://wikijs:3000
     - kuma.wikijs.name=Wiki.js
@@ -26,8 +30,6 @@ services:
     - kuma.wikijs.tags=productivity,wiki
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/wikijs-icon.png
     - net.unraid.docker.webui=http://[IP]:[PORT:3000]
-    ports:
-    - 3000:3000
     deploy:
       resources:
         limits:
@@ -39,6 +41,7 @@ services:
     networks:
     - internal_net
     - db_net
+    - public_net
     depends_on:
     - wikijs-postgres
   wikijs-postgres:
@@ -77,4 +80,6 @@ networks:
   internal_net:
     external: true
   db_net:
+    external: true
+  public_net:
     external: true

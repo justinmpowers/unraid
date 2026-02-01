@@ -19,8 +19,6 @@ services:
     - SMTP_PASSWORD=${AUTHENTIK_EMAIL_PASSWORD}
     volumes:
     - ${VAULTWARDEN_PATH}/vaultwarden:/data
-    ports:
-    - 4743:80
     deploy:
       resources:
         limits:
@@ -30,6 +28,10 @@ services:
           cpus: '0.2'
           memory: 256M
     labels:
+    - traefik.enable=true
+    - traefik.http.routers.vaultwarden.rule=Host(`vaultwarden.${DOMAIN}`)
+    - traefik.http.routers.vaultwarden.entrypoints=web
+    - traefik.http.services.vaultwarden.loadbalancer.server.port=80
     - kuma.vaultwarden.type=http
     - kuma.vaultwarden.url=http://vaultwarden:80/alive
     - kuma.vaultwarden.name=Vaultwarden
@@ -40,6 +42,9 @@ services:
     - net.unraid.docker.webui=http://[IP]:[PORT:4743]
     networks:
     - internal_net
+    - public_net
 networks:
   internal_net:
+    external: true
+  public_net:
     external: true

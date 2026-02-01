@@ -24,9 +24,11 @@ services:
     - ${APPDATA_PATH}/immich/photos:/photos
     - ${APPDATA_PATH}/immich/libraries:/libraries
     - ${APPDATA_PATH}/immich/config:/config
-    ports:
-    - 8083:8080
     labels:
+    - traefik.enable=true
+    - traefik.http.routers.immich.rule=Host(`immich.${DOMAIN}`)
+    - traefik.http.routers.immich.entrypoints=web
+    - traefik.http.services.immich.loadbalancer.server.port=8080
     - kuma.immich.type=http
     - kuma.immich.url=http://immich:8080
     - kuma.immich.name=Immich Photos
@@ -42,6 +44,7 @@ services:
           memory: 2G
         reservations:
           cpus: '0.3'
+    - public_net
           memory: 600M
     networks:
     - internal_net
@@ -104,4 +107,6 @@ networks:
   internal_net:
     external: true
   db_net:
+    external: true
+  public_net:
     external: true

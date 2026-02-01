@@ -11,9 +11,11 @@ services:
     volumes:
     - ${HOME_ASSISTANT_PATH}/Home-Assistant-Container:/config
     - /etc/localtime:/etc/localtime:ro
-    ports:
-    - 8123:8123
     labels:
+    - traefik.enable=true
+    - traefik.http.routers.homeassistant.rule=Host(`homeassistant.${DOMAIN}`)
+    - traefik.http.routers.homeassistant.entrypoints=web
+    - traefik.http.services.homeassistant.loadbalancer.server.port=8123
     - kuma.homeassistant.type=http
     - kuma.homeassistant.url=http://Home-Assistant-Container:8123
     - kuma.homeassistant.name=Home Assistant
@@ -21,7 +23,6 @@ services:
     - kuma.homeassistant.keyword=Home Assistant
     - kuma.homeassistant.tags=iot,smart-home
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/home-assistant-icon.png
-    - net.unraid.docker.webui=http://[IP]:[PORT:8123]
     deploy:
       resources:
         limits:
@@ -32,6 +33,7 @@ services:
           memory: 400M
     networks:
     - iot_net
+    - public_net
     privileged: true
   matter-server:
     image: ghcr.io/home-assistant-libs/python-matter-server:8.1
@@ -62,4 +64,6 @@ services:
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/matter-server-icon.png
 networks:
   iot_net:
+    external: true
+  public_net:
     external: true

@@ -12,8 +12,6 @@ services:
     volumes:
     - ${HOME_ASSISTANT_PATH}/zigbee2mqtt:/app/data
     - /run/udev:/run/udev:ro
-    ports:
-    - 9442:8080
     deploy:
       resources:
         limits:
@@ -23,9 +21,16 @@ services:
           cpus: '0.15'
           memory: 256M
     labels:
-    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/zigbee2mqtt-icon.png
-    - net.unraid.docker.webui=http://[IP]:[PORT:9442]
-    networks:
+    - traefik.enable=true
+    - traefik.http.routers.zigbee2mqtt.rule=Host(`zigbee2mqtt.${DOMAIN}`)
+    - traefik.http.routers.zigbee2mqtt.entrypoints=web
+    - traefik.http.services.zigbee2mqtt.loadbalancer.server.port=8080
+    - public_net
+    privileged: true
+networks:
+  iot_net:
+    external: true
+  publicetworks:
     - iot_net
     privileged: true
 networks:

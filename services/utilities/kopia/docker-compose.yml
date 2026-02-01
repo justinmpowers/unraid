@@ -27,8 +27,6 @@ services:
     - /dev/zfs:/dev/zfs
     cap_add:
     - SYS_ADMIN
-    ports:
-    - 51515:51515
     command:
     - server
     - start
@@ -46,6 +44,10 @@ services:
           cpus: '0.5'
           memory: 1G
     labels:
+    - traefik.enable=true
+    - traefik.http.routers.kopia-b2.rule=Host(`kopia-b2.${DOMAIN}`)
+    - traefik.http.routers.kopia-b2.entrypoints=web
+    - traefik.http.services.kopia-b2.loadbalancer.server.port=51515
     - kuma.kopia-backblaze.type=http
     - kuma.kopia-backblaze.url=http://kopia-backblaze:51515
     - kuma.kopia-backblaze.name=Kopia Backup (Backblaze)
@@ -56,6 +58,7 @@ services:
     - net.unraid.docker.webui=http://[IP]:[PORT:51515]
     networks:
     - internal_net
+    - public_net
   kopia-local:
     image: kopia/kopia:20251215.0.232403
     container_name: kopia-truenas
@@ -81,8 +84,6 @@ services:
     devices:
     - /dev/zfs:/dev/zfs
     cap_add:
-    - SYS_ADMIN
-    ports:
     - 51516:51515
     command:
     - server
@@ -102,6 +103,10 @@ services:
           memory: 1G
     labels:
     - kuma.kopia-truenas.type=http
+    - traefik.enable=true
+    - traefik.http.routers.kopia-local.rule=Host(`kopia-local.${DOMAIN}`)
+    - traefik.http.routers.kopia-local.entrypoints=web
+    - traefik.http.services.kopia-local.loadbalancer.server.port=51515
     - kuma.kopia-truenas.url=http://kopia-truenas:51515
     - kuma.kopia-truenas.name=Kopia Backup (Local)
     - kuma.kopia-truenas.interval=60
@@ -109,8 +114,11 @@ services:
     - kuma.kopia-truenas.tags=utilities,backup,truenas
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/kopia-icon.png
     - net.unraid.docker.webui=http://[IP]:[PORT:51516]
-    networks:
-    - internal_net
+    - public_net
+networks:
+  internal_net:
+    external: true
+  publicrnal_net
 networks:
   internal_net:
     external: true
