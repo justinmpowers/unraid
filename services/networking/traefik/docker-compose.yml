@@ -5,7 +5,6 @@ services:
     restart: always
     command:
       - "--log.level=INFO"
-      - "--log.filePath=/dev/stdout"
     environment:
       - TZ=${TZ}
       # Cloudflare DNS challenge (recommended if using tunnels or no port-forward)
