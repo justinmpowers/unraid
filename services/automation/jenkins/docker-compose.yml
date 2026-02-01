@@ -4,8 +4,9 @@ services:
     container_name: jenkins
     restart: always
     ports:
-      - '8080:8080'
-      - '50000:50000'
+      # Remove 8080 port binding - Traefik will handle external access
+      # - '8080:8080'
+      - '50000:50000'  # Keep agent port for Jenkins agents
     volumes:
       - ${APPDATA_PATH}/jenkins_home:/var/jenkins_home
     environment:
@@ -16,9 +17,23 @@ services:
       # These tell Jenkins about the reverse proxy
       - JENKINS_UC=https://updates.jenkins.io
       - JENKINS_UC_INSECURE=false
+    labels:
+      - traefik.enable=true
+      # HTTP router (redirects to HTTPS)
+      - traefik.http.routers.jenkins-http.rule=Host(`jenkins.${DOMAIN}`)
+      - traefik.http.routers.jenkins-http.entrypoints=web
+      - traefik.http.routers.jenkins-http.middlewares=redirect-to-https@file
+      # HTTPS router
+      - traefik.http.routers.jenkins.rule=Host(`jenkins.${DOMAIN}`)
+      - traefik.http.routers.jenkins.entrypoints=websecure
+      - traefik.http.routers.jenkins.tls.certresolver=letsencrypt
+      - traefik.http.services.jenkins.loadbalancer.server.port=8080
     networks:
       - docker_proxy_net
+      - public_net
     
 networks:
   docker_proxy_net:
+    external: true
+  public_net:
     external: true
