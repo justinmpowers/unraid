@@ -1,0 +1,15 @@
+http:
+  middlewares:
+    traefik-auth:
+      basicAuth:
+        users:
+          - ${TRAEFIK_DASHBOARD_AUTH}
+    default-headers:
+      headers:
+        frameDeny: true
+        contentTypeNosniff: true
+        browserXssFilter: true
+        referrerPolicy: "strict-origin-when-cross-origin"
+        stsSeconds: 63072000
+        stsIncludeSubdomains: true
+        stsPreload: true
