@@ -7,14 +7,12 @@ services:
       - TZ=${TZ}
       # Cloudflare DNS challenge (recommended if using tunnels or no port-forward)
       - CF_DNS_API_TOKEN=${CLOUDFLARE_DNS_API_TOKEN}
-      - ACME_EMAIL=${ACME_EMAIL}
-      - TRAEFIK_DASHBOARD_AUTH=${TRAEFIK_DASHBOARD_AUTH}
     ports:
       - "8090:80"
       - "8443:443"
     volumes:
-      - ./traefik.yml:/etc/traefik/traefik.yml:ro
-      - ./dynamic.yml:/etc/traefik/dynamic.yml:ro
+      - ${APPDATA_PATH}/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ${APPDATA_PATH}/traefik/dynamic.yml:/etc/traefik/dynamic.yml:ro
       - ${APPDATA_PATH}/traefik/acme:/etc/traefik/acme
       - ${APPDATA_PATH}/traefik/logs:/var/log/traefik
     labels:
