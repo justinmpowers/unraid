@@ -2,7 +2,6 @@
 # Portainer - Docker Management UI
 # Integrates with existing infrastructure for monitoring and quick actions
 
-
 services:
   portainer:
     image: portainer/portainer-ce:2.38.0
@@ -16,10 +15,10 @@ services:
     volumes:
       # Portainer data
       - ${APPDATA_PATH}/portainer:/data
-      
+
       # Docker socket for container management
-      - /var/run/docker.sock:/var/run/docker.sock:ro  # Read-only recommended
-      
+      - /var/run/docker.sock:/var/run/docker.sock:ro # Read-only recommended
+
       # Optional: Import your compose files for viewing
       - /mnt/user/appdata/docker-compose:/compose:ro
     networks:
@@ -29,10 +28,10 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 256M
         reservations:
-          cpus: '0.1'
+          cpus: "0.1"
           memory: 128M
     labels:
       - traefik.enable=true
@@ -46,17 +45,21 @@ services:
       - "kuma.portainer.interval=60"
       - "kuma.portainer.keyword=Portainer"
       - "kuma.portainer.tags=utilities,docker-management"
-      
+
       # Unraid labels
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/portainer-icon.png"
       - "net.unraid.docker.webui=http://[IP]:[PORT:9000]"
     healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider https://localhost:9443 || exit 1"]
+      test:
+        [
+          "CMD-SHELL",
+          "wget --no-verbose --tries=1 --spider https://localhost:9443 || exit 1",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
-    security_opt:
+    security_opt: []
 
 networks:
   monitoring_net:
@@ -64,11 +67,4 @@ networks:
   internal_net:
     external: true
   public_net:
-    external: true
-      - no-new-privileges:true
-
-networks:
-  monitoring_net:
-    external: true
-  internal_net:
     external: true

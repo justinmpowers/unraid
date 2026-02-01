@@ -1,7 +1,6 @@
 # services/utilities/dashy/docker-compose.yml
 # Optimized for production use
 
-
 services:
   dashy:
     image: lissy93/dashy:release-3.1.1@sha256:358c44167431d454775d3ff6082ca3996557663aa85edaf8488c48b93b8825e6
@@ -14,18 +13,18 @@ services:
       - HOST_OS=Unraid
       - HOST_HOSTNAME=JP-Dell
       - HOST_CONTAINERNAME=dashy
-      
+
       # 🔧 PRODUCTION OPTIMIZATIONS
-      - NODE_ENV=production        # Force production mode
-      - DISABLE_DEV_MODE=true      # Disable development features
+      - NODE_ENV=production # Force production mode
+      - DISABLE_DEV_MODE=true # Disable development features
       - PORT=8080
       - DIRECTORY=/app
       - IS_DOCKER=true
-      
+
       # 📊 PERFORMANCE SETTINGS
-      - VUE_APP_DOMAIN=/           # Base path optimization
-      - BASE_URL=/                 # Static asset path
-      
+      - VUE_APP_DOMAIN=/ # Base path optimization
+      - BASE_URL=/ # Static asset path
+
     labels:
       - traefik.enable=true
       - traefik.http.routers.dashy.rule=Host(`dashy.${DOMAIN}`)
@@ -46,19 +45,18 @@ services:
     networks:
       - internal_net
       - public_net
-    
+
     # 🎯 RESOURCE LIMITS (should drop dramatically)
     deploy:
       resources:
         limits:
-          cpus: '0.2'      # Should be very light in production
-          memory: 128M     # Down from 225MB!
+          cpus: "0.2" # Should be very light in production
+          memory: 128M # Down from 225MB!
         reservations:
-          cpus: '0.02'
+          cpus: "0.02"
           memory: 32M
 
 networks:
   internal_net:
   public_net:
-    external: true
     external: true

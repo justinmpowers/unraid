@@ -1,81 +1,78 @@
-
 services:
   wikijs:
     image: requarks/wiki:2.5.311
     container_name: wikijs
     restart: unless-stopped
     environment:
-    - TZ=${TZ}
-    - HOST_OS=Unraid
-    - HOST_HOSTNAME=JP-Dell
-    - HOST_CONTAINERNAME=wikijs
-    - DB_TYPE=postgres
-    - DB_HOST=wikijs-postgres
-    - DB_PORT=5432
-    - DB_USER=${WIKIJS_DB_USER}
-    - DB_PASS=${WIKIJS_DB_PASSWORD}
-    - DB_NAME=${WIKIJS_DB_NAME}
+      - TZ=${TZ}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=wikijs
+      - DB_TYPE=postgres
+      - DB_HOST=wikijs-postgres
+      - DB_PORT=5432
+      - DB_USER=${WIKIJS_DB_USER}
+      - DB_PASS=${WIKIJS_DB_PASSWORD}
+      - DB_NAME=${WIKIJS_DB_NAME}
     volumes:
-    - ${APPDATA_PATH}/wikijs:/wiki/data
+      - ${APPDATA_PATH}/wikijs:/wiki/data
     labels:
-    - traefik.enable=true
-    - traefik.http.routers.wikijs.rule=Host(`wikijs.${DOMAIN}`)
-    - traefik.http.routers.wikijs.entrypoints=web
-    - traefik.http.services.wikijs.loadbalancer.server.port=3000
-    - kuma.wikijs.type=http
-    - kuma.wikijs.url=http://wikijs:3000
-    - kuma.wikijs.name=Wiki.js
-    - kuma.wikijs.interval=60
-    - kuma.wikijs.keyword=Wiki.js
-    - kuma.wikijs.tags=productivity,wiki
-    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/wikijs-icon.png
-    - net.unraid.docker.webui=http://[IP]:[PORT:3000]
+      - traefik.enable=true
+      - traefik.http.routers.wikijs.rule=Host(`wikijs.${DOMAIN}`)
+      - traefik.http.routers.wikijs.entrypoints=web
+      - traefik.http.services.wikijs.loadbalancer.server.port=3000
+      - kuma.wikijs.type=http
+      - kuma.wikijs.url=http://wikijs:3000
+      - kuma.wikijs.name=Wiki.js
+      - kuma.wikijs.interval=60
+      - kuma.wikijs.keyword=Wiki.js
+      - kuma.wikijs.tags=productivity,wiki
+      - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/wikijs-icon.png
+      - net.unraid.docker.webui=http://[IP]:[PORT:3000]
     deploy:
       resources:
         limits:
-          cpus: '0.75'
+          cpus: "0.75"
           memory: 512M
         reservations:
-          cpus: '0.2'
+          cpus: "0.2"
           memory: 256M
     networks:
-    - internal_net
-    - db_net
-    - public_net
+      - internal_net
+      - db_net
+      - public_net
     depends_on:
-    - wikijs-postgres
+      - wikijs-postgres
   wikijs-postgres:
     image: postgres:18.1
     container_name: wikijs-postgresql
     restart: unless-stopped
     environment:
-    - TZ=${TZ}
-    - HOST_OS=Unraid
-    - HOST_HOSTNAME=JP-Dell
-    - HOST_CONTAINERNAME=wikijs-postgresql
-    - POSTGRES_DB=${WIKIJS_DB_NAME}
-    - POSTGRES_USER=${WIKIJS_DB_USER}
-    - POSTGRES_PASSWORD=${WIKIJS_DB_PASSWORD}
+      - TZ=${TZ}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=wikijs-postgresql
+      - POSTGRES_DB=${WIKIJS_DB_NAME}
+      - POSTGRES_USER=${WIKIJS_DB_USER}
+      - POSTGRES_PASSWORD=${WIKIJS_DB_PASSWORD}
     volumes:
-    - type: bind
-      source: ${APPDATA_PATH}/wikijs/postgres
-      target: /var/lib/postgresql/data
+      - type: bind
+        source: ${APPDATA_PATH}/wikijs/postgres
+        target: /var/lib/postgresql/data
     deploy:
       resources:
         limits:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 512M
         reservations:
-          cpus: '0.15'
+          cpus: "0.15"
           memory: 256M
-      bind:
-        propagation: rshared
     labels:
-    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png
+      - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png
     ports:
-    - 5435:5432
+      - 5435:5432
     networks:
-    - db_net
+      - db_net
 networks:
   internal_net:
     external: true

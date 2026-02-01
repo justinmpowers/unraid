@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 # J3D - Etsy Orders & Filament Tracker
 # Version: 2.0.0
@@ -33,10 +33,10 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.0'
+          cpus: "1.0"
           memory: 1G
         reservations:
-          cpus: '0.3'
+          cpus: "0.3"
           memory: 256M
     labels:
       - kuma.postgres.type=http
@@ -56,19 +56,19 @@ services:
     environment:
       # Database
       DATABASE_URL: postgresql://j3d_user:${J3D_DB_PASSWORD:-changeme}@j3d-postgres:5432/j3d
-      
+
       # Flask config
       FLASK_CONFIG: production
       SECRET_KEY: ${J3D_SECRET_KEY}
-      
+
       # Etsy OAuth
       ETSY_CLIENT_ID: ${J3D_ETSY_CLIENT_ID}
       ETSY_CLIENT_SECRET: ${J3D_ETSY_CLIENT_SECRET}
       ETSY_REDIRECT_URI: ${J3D_ETSY_REDIRECT_URI}
-      
+
       # Auto-migration on startup
       AUTO_MIGRATE: "1"
-      
+
       # Unraid environment
       TZ: ${TZ}
       HOST_OS: Unraid
@@ -81,10 +81,10 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.0'
+          cpus: "1.0"
           memory: 1G
         reservations:
-          cpus: '0.25'
+          cpus: "0.25"
           memory: 256M
     labels:
       - traefik.enable=true
@@ -111,17 +111,13 @@ services:
       - j3d-backend
     environment:
       TZ: ${TZ}
-      - "4200:4200"
-    networks:
-      - internal_net
-      - public_net
     deploy:
       resources:
         limits:
-          cpus: '1.0'
+          cpus: "1.0"
           memory: 512M
         reservations:
-          cpus: '0.25'
+          cpus: "0.25"
           memory: 256M
     labels:
       - kuma.frontend.type=http
@@ -134,10 +130,6 @@ services:
     networks:
       - internal_net
       - public_net
-      - traefik.http.routers.j3d-frontend.entrypoints=web
-      - traefik.http.services.j3d-frontend.loadbalancer.server.port=4200
-      - net.unraid.docker.icon=https://raw.githubusercontent.com/justinmpowers/j3d-frontend/main/src/assets/logo.png
-      - net.unraid.docker.webui=http://[IP]:[PORT:4200]
 
 networks:
   internal_net:

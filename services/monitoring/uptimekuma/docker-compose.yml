@@ -71,4 +71,3 @@ networks:
   teslamate_net:
   public_net:
     external: true
-    external: true

@@ -1,38 +1,32 @@
-
 services:
   zigbee2mqtt:
     image: koenkk/zigbee2mqtt:2.7.2
     container_name: zigbee2mqtt
     restart: unless-stopped
     environment:
-    - TZ=${TZ}
-    - HOST_OS=Unraid
-    - HOST_HOSTNAME=JP-Dell
-    - HOST_CONTAINERNAME=zigbee2mqtt
+      - TZ=${TZ}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=zigbee2mqtt
     volumes:
-    - ${HOME_ASSISTANT_PATH}/zigbee2mqtt:/app/data
-    - /run/udev:/run/udev:ro
+      - ${HOME_ASSISTANT_PATH}/zigbee2mqtt:/app/data
+      - /run/udev:/run/udev:ro
     deploy:
       resources:
         limits:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 512M
         reservations:
-          cpus: '0.15'
+          cpus: "0.15"
           memory: 256M
     labels:
-    - traefik.enable=true
-    - traefik.http.routers.zigbee2mqtt.rule=Host(`zigbee2mqtt.${DOMAIN}`)
-    - traefik.http.routers.zigbee2mqtt.entrypoints=web
-    - traefik.http.services.zigbee2mqtt.loadbalancer.server.port=8080
-    - public_net
+      - traefik.enable=true
+      - traefik.http.routers.zigbee2mqtt.rule=Host(`zigbee2mqtt.${DOMAIN}`)
+      - traefik.http.routers.zigbee2mqtt.entrypoints=web
+      - traefik.http.services.zigbee2mqtt.loadbalancer.server.port=8080
+    networks:
+      - public_net
     privileged: true
 networks:
-  iot_net:
-    external: true
-  publicetworks:
-    - iot_net
-    privileged: true
-networks:
-  iot_net:
+  public_net:
     external: true

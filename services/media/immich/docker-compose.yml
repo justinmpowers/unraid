@@ -44,10 +44,10 @@ services:
           memory: 2G
         reservations:
           cpus: '0.3'
-    - public_net
           memory: 600M
     networks:
     - internal_net
+    - public_net
     - db_net
     depends_on:
     - immich-postgres
