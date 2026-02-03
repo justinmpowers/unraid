@@ -12,6 +12,7 @@ services:
       - VOLUMES=1
       - EVENTS=1
       - SERVICES=1
+      - TASKS=1
       - VERSION=1
     ports:
       - '2375:2375'
