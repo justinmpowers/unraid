@@ -112,7 +112,9 @@ services:
     labels:
     - traefik.enable=true
     - traefik.http.routers.authentik.rule=Host(`auth.${DOMAIN}`)
-    - traefik.http.routers.authentik.entrypoints=web
+    - traefik.http.routers.authentik.entrypoints=websecure
+    - traefik.http.routers.authentik.tls.certresolver=letsencrypt
+    - traefik.http.routers.authentik.middlewares=default-headers@file
     - traefik.http.services.authentik.loadbalancer.server.port=9000
     - kuma.authentik.type=http
     - kuma.authentik.url=http://authentik:9000/-/health/live/
