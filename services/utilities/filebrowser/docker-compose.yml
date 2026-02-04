@@ -28,6 +28,7 @@ services:
       - internal_net
     labels:
       - traefik.enable=true
+      - traefik.docker.network=internal_net
       - traefik.http.routers.filebrowser.rule=Host(`filebrowser.${DOMAIN}`)
       - traefik.http.routers.filebrowser.entrypoints=web
       - traefik.http.services.filebrowser.loadbalancer.server.port=80

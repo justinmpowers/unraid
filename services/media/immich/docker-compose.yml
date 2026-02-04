@@ -28,6 +28,7 @@ services:
       - ${APPDATA_PATH}/immich/config:/config
     labels:
       - traefik.enable=true
+      - traefik.docker.network=internal_net
       - traefik.http.routers.immich.rule=Host(`immich.${DOMAIN}`)
       - traefik.http.routers.immich.entrypoints=web
       - traefik.http.services.immich.loadbalancer.server.port=8080

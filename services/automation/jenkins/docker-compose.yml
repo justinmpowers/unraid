@@ -19,16 +19,18 @@ services:
       - JENKINS_UC_INSECURE=false
     labels:
       - traefik.enable=true
-      # Single HTTP router (tunnel handles TLS termination)
+      # Use internal_net for Traefik to find this service
+      - traefik.docker.network=internal_net
+      # HTTP router (Traefik handles TLS termination)
       - traefik.http.routers.jenkins.rule=Host(`jenkins.${DOMAIN}`)
       - traefik.http.routers.jenkins.entrypoints=web
       - traefik.http.services.jenkins.loadbalancer.server.port=8080
     networks:
       - docker_proxy_net
-      - public_net
+      - internal_net  # Changed from public_net to internal_net for security
     
 networks:
   docker_proxy_net:
     external: true
-  public_net:
+  internal_net:
     external: true

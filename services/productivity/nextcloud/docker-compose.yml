@@ -35,6 +35,7 @@ services:
           memory: 512M
     labels:
       - traefik.enable=true
+      - traefik.docker.network=internal_net
       - traefik.http.routers.nextcloud.rule=Host(`nextcloud.${DOMAIN}`)
       - traefik.http.routers.nextcloud.entrypoints=web
       - traefik.http.services.nextcloud.loadbalancer.server.port=80

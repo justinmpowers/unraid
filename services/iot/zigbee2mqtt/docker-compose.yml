@@ -23,15 +23,13 @@ services:
           memory: 256M
     labels:
       - traefik.enable=true
+      # Use iot_net for Traefik to find this service (sensitive IoT device)
+      - traefik.docker.network=iot_net
       - traefik.http.routers.zigbee2mqtt.rule=Host(`zigbee2mqtt.${DOMAIN}`)
       - traefik.http.routers.zigbee2mqtt.entrypoints=web
       - traefik.http.services.zigbee2mqtt.loadbalancer.server.port=8080
     networks:
-      - public_net
-      - iot_net
-    privileged: true
+      - iot_net  # Removed public_net for security
 networks:
-  public_net:
-    external: true
   iot_net:
     external: true

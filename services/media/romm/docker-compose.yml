@@ -15,6 +15,7 @@ services:
       - ROMM_AUTH_SECRET_KEY=${ROMM_AUTH_SECRET_KEY}
     labels:
       - traefik.enable=true
+      - traefik.docker.network=internal_net
       - traefik.http.routers.romm.rule=Host(`romm.${DOMAIN}`)
       - traefik.http.routers.romm.entrypoints=web
       - traefik.http.services.romm.loadbalancer.server.port=8080

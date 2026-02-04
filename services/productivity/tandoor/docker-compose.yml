@@ -48,6 +48,7 @@ services:
     - tandoor-postgres
     labels:
     - traefik.enable=true
+    - traefik.docker.network=internal_net
     - traefik.http.routers.tandoor.rule=Host(`tandoor.${DOMAIN}`)
     - traefik.http.routers.tandoor.entrypoints=web
     - traefik.http.services.tandoor.loadbalancer.server.port=8080

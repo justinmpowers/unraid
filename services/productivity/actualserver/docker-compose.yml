@@ -26,6 +26,7 @@ services:
       - internal_net
     labels:
       - traefik.enable=true
+      - traefik.docker.network=internal_net
       - traefik.http.routers.actualserver.rule=Host(`actual.${DOMAIN}`)
       - traefik.http.routers.actualserver.entrypoints=web
       - traefik.http.services.actualserver.loadbalancer.server.port=5006

@@ -38,6 +38,7 @@ services:
           memory: 128M
     labels:
       - traefik.enable=true
+      - traefik.docker.network=internal_net
       - traefik.http.routers.portainer.rule=Host(`portainer.${DOMAIN}`)
       - traefik.http.routers.portainer.entrypoints=web
       - traefik.http.services.portainer.loadbalancer.server.port=9000
