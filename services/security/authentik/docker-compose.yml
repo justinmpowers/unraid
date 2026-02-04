@@ -108,6 +108,8 @@ services:
       - ${APPDATA_PATH}/authentik/templates:/templates
     labels:
       - traefik.enable=true
+      # Tell Traefik to use internal_net for this service (not public_net)
+      - traefik.docker.network=internal_net
       # HTTP to HTTPS redirect
       - traefik.http.routers.authentik-http.rule=Host(`auth.${DOMAIN}`)
       - traefik.http.routers.authentik-http.entrypoints=web
