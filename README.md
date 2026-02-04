@@ -7,7 +7,7 @@ Comprehensive Docker Compose management for my Unraid server with 35+ containeri
 - **Complete Service Coverage**: 35+ services across 11 categories
 - **Pinned Versions**: All services use specific versions, not `:latest`
 - **Organized Structure**: Services grouped logically by function
-- **Automated Updates**: Renovate opens weekly PRs for container updates (legacy Python script still available)
+- **Automated Updates**: Renovate opens weekly PRs for container updates
 - **Resource Management**: CPU and memory limits on all containers
 - **Docker Socket Security**: Using proxy instead of direct socket access
 - **Git-Tracked**: All changes are reversible and auditable
@@ -94,19 +94,38 @@ services/
   - 2 CPU / 2GB memory limit
 
 ### Automated Updates (Renovate)
+
+**Two Options Available:**
+
+#### Option A: GitHub Actions (Recommended for Simplicity)
 - **Config**: `.github/renovate.json`
 - **Workflow**: `.github/workflows/renovate.yml`
-- **What it does**: Scans all `services/**/docker-compose.yml` images weekly (Sun 09:00 UTC), groups them into a single PR with labels `automated` and `container-updates`, and respects pinned versions.
-- **Notes**: Use a repo-scoped `RENOVATE_TOKEN` (or `GH_TOKEN`) secret for the workflow. Major updates are labeled `breaking-change?` and not auto-merged.
+- **How it works**: Runs on schedule every Sunday at 09:00 UTC
+- **What it does**: Scans all `services/**/docker-compose.yml` images, groups updates into a single PR with labels `automated` and `container-updates`, and respects pinned versions
+- **Major Updates**: Labeled `breaking-change?` for manual review before merge
+- **Auto-Deploy**: PRs auto-merge to main, triggering the deploy workflow
+- **Cost**: ~$0.36/month (minimal GitHub Actions minutes)
+- **Setup**: Add `GH_TOKEN`, `DOCKER_HUB_USERNAME`, and `DOCKER_HUB_PASSWORD` secrets to GitHub
 
-### Legacy Update Script (manual)
-- **Script**: `scripts/check-updates.py`
-- **Features**:
-  - Monitors 35+ services for new releases
-  - GitHub API integration for version tracking
-  - Registry-aware (Docker Hub, GHCR, custom registries)
-  - Rate limit management
-  - Jenkins and all services monitored
+#### Option B: Self-Hosted on Unraid (Recommended for Control)
+- **Location**: `services/automation/renovate/`
+- **Container**: Renovate runs as a native Unraid Docker service
+- **How it works**: Same as GitHub Actions but runs on your hardware
+- **Benefits**: Full control, zero GitHub Actions cost, native Unraid integration
+- **Cost**: ~$0 (uses existing Unraid hardware)
+- **Setup**: See [Renovate README](services/automation/renovate/README.md) for detailed instructions
+- **Requirements**: Git repository mounted, GitHub token, Docker Hub credentials
+
+**Comparison:**
+| Aspect | GitHub Actions | Self-Hosted |
+|--------|---|---|
+| Cost | $0.36/month | $0 |
+| Ease | ⭐⭐⭐ Easy | ⭐⭐ Moderate |
+| Control | Medium | High |
+| Resources | GitHub's servers | Your Unraid |
+| Setup Time | 5 minutes | 15 minutes |
+
+**Recommendation:** Start with GitHub Actions, migrate to self-hosted if you want full control.
 
 ## 🔒 Security Features
 
@@ -145,15 +164,12 @@ for dir in services/*/*/; do
 done
 ```
 
-### Check for Updates
-```bash
-python3 scripts/check-updates.py
-```
-
 ### Deploy a Service Update
 ```bash
 ./scripts/deploy-service.sh services/utilities/dashy
 ```
+
+**Note**: Container updates are handled automatically by Renovate, which creates PRs on a weekly schedule.
 
 ## 📊 Monitoring
 

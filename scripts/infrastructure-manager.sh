@@ -82,7 +82,6 @@ show_usage() {
     echo "  network-status          Show Docker network status"
     echo
     echo -e "${GREEN}Maintenance Commands:${NC}"
-    echo "  check-updates           Check for container updates"
     echo "  backup                  Backup service configurations"
     echo "  cleanup                 Clean up unused Docker resources"
     echo "  validate                Validate all compose files"
@@ -617,9 +616,11 @@ case "$COMMAND" in
         validate_all_compose
         ;;
     "check-updates")
-        log_info "Running update checker..."
-        cd "$WORKING_DIR"
-        python "$SCRIPT_DIR/check-updates.py"
+        log_error "❌ DEPRECATED: check-updates command is no longer supported"
+        log_info "💡 Container updates are now handled by Renovate (see README)"
+        log_info "📅 Renovate runs weekly on Sunday at 09:00 UTC"
+        log_info "🔗 Check https://github.com/${{ github.repository }}/pulls for pending updates"
+        exit 1
         ;;
     "")
         log_error "Command required"

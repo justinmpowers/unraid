@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+  renovate:
+    image: renovate/renovate:39.1.3  # Pinned version - update manually
+    container_name: renovate
+    restart: unless-stopped
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    
+    # Environment variables
+    environment:
+      # Renovate core settings
+      RENOVATE_EXTENDS: "config:recommended"
+      RENOVATE_ONBOARDING: "false"  # Skip onboarding since we have config
+      # RENOVATE_AUTODISCOVER disabled - managing single mounted repository only
+      # To enable autodiscovery of multiple repos, uncomment below and remove volume mount:
+      # RENOVATE_AUTODISCOVER: "true"
+      # RENOVATE_AUTODISCOVER_FILTER: "justinmpowers/*"
+      
+      # Repository settings
+      RENOVATE_FORCE_CLASSIC_PR: "false"
+      RENOVATE_LABELS: "automated,container-updates,infrastructure"
+      RENOVATE_BRANCH_PREFIX: "renovate/"
+      RENOVATE_TIMEZONE: "UTC"
+      
+      # Schedule settings
+      RENOVATE_SCHEDULE: "after 09:00 on Sunday"
+      
+      # Docker/Container settings
+      RENOVATE_DOCKER_ENABLED: "true"
+      
+      # Authentication - REQUIRED
+      GITHUB_TOKEN: "${GITHUB_TOKEN}"
+      DOCKER_HUB_USERNAME: "${DOCKER_HUB_USERNAME}"
+      DOCKER_HUB_PASSWORD: "${DOCKER_HUB_PASSWORD}"
+      
+      # Logging
+      LOG_LEVEL: "info"
+      RENOVATE_LOG_LEVEL: "info"
+      
+      # Advanced (optional)
+      # RENOVATE_DEPENDENCY_DASHBOARD: "false"
+      # RENOVATE_SEMANTIC_COMMITS: "true"
+      # RENOVATE_COMMIT_BODY: "Renovate: Self-hosted on Unraid"
+    
+    # Volumes
+    volumes:
+      # Mount YOUR repository ONLY (single repo mode)
+      # This is the justinmpowers/unraid repository
+      # Renovate will process all docker-compose.yml files in this directory
+      - ${APPDATA_PATH}/renovate/unraid:/repo
+      
+      # Renovate cache (improves performance on subsequent runs)
+      - ${APPDATA_PATH}/renovate/cache:/tmp/renovate
+      
+      # NOTE: To enable autodiscovery of multiple repositories:
+      # 1. Remove the /repo volume mount above
+      # 2. Uncomment RENOVATE_AUTODISCOVER in environment section
+      # 3. Renovate will clone repos dynamically instead
+    
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    
+    # Healthcheck
+    healthcheck:
+      test: ["CMD", "renovate", "--version"]
+      interval: 300s  # Every 5 minutes
+      timeout: 30s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  renovate_cache:
+    driver: local
+
+networks:
+  default:
+    name: internal_net
+    external: true

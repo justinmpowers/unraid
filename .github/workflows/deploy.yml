@@ -33,7 +33,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2  # Need previous commit for comparison
+          fetch-depth: 0  # Full history for reliable git diffs
         
       - name: Setup Environment
         run: |
@@ -41,6 +41,13 @@ jobs:
           echo "Working directory: $(pwd)"
           echo "Runner: ${{ runner.name }}"
           echo "Event: ${{ github.event_name }}"
+          
+          # Ensure git is in a clean state and synchronized with remote
+          echo "🔄 Synchronizing git with origin..."
+          cd "$GITHUB_WORKSPACE"
+          git fetch origin main
+          git reset --hard origin/main
+          echo "✅ Git synchronized with origin/main"
           
           # Navigate to the docker-compose directory (mounted in runner)
           COMPOSE_PATH="/workspace"
@@ -105,12 +112,11 @@ jobs:
             echo "🚀 Manual deployment triggered"
             DEPLOYMENT_TYPE="manual"
             
-            # For manual deployments, check git changes in the last commit
-            # This is much safer than file modification time
+            # For manual deployments, check git changes compared to origin/main
             cd "$GITHUB_WORKSPACE"
             
-            # Get recently changed files from git (last 3 commits to be safe)
-            git diff --name-only HEAD~3 HEAD | grep "docker-compose.yml" > /tmp/manual_changes.txt || touch /tmp/manual_changes.txt
+            # Get changed files compared to origin/main (more reliable than commit counts)
+            git diff --name-only origin/main HEAD | grep "docker-compose.yml" > /tmp/manual_changes.txt || touch /tmp/manual_changes.txt
             
             # If no recent git changes, don't deploy anything
             if [ ! -s /tmp/manual_changes.txt ]; then
@@ -131,14 +137,24 @@ jobs:
             # Check for changes in the repository (GitHub workspace)
             cd "$GITHUB_WORKSPACE"
             
-            # Get changed files between current and previous commit
-            git diff --name-only HEAD~1 HEAD > changed_files.txt || git diff --name-only HEAD > changed_files.txt
+            # Get changed files compared to origin/main (stable reference point)
+            git diff --name-only origin/main HEAD > changed_files.txt || git diff --name-only HEAD > changed_files.txt
             
             echo "Changed files:"
             cat changed_files.txt
             
             # Find services with changed compose files
             grep "docker-compose.yml" changed_files.txt > /tmp/changed_services.txt || touch /tmp/changed_services.txt
+            
+            # Sync docker-compose files from repo to /workspace before deployment
+            echo "📁 Syncing updated files from repository to /workspace..."
+            for file in $(cat /tmp/changed_services.txt); do
+              if [ -f "$GITHUB_WORKSPACE/$file" ]; then
+                mkdir -p "$COMPOSE_PATH/$(dirname $file)"
+                cp "$GITHUB_WORKSPACE/$file" "$COMPOSE_PATH/$file"
+                echo "✅ Synced: $file"
+              fi
+            done
             
             # Copy back to compose directory
             cd "$COMPOSE_PATH"

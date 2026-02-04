@@ -1,4 +1,16 @@
 #!/usr/bin/env python3
+"""
+⚠️ DEPRECATED: This script is no longer actively maintained.
+   Container updates are now handled by Renovate (see README.md).
+   
+   Renovate provides:
+   - Weekly automated update checks
+   - Grouped PR creation with proper labeling
+   - Native GitHub Actions integration
+   - Major version handling with manual review gates
+   
+   This script is kept for reference/historical purposes only.
+"""
 import os
 import yaml
 import requests

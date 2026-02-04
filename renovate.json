@@ -11,6 +11,19 @@
   "rangeStrategy": "pin",
   "respectLatest": true,
   "enabledManagers": ["docker-compose"],
+  "hostRules": [
+    {
+      "matchHost": "docker.io",
+      "username": "${DOCKER_HUB_USERNAME}",
+      "password": "${DOCKER_HUB_PASSWORD}",
+      "description": "Docker Hub credentials to avoid rate limits"
+    },
+    {
+      "matchHost": "ghcr.io",
+      "token": "${GITHUB_TOKEN}",
+      "description": "GitHub Container Registry authentication"
+    }
+  ],
   "packageRules": [
     {
       "matchManagers": ["docker-compose"],
