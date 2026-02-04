@@ -65,8 +65,6 @@ services:
       - PGDATA=/var/lib/postgresql/18/main
     volumes:
       - nextcloud_pgdata:/var/lib/postgresql
-    ports:
-      - 5432:5432
     deploy:
       resources:
         limits:

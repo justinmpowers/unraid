@@ -115,6 +115,8 @@ services/
 - **Resource Limits**: CPU and memory limits prevent resource exhaustion
 - **Environment Secrets**: Sensitive data in `.env` file
 - **Privilege Isolation**: Services run with minimal required privileges
+- **Database Isolation**: All databases only exposed to internal `db_net` - no host port exposure
+- **Network Segmentation**: Services isolated by function (internal_net, db_net, iot_net, monitoring_net, public_net)
 
 ## 🛠️ Usage
 

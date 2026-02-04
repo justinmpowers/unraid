@@ -67,8 +67,6 @@ services:
       - POSTGRES_PASSWORD=${IMMICH_DB_PASSWORD}
     volumes:
       - ${CACHE_PATH}/PostgreSQL_Immich:/var/lib/postgresql/data
-    ports:
-      - 5433:5432
     deploy:
       resources:
         limits:

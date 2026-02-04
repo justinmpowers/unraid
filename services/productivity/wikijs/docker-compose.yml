@@ -70,8 +70,6 @@ services:
           memory: 256M
     labels:
       - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png
-    ports:
-      - 5435:5432
     networks:
       - db_net
 networks:
