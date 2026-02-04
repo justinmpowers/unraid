@@ -108,10 +108,16 @@ services:
       - ${APPDATA_PATH}/authentik/templates:/templates
     labels:
       - traefik.enable=true
+      # HTTP to HTTPS redirect
+      - traefik.http.routers.authentik-http.rule=Host(`auth.${DOMAIN}`)
+      - traefik.http.routers.authentik-http.entrypoints=web
+      - traefik.http.routers.authentik-http.middlewares=redirect-to-https@file
+      # HTTPS router
       - traefik.http.routers.authentik.rule=Host(`auth.${DOMAIN}`)
       - traefik.http.routers.authentik.entrypoints=websecure
       - traefik.http.routers.authentik.tls.certresolver=letsencrypt
       - traefik.http.routers.authentik.middlewares=default-headers@file
+      # Service configuration
       - traefik.http.services.authentik.loadbalancer.server.port=9000
       - kuma.authentik.type=http
       - kuma.authentik.url=http://authentik:9000/-/health/live/
