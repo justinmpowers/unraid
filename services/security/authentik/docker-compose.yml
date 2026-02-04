@@ -110,14 +110,9 @@ services:
       - traefik.enable=true
       # Tell Traefik to use internal_net for this service (not public_net)
       - traefik.docker.network=internal_net
-      # HTTP to HTTPS redirect
-      - traefik.http.routers.authentik-http.rule=Host(`auth.${DOMAIN}`)
-      - traefik.http.routers.authentik-http.entrypoints=web
-      - traefik.http.routers.authentik-http.middlewares=redirect-to-https@file
-      # HTTPS router
+      # Router (serve via web entrypoint to avoid redirect loops behind tunnels)
       - traefik.http.routers.authentik.rule=Host(`auth.${DOMAIN}`)
-      - traefik.http.routers.authentik.entrypoints=websecure
-      - traefik.http.routers.authentik.tls.certresolver=letsencrypt
+      - traefik.http.routers.authentik.entrypoints=web
       - traefik.http.routers.authentik.middlewares=default-headers@file
       # Service configuration
       - traefik.http.services.authentik.loadbalancer.server.port=9000
