@@ -26,7 +26,10 @@ services:
       - traefik.http.services.zigbee2mqtt.loadbalancer.server.port=8080
     networks:
       - public_net
+      - iot_net
     privileged: true
 networks:
   public_net:
+    external: true
+  iot_net:
     external: true
