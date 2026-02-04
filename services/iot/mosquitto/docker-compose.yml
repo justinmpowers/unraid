@@ -1,39 +1,38 @@
-
 services:
   mosquitto:
     image: eclipse-mosquitto:2.0.22
     container_name: mosquitto
     restart: unless-stopped
     environment:
-    - TZ=${TZ}
-    - HOST_OS=Unraid
-    - HOST_HOSTNAME=JP-Dell
-    - HOST_CONTAINERNAME=mosquitto
+      - TZ=${TZ}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=mosquitto
     volumes:
-    - ${APPDATA_PATH}/mosquitto/config:/mosquitto/config
-    - ${APPDATA_PATH}/mosquitto/data:/mosquitto/data
-    - ${APPDATA_PATH}/mosquitto/log:/mosquitto/log
+      - ${APPDATA_PATH}/mosquitto/config:/mosquitto/config
+      - ${APPDATA_PATH}/mosquitto/data:/mosquitto/data
+      - ${APPDATA_PATH}/mosquitto/log:/mosquitto/log
+    ports:
+      - 1883:1883
+      - 9001:9001
     deploy:
       resources:
         limits:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 256M
         reservations:
-          cpus: '0.1'
+          cpus: "0.1"
           memory: 128M
     labels:
-    - traefik.enable=true
-    - traefik.http.routers.mosquitto.rule=Host(`mosquitto.${DOMAIN}`)
-    - traefik.http.routers.mosquitto.entrypoints=web
-    - traefik.http.services.mosquitto.loadbalancer.server.port=9001
-    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/mosquitto-icon.png
-    - net.unraid.docker.webui=http://[IP]:[PORT:9001]
+      - traefik.enable=true
+      - traefik.http.routers.mosquitto.rule=Host(`mosquitto.${DOMAIN}`)
+      - traefik.http.routers.mosquitto.entrypoints=web
+      - traefik.http.services.mosquitto.loadbalancer.server.port=9001
+      - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/mosquitto-icon.png
+      - net.unraid.docker.webui=http://[IP]:[PORT:9001]
     networks:
-    - iot_net
-    - public_net
+      - iot_net
     user: ${PUID}:${PGID}
 networks:
   iot_net:
-    external: true
-  public_net:
     external: true

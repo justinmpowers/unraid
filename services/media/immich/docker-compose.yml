@@ -4,109 +4,108 @@ services:
     container_name: immich
     restart: unless-stopped
     devices:
-    - /dev/dri:/dev/dri
+      - /dev/dri:/dev/dri
     group_add:
-    - '44'
+      - "44"
     environment:
-    - TZ=${TZ}
-    - HOST_OS=Unraid
-    - HOST_HOSTNAME=JP-Dell
-    - HOST_CONTAINERNAME=immich
-    - PUID=${PUID}
-    - PGID=${PGID}
-    - UMASK=${UMASK}
-    - DB_HOSTNAME=immich-postgres
-    - DB_USERNAME=${IMMICH_DB_USER}
-    - DB_PASSWORD=${IMMICH_DB_PASSWORD}
-    - DB_DATABASE_NAME=${IMMICH_DB_NAME}
-    - REDIS_HOSTNAME=immich-redis
+      - TZ=${TZ}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=immich
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - UMASK=${UMASK}
+      - DB_HOSTNAME=immich-postgres
+      - DB_USERNAME=${IMMICH_DB_USER}
+      - DB_PASSWORD=${IMMICH_DB_PASSWORD}
+      - DB_DATABASE_NAME=${IMMICH_DB_NAME}
+      - REDIS_HOSTNAME=immich-redis
+    ports:
+      - 8083:8080
     volumes:
-    - ${APPDATA_PATH}/immich/photos:/photos
-    - ${APPDATA_PATH}/immich/libraries:/libraries
-    - ${APPDATA_PATH}/immich/config:/config
+      - ${APPDATA_PATH}/immich/photos:/photos
+      - ${APPDATA_PATH}/immich/libraries:/libraries
+      - ${APPDATA_PATH}/immich/config:/config
     labels:
-    - traefik.enable=true
-    - traefik.http.routers.immich.rule=Host(`immich.${DOMAIN}`)
-    - traefik.http.routers.immich.entrypoints=web
-    - traefik.http.services.immich.loadbalancer.server.port=8080
-    - kuma.immich.type=http
-    - kuma.immich.url=http://immich:8080
-    - kuma.immich.name=Immich Photos
-    - kuma.immich.interval=60
-    - kuma.immich.keyword=Immich
-    - kuma.immich.tags=media,photos
-    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/immich-icon.png
-    - net.unraid.docker.webui=http://[IP]:[PORT:8083]
+      - traefik.enable=true
+      - traefik.http.routers.immich.rule=Host(`immich.${DOMAIN}`)
+      - traefik.http.routers.immich.entrypoints=web
+      - traefik.http.services.immich.loadbalancer.server.port=8080
+      - kuma.immich.type=http
+      - kuma.immich.url=http://immich:8080
+      - kuma.immich.name=Immich Photos
+      - kuma.immich.interval=60
+      - kuma.immich.keyword=Immich
+      - kuma.immich.tags=media,photos
+      - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/immich-icon.png
+      - net.unraid.docker.webui=http://[IP]:[PORT:8083]
     deploy:
       resources:
         limits:
-          cpus: '2.0'
+          cpus: "2.0"
           memory: 2G
         reservations:
-          cpus: '0.3'
+          cpus: "0.3"
           memory: 600M
     networks:
-    - internal_net
-    - public_net
-    - db_net
+      - internal_net
+      - db_net
     depends_on:
-    - immich-postgres
-    - immich-redis
+      - immich-postgres
+      - immich-redis
   immich-postgres:
     image: ghcr.io/immich-app/postgres:16-vectorchord0.4.2-pgvectors0.3.0
     container_name: Immich_PostgreSQL
     restart: unless-stopped
     environment:
-    - TZ=${TZ}
-    - HOST_OS=Unraid
-    - HOST_HOSTNAME=JP-Dell
-    - HOST_CONTAINERNAME=Immich_PostgreSQL
-    - POSTGRES_DB=${IMMICH_DB_NAME}
-    - POSTGRES_USER=${IMMICH_DB_USER}
-    - POSTGRES_PASSWORD=${IMMICH_DB_PASSWORD}
+      - TZ=${TZ}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=Immich_PostgreSQL
+      - POSTGRES_DB=${IMMICH_DB_NAME}
+      - POSTGRES_USER=${IMMICH_DB_USER}
+      - POSTGRES_PASSWORD=${IMMICH_DB_PASSWORD}
     volumes:
-    - ${CACHE_PATH}/PostgreSQL_Immich:/var/lib/postgresql/data
+      - ${CACHE_PATH}/PostgreSQL_Immich:/var/lib/postgresql/data
     ports:
-    - 5433:5432
+      - 5433:5432
     deploy:
       resources:
         limits:
-          cpus: '1'
+          cpus: "1"
           memory: 2G
         reservations:
-          cpus: '0.25'
+          cpus: "0.25"
           memory: 512M
     labels:
-    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png
+      - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png
     networks:
-    - db_net
+      - db_net
   immich-redis:
     image: redis:8.4.0-alpine
     container_name: immich-redis
     restart: unless-stopped
     environment:
-    - TZ=${TZ}
-    - HOST_OS=Unraid
-    - HOST_HOSTNAME=JP-Dell
-    - HOST_CONTAINERNAME=immich-redis
+      - TZ=${TZ}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=immich-redis
     deploy:
       resources:
         limits:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 512M
         reservations:
-          cpus: '0.1'
+          cpus: "0.1"
           memory: 256M
     labels:
-    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/redis-icon.png
+      - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/redis-icon.png
     volumes:
-    - ${CACHE_PATH}/immich/redis:/data
+      - ${CACHE_PATH}/immich/redis:/data
     networks:
-    - db_net
+      - db_net
 networks:
   internal_net:
     external: true
   db_net:
-    external: true
-  public_net:
     external: true

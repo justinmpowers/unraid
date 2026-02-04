@@ -37,10 +37,11 @@ services:
         reservations:
           cpus: "0.2"
           memory: 256M
+    ports:
+      - 3000:3000
     networks:
       - internal_net
       - db_net
-      - public_net
     depends_on:
       - wikijs-postgres
   wikijs-postgres:
@@ -77,6 +78,4 @@ networks:
   internal_net:
     external: true
   db_net:
-    external: true
-  public_net:
     external: true

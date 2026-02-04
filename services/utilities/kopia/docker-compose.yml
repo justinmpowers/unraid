@@ -23,6 +23,8 @@ services:
       - /usr/sbin/zpool:/usr/sbin/zpool:ro
       - /sbin/mount:/sbin/mount:ro
       - /sbin/umount:/sbin/umount:ro
+    ports:
+      - 51515:51515
     devices:
       - /dev/zfs:/dev/zfs
     cap_add:
@@ -58,7 +60,6 @@ services:
       - net.unraid.docker.webui=http://[IP]:[PORT:51515]
     networks:
       - internal_net
-      - public_net
   kopia-local:
     image: kopia/kopia:20251215.0.232403
     container_name: kopia-truenas
@@ -83,7 +84,7 @@ services:
       - /sbin/umount:/sbin/umount:ro
     devices:
       - /dev/zfs:/dev/zfs
-    cap_add:
+    ports:
       - 51516:51515
     command:
       - server
@@ -114,9 +115,9 @@ services:
       - kuma.kopia-truenas.tags=utilities,backup,truenas
       - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/kopia-icon.png
       - net.unraid.docker.webui=http://[IP]:[PORT:51516]
-      - public_net
+    networks:
+      - internal_net
+
 networks:
   internal_net:
-    external: true
-  public_net:
     external: true

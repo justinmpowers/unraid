@@ -78,6 +78,8 @@ services:
     volumes:
       - ${APPDATA_PATH}/j3d/backend:/app/instance
       - ${APPDATA_PATH}/j3d/uploads:/app/instance/uploads
+    ports:
+      - "5000:5000"
     deploy:
       resources:
         limits:

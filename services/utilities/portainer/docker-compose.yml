@@ -21,10 +21,13 @@ services:
 
       # Optional: Import your compose files for viewing
       - /mnt/user/appdata/docker-compose:/compose:ro
+    ports:
+      - "9444:9443" # HTTPS UI (recommended)
+      - "9002:9000" # HTTP UI
+      - "8002:8000" # Edge agent (optional)
     networks:
       - monitoring_net
       - internal_net
-      - public_net
     deploy:
       resources:
         limits:
@@ -65,6 +68,4 @@ networks:
   monitoring_net:
     external: true
   internal_net:
-    external: true
-  public_net:
     external: true

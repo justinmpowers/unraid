@@ -24,7 +24,8 @@ services:
       # 📊 PERFORMANCE SETTINGS
       - VUE_APP_DOMAIN=/ # Base path optimization
       - BASE_URL=/ # Static asset path
-
+    ports:
+      - "4000:8080"
     labels:
       - traefik.enable=true
       - traefik.http.routers.dashy.rule=Host(`dashy.${DOMAIN}`)
@@ -44,7 +45,6 @@ services:
       - ${APPDATA_PATH}/dashy/icons:/app/user-data/item-icons
     networks:
       - internal_net
-      - public_net
 
     # 🎯 RESOURCE LIMITS (should drop dramatically)
     deploy:
@@ -58,5 +58,4 @@ services:
 
 networks:
   internal_net:
-  public_net:
     external: true
