@@ -82,8 +82,6 @@ services:
           memory: 256M
     volumes:
     - tandoor_pgdata:/var/lib/postgresql
-    ports:
-    - 5437:5432
     networks:
     - db_net
     labels:

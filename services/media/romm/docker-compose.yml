@@ -57,8 +57,6 @@ services:
       - MYSQL_DATABASE=${ROMM_DB_NAME}
       - MYSQL_USER=${ROMM_DB_USER}
       - MYSQL_PASSWORD=${ROMM_DB_PASSWORD}
-    ports:
-      - 3307:3306
     labels:
       - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/mariadb-icon.png
     volumes:

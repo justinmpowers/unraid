@@ -14,8 +14,6 @@ services:
       - PGDATA=/var/lib/postgresql/18/main
     volumes:
       - authentik_pgdata:/var/lib/postgresql
-    ports:
-      - 5434:5432
     networks:
       - db_net
     healthcheck:
@@ -51,8 +49,6 @@ services:
       "
     volumes:
       - ${CACHE_PATH}/authentik/redis:/data
-    ports:
-      - 6380:6379
     networks:
       - db_net
     healthcheck:
