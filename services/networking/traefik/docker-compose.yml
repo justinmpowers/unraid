@@ -32,6 +32,7 @@ services:
       - docker_proxy_net
       - iot_net
       - monitoring_net
+      - internal_net
     logging:
       driver: "json-file"
       options:
@@ -46,4 +47,6 @@ networks:
   iot_net:
     external: true
   monitoring_net:
+    external: true
+  internal_net:
     external: true
