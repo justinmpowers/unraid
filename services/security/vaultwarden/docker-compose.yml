@@ -9,7 +9,7 @@ services:
       - HOST_HOSTNAME=JP-Dell
       - HOST_CONTAINERNAME=vaultwarden
       - WEBSOCKET_ENABLED=true
-      - DOMAIN=https://vault.azuleluna.xyz
+      - DOMAIN=https://vaultwardens.azuleluna.xyz
       - ADMIN_TOKEN=${VAULTWARDEN_ADMIN_TOKEN}
       - SMTP_HOST=${AUTHENTIK_EMAIL_HOST}
       - SMTP_FROM=${AUTHENTIK_EMAIL_FROM}
