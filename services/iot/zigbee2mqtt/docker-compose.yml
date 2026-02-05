@@ -28,6 +28,12 @@ services:
       - traefik.http.routers.zigbee2mqtt.rule=Host(`zigbee2mqtt.${DOMAIN}`)
       - traefik.http.routers.zigbee2mqtt.entrypoints=web
       - traefik.http.services.zigbee2mqtt.loadbalancer.server.port=8080
+      - kuma.zigbee2mqtt.type=http
+      - kuma.zigbee2mqtt.url=http://zigbee2mqtt:8080
+      - kuma.zigbee2mqtt.name=Zigbee2MQTT
+      - kuma.zigbee2mqtt.interval=60
+      - kuma.zigbee2mqtt.keyword=Zigbee2MQTT
+      - kuma.zigbee2mqtt.tags=iot,smart-home
     networks:
       - iot_net  # Removed public_net for security
 networks:

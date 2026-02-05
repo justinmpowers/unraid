@@ -48,14 +48,14 @@ services:
           cpus: '0.5'
           memory: 1G
     labels:
-      - "kuma.github_runner.type=docker"
-      - "kuma.github_runner.docker_container=Docker-Compose-Runner"
-      - "kuma.github_runner.docker_host=tcp://docker-socket-proxy:2375"  # Now using socket proxy
-      - "kuma.github_runner.name=GitHub Actions Runner"
-      - "kuma.github_runner.interval=60"
-      - "kuma.github_runner.tags=automation,ci-cd"
+      - kuma.github_runner.type=docker
+      - kuma.github_runner.docker_container=Docker-Compose-Runner
+      - kuma.github_runner.docker_host=tcp://docker-socket-proxy:2375
+      - kuma.github_runner.name=GitHub Actions Runner
+      - kuma.github_runner.interval=60
+      - kuma.github_runner.tags=automation,ci-cd
       # Keep existing Unraid labels
-      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/github-runner-icon.png"
+      - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/github-runner-icon.png
 
 networks:
   monitoring_net:

@@ -67,6 +67,15 @@ services:
       # 2. Uncomment RENOVATE_AUTODISCOVER in environment section
       # 3. Renovate will clone repos dynamically instead
     
+    # Labels
+    labels:
+      - kuma.renovate.type=docker
+      - kuma.renovate.docker_container=renovate
+      - kuma.renovate.docker_host=unix:///var/run/docker.sock
+      - kuma.renovate.name=Renovate Bot
+      - kuma.renovate.interval=300
+      - kuma.renovate.tags=automation,dependency-updates
+    
     # Logging
     logging:
       driver: "json-file"

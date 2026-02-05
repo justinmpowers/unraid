@@ -26,6 +26,12 @@ services:
       - traefik.http.routers.traefik.entrypoints=web
       - traefik.http.routers.traefik.service=api@internal
       - traefik.http.routers.traefik.middlewares=traefik-auth@file
+      - kuma.traefik.type=http
+      - kuma.traefik.url=http://traefik:80/ping
+      - kuma.traefik.name=Traefik Proxy
+      - kuma.traefik.interval=60
+      - kuma.traefik.keyword=OK
+      - kuma.traefik.tags=networking,proxy
     depends_on: []
     networks:
       - public_net

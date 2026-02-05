@@ -25,6 +25,12 @@ services:
       - traefik.http.routers.jenkins.rule=Host(`jenkins.${DOMAIN}`)
       - traefik.http.routers.jenkins.entrypoints=web
       - traefik.http.services.jenkins.loadbalancer.server.port=8080
+      - kuma.jenkins.type=http
+      - kuma.jenkins.url=http://jenkins:8080
+      - kuma.jenkins.name=Jenkins
+      - kuma.jenkins.interval=60
+      - kuma.jenkins.keyword=Jenkins
+      - kuma.jenkins.tags=automation,ci-cd
     networks:
       - docker_proxy_net
       - internal_net  # Changed from public_net to internal_net for security

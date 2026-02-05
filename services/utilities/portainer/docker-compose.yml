@@ -43,16 +43,16 @@ services:
       - traefik.http.routers.portainer.entrypoints=web
       - traefik.http.services.portainer.loadbalancer.server.port=9000
       # Uptime Kuma monitoring
-      - "kuma.portainer.type=http"
-      - "kuma.portainer.url=http://portainer:9000"
-      - "kuma.portainer.name=Portainer"
-      - "kuma.portainer.interval=60"
-      - "kuma.portainer.keyword=Portainer"
-      - "kuma.portainer.tags=utilities,docker-management"
+      - kuma.portainer.type=http
+      - kuma.portainer.url=http://portainer:9000
+      - kuma.portainer.name=Portainer
+      - kuma.portainer.interval=60
+      - kuma.portainer.keyword=Portainer
+      - kuma.portainer.tags=utilities,docker-management
 
       # Unraid labels
-      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/portainer-icon.png"
-      - "net.unraid.docker.webui=http://[IP]:[PORT:9000]"
+      - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/portainer-icon.png
+      - net.unraid.docker.webui=http://[IP]:[PORT:9000]
     healthcheck:
       test:
         [
