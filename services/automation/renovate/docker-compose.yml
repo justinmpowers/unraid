@@ -38,6 +38,7 @@ services:
       
       # Docker/Container settings
       RENOVATE_DOCKER_ENABLED: "true"
+      RENOVATE_HOST_RULES: "[{\"hostType\":\"docker\",\"matchHost\":\"registry-1.docker.io\",\"username\":\"${DOCKER_HUB_USERNAME}\",\"password\":\"${DOCKER_HUB_PASSWORD}\"}]"
       
       # Authentication - REQUIRED
       RENOVATE_TOKEN: "${GITHUB_ACCESS_TOKEN}"
