@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   renovate:
-    image: renovate/renovate:39.1.3  # Pinned version - update manually
+    image: renovate/renovate:43.4  # Pinned version - update manually
     container_name: renovate
     restart: unless-stopped
     
