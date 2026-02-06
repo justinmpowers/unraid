@@ -31,6 +31,7 @@ services:
       RENOVATE_LABELS: "automated,container-updates,infrastructure"
       RENOVATE_BRANCH_PREFIX: "renovate/"
       RENOVATE_TIMEZONE: "UTC"
+      RENOVATE_REPOSITORIES: "justinmpowers/unraid"
       
       # Schedule settings
       RENOVATE_SCHEDULE: "after 09:00 on Sunday"
