@@ -39,7 +39,7 @@ services:
       RENOVATE_DOCKER_ENABLED: "true"
       
       # Authentication - REQUIRED
-      GITHUB_TOKEN: "${GITHUB_TOKEN}"
+      GITHUB_TOKEN: "${GITHUB_ACCESS_TOKEN}"
       DOCKER_HUB_USERNAME: "${DOCKER_HUB_USERNAME}"
       DOCKER_HUB_PASSWORD: "${DOCKER_HUB_PASSWORD}"
       
