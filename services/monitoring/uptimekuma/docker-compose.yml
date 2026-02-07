@@ -38,6 +38,8 @@ services:
     - HOST_HOSTNAME=JP-Dell
     - HOST_CONTAINERNAME=AutoKuma
     - AUTOKUMA__KUMA__URL=http://UptimeKuma:3001
+    - AUTOKUMA__KUMA__USERNAME=${UPTIME_KUMA_USERNAME:-}
+    - AUTOKUMA__KUMA__PASSWORD=${UPTIME_KUMA_PASSWORD:-}
     labels:
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/autokuma-icon.png
     volumes:
