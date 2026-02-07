@@ -23,8 +23,12 @@ services:
       - traefik.docker.network=internal_net
       # HTTP router (Traefik handles TLS termination)
       - traefik.http.routers.jenkins.rule=Host(`jenkins.${DOMAIN}`)
-      - traefik.http.routers.jenkins.entrypoints=web
+      - traefik.http.routers.jenkins.entrypoints=websecure
+      - "traefik.http.routers.jenkins.tls.certresolver=letsencrypt"
       - traefik.http.services.jenkins.loadbalancer.server.port=8080
+      - "traefik.http.routers.jenkins-static.rule=Host(`jenkins-static.azuleluna.xyz`)"
+      - "traefik.http.routers.jenkins-static.entrypoints=websecure"
+      - "traefik.http.routers.jenkins-static.tls.certresolver=letsencrypt"
       - kuma.jenkins.type=http
       - kuma.jenkins.url=http://jenkins:8080
       - kuma.jenkins.name=Jenkins
