@@ -37,7 +37,7 @@ services:
     - HOST_OS=Unraid
     - HOST_HOSTNAME=JP-Dell
     - HOST_CONTAINERNAME=AutoKuma
-    - AUTOKUMA_UPTIME_KUMA_URL=http://UptimeKuma:3001
+    - AUTOKUMA__KUMA__URL=http://UptimeKuma:3001
     labels:
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/autokuma-icon.png
     volumes:
