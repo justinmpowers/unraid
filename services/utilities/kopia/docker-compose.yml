@@ -36,6 +36,7 @@ services:
       - --disable-csrf-token-checks
       - --server-username=admin
       - --server-password=${KOPIA_SERVER_PASSWORD}
+      - --insecure
     user: 0:0
     deploy:
       resources:
@@ -93,6 +94,7 @@ services:
       - --disable-csrf-token-checks
       - --server-username=admin
       - --server-password=${KOPIA_SERVER_PASSWORD}
+      - --insecure
     user: 0:0
     deploy:
       resources:
