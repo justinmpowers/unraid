@@ -4,7 +4,12 @@ services:
     container_name: traefik
     restart: always
     command:
-      - "--log.level=INFO"
+      - "--api=true"
+      - "--api.dashboard=true"
+      - "--log.level=DEBUG"
+      - "--entrypoints.websecure.address=:8443"
+      - "--entrypoints.websecure.http.tls=true"
+      - "--entrypoints.web.address=:80"
     environment:
       - TZ=${TZ}
       # Cloudflare DNS challenge (recommended if using tunnels or no port-forward)
