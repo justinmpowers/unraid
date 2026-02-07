@@ -7,7 +7,7 @@ services:
       - "--api=true"
       - "--api.dashboard=true"
       - "--log.level=DEBUG"
-      - "--entrypoints.websecure.address=:8443"
+      - "--entrypoints.websecure.address=:443"
       - "--entrypoints.websecure.http.tls=true"
       - "--entrypoints.web.address=:80"
     environment:
