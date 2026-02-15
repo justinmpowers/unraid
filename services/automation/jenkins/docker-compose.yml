@@ -1,34 +1,35 @@
 services:
   jenkins:
-    image: jenkins/jenkins:2.541.1-lts
+    image: jenkins/jenkins:2.550
     container_name: jenkins
     restart: always
     ports:
-      # Remove 8080 port binding - Traefik will handle external access
-      # - '8080:8080'
-      - '50000:50000'  # Keep agent port for Jenkins agents
+    - 50000:50000
     volumes:
-      - ${APPDATA_PATH}/jenkins_home:/var/jenkins_home
+    - ${APPDATA_PATH}/jenkins_home:/var/jenkins_home
     environment:
-      - JENKINS_OPTS=--httpPort=8080
-      # Use Docker socket proxy instead of direct /var/run/docker.sock mount
-      - DOCKER_HOST=tcp://docker-socket-proxy:2375
-      - JAVA_OPTS=-Xmx2g -Xms512m
-      # These tell Jenkins about the reverse proxy
-      - JENKINS_UC=https://updates.jenkins.io
-      - JENKINS_UC_INSECURE=false
+    - JENKINS_OPTS=--httpPort=8080
+    - DOCKER_HOST=tcp://docker-socket-proxy:2375
+    - JAVA_OPTS=-Xmx2g -Xms512m
+    - JENKINS_UC=https://updates.jenkins.io
+    - JENKINS_UC_INSECURE=false
     labels:
-      - traefik.enable=true
-      # Single HTTP router (tunnel handles TLS termination)
-      - traefik.http.routers.jenkins.rule=Host(`jenkins.${DOMAIN}`)
-      - traefik.http.routers.jenkins.entrypoints=web
-      - traefik.http.services.jenkins.loadbalancer.server.port=8080
+    - traefik.enable=true
+    - traefik.docker.network=internal_net
+    - traefik.http.routers.jenkins.rule=Host(`jenkins.${DOMAIN}`)
+    - traefik.http.routers.jenkins.entrypoints=web
+    - traefik.http.services.jenkins.loadbalancer.server.port=8080
+    - kuma.jenkins.type=http
+    - kuma.jenkins.url=http://jenkins:8080
+    - kuma.jenkins.name=Jenkins
+    - kuma.jenkins.interval=60
+    - kuma.jenkins.keyword=Jenkins
+    - kuma.jenkins.tags=automation,ci-cd
     networks:
-      - docker_proxy_net
-      - public_net
-    
+    - docker_proxy_net
+    - internal_net
 networks:
   docker_proxy_net:
     external: true
-  public_net:
+  internal_net:
     external: true

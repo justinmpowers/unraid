@@ -1,5 +1,3 @@
-
-
 services:
   github-runner:
     image: myoung34/github-runner:2.331.0
@@ -26,16 +24,19 @@ services:
       - HOST_OS=Unraid
       - HOST_HOSTNAME=JP-Dell
       - HOST_CONTAINERNAME=Docker-Compose-Runner
-    volumes:
-      # Docker socket for container management
-      - /var/run/docker.sock:/var/run/docker.sock:rw
       
-      # Docker-compose workspace (read-only for deployments)
-      - /mnt/user/appdata/docker-compose:/workspace:rw
+      # Docker Socket Proxy - Secure access to Docker daemon
+      # Uses docker-socket-proxy instead of direct socket access (better security)
+      - DOCKER_HOST=tcp://docker-socket-proxy:2375
+    volumes:
+      # Docker-compose workspace (for deployments)
+      - ${APPDATA_PATH}/renovate/unraid:/workspace:rw
       
       # NO persistent runner data - fresh container each time!
+      # NO direct docker socket - uses docker-socket-proxy for security
     networks:
-      - monitoring_net
+      - internal_net
+      - monitoring_net  # For monitoring/logging if needed
     deploy:
       resources:
         limits:
@@ -45,15 +46,17 @@ services:
           cpus: '0.5'
           memory: 1G
     labels:
-      - "kuma.github_runner.type=docker"
-      - "kuma.github_runner.docker_container=Docker-Compose-Runner"
-      - "kuma.github_runner.docker_host=unix:///var/run/docker.sock"  # Add this line
-      - "kuma.github_runner.name=GitHub Actions Runner"
-      - "kuma.github_runner.interval=60"
-      - "kuma.github_runner.tags=automation,ci-cd"
+      - kuma.github_runner.type=docker
+      - kuma.github_runner.docker_container=Docker-Compose-Runner
+      - kuma.github_runner.docker_host=tcp://docker-socket-proxy:2375
+      - kuma.github_runner.name=GitHub Actions Runner
+      - kuma.github_runner.interval=60
+      - kuma.github_runner.tags=automation,ci-cd
       # Keep existing Unraid labels
-      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/github-runner-icon.png"
+      - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/github-runner-icon.png
 
 networks:
   monitoring_net:
+    external: true
+  internal_net:
     external: true

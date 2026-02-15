@@ -1,7 +1,6 @@
-
 services:
   cloudflared:
-    image: cloudflare/cloudflared:2026.1.2
+    image: cloudflare/cloudflared:2026.2.0
     container_name: Unraid-Cloudflared-Tunnel
     restart: unless-stopped
     environment:

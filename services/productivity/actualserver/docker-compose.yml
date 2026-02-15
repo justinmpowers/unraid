@@ -1,42 +1,43 @@
 services:
   actualserver:
-    image: actualbudget/actual-server:26.1.0
+    image: actualbudget/actual-server:26.2.0
     container_name: ActualServer
     restart: unless-stopped
     environment:
-      - TZ=${TZ}
-      - HOST_OS=Unraid
-      - HOST_HOSTNAME=JP-Dell
-      - HOST_CONTAINERNAME=ActualServer
-      - ACTUAL_UPLOAD_FILE_SIZE_SYNC_MB=20
-      - ACTUAL_UPLOAD_FILE_SIZE_IMPORT_MB=20
+    - TZ=${TZ}
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=JP-Dell
+    - HOST_CONTAINERNAME=ActualServer
+    - ACTUAL_UPLOAD_FILE_SIZE_SYNC_MB=20
+    - ACTUAL_UPLOAD_FILE_SIZE_IMPORT_MB=20
     volumes:
-      - ${APPDATA_PATH}/actual-server:/data
+    - ${APPDATA_PATH}/actual-server:/data
     ports:
-      - 5006:5006
+    - 5006:5006
     deploy:
       resources:
         limits:
-          cpus: "0.5"
+          cpus: '0.5'
           memory: 512M
         reservations:
-          cpus: "0.15"
+          cpus: '0.15'
           memory: 256M
     networks:
-      - internal_net
+    - internal_net
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.actualserver.rule=Host(`actual.${DOMAIN}`)
-      - traefik.http.routers.actualserver.entrypoints=web
-      - traefik.http.services.actualserver.loadbalancer.server.port=5006
-      - kuma.actualserver.type=http
-      - kuma.actualserver.url=http://ActualServer:5006
-      - kuma.actualserver.name=Actual Budget Server
-      - kuma.actualserver.interval=60
-      - kuma.actualserver.keyword=Actual
-      - kuma.actualserver.tags=productivity,budget
-      - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/actualserver-icon.png
-      - net.unraid.docker.webui=http://[IP]:[PORT:5006]
+    - traefik.enable=true
+    - traefik.docker.network=internal_net
+    - traefik.http.routers.actualserver.rule=Host(`actual.${DOMAIN}`)
+    - traefik.http.routers.actualserver.entrypoints=web
+    - traefik.http.services.actualserver.loadbalancer.server.port=5006
+    - kuma.actualserver.type=http
+    - kuma.actualserver.url=http://ActualServer:5006
+    - kuma.actualserver.name=Actual Budget Server
+    - kuma.actualserver.interval=60
+    - kuma.actualserver.keyword=Actual
+    - kuma.actualserver.tags=productivity,budget
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/actualserver-icon.png
+    - net.unraid.docker.webui=http://[IP]:[PORT:5006]
 networks:
   internal_net:
     external: true

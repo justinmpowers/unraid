@@ -28,18 +28,19 @@ services:
       - "4000:8080"
     labels:
       - traefik.enable=true
+      - traefik.docker.network=internal_net
       - traefik.http.routers.dashy.rule=Host(`dashy.${DOMAIN}`)
       - traefik.http.routers.dashy.entrypoints=web
       - traefik.http.services.dashy.loadbalancer.server.port=8080
-      - "kuma.dashy.type=http"
-      - "kuma.dashy.url=http://dashy:8080"
-      - "kuma.dashy.name=Dashy Dashboard"
-      - "kuma.dashy.interval=60"
-      - "kuma.dashy.keyword=Dashy"
-      - "kuma.dashy.tags=utilities,dashboard"
+      - kuma.dashy.type=http
+      - kuma.dashy.url=http://dashy:8080
+      - kuma.dashy.name=Dashy Dashboard
+      - kuma.dashy.interval=60
+      - kuma.dashy.keyword=Dashy
+      - kuma.dashy.tags=utilities,dashboard
       # Keep existing Unraid labels
-      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/dashy-icon.png"
-      - "net.unraid.docker.webui=http://[IP]:[PORT:4000]"
+      - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/dashy-icon.png
+      - net.unraid.docker.webui=http://[IP]:[PORT:4000]
     volumes:
       - ${APPDATA_PATH}/dashy:/app/user-data
       - ${APPDATA_PATH}/dashy/icons:/app/user-data/item-icons

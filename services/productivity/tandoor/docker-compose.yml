@@ -1,6 +1,6 @@
 services:
   tandoor:
-    image: vabene1111/recipes:2.4.1
+    image: vabene1111/recipes:2.5.3
     container_name: tandoor
     restart: unless-stopped
     environment:
@@ -48,6 +48,7 @@ services:
     - tandoor-postgres
     labels:
     - traefik.enable=true
+    - traefik.docker.network=internal_net
     - traefik.http.routers.tandoor.rule=Host(`tandoor.${DOMAIN}`)
     - traefik.http.routers.tandoor.entrypoints=web
     - traefik.http.services.tandoor.loadbalancer.server.port=8080
@@ -60,7 +61,7 @@ services:
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/tandoor-icon.png
     - net.unraid.docker.webui=http://[IP]:[PORT:8084]
   tandoor-postgres:
-    image: postgres:18.1
+    image: postgres:18.2
     container_name: tandoor-postgres
     restart: unless-stopped
     environment:
