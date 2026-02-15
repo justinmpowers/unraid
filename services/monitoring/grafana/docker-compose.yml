@@ -1,46 +1,46 @@
 services:
   grafana:
-    image: grafana/grafana:12.3.2
+    image: grafana/grafana:12.3.3
     container_name: Grafana
     restart: unless-stopped
     environment:
-      - TZ=${TZ}
-      - HOST_OS=Unraid
-      - HOST_HOSTNAME=JP-Dell
-      - HOST_CONTAINERNAME=Grafana
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
-      - GF_INSTALL_PLUGINS=${GRAFANA_PLUGINS}
-      - GF_USERS_ALLOW_SIGN_UP=false
-      - GF_SERVER_ROOT_URL=https://grafana.azuleluna.xyz
-      - GF_SECURITY_COOKIE_SECURE=true
+    - TZ=${TZ}
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=JP-Dell
+    - HOST_CONTAINERNAME=Grafana
+    - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
+    - GF_INSTALL_PLUGINS=${GRAFANA_PLUGINS}
+    - GF_USERS_ALLOW_SIGN_UP=false
+    - GF_SERVER_ROOT_URL=https://grafana.azuleluna.xyz
+    - GF_SECURITY_COOKIE_SECURE=true
     volumes:
-      - ${OBSERVABILITY_PATH}/grafana:/var/lib/grafana
+    - ${OBSERVABILITY_PATH}/grafana:/var/lib/grafana
     ports:
-      - 3006:3000
+    - 3006:3000
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.grafana.rule=Host(`grafana.${DOMAIN}`)
-      - traefik.http.routers.grafana.entrypoints=web
-      - traefik.http.services.grafana.loadbalancer.server.port=3000
-      - kuma.grafana.type=http
-      - kuma.grafana.url=http://Grafana:3000/api/health
-      - kuma.grafana.name=Grafana
-      - kuma.grafana.interval=60
-      - kuma.grafana.accepted_statuscodes=200
-      - kuma.grafana.tags=monitoring,visualization
-      - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/grafana-icon.png
-      - net.unraid.docker.webui=http://[IP]:[PORT:3006]
+    - traefik.enable=true
+    - traefik.http.routers.grafana.rule=Host(`grafana.${DOMAIN}`)
+    - traefik.http.routers.grafana.entrypoints=web
+    - traefik.http.services.grafana.loadbalancer.server.port=3000
+    - kuma.grafana.type=http
+    - kuma.grafana.url=http://Grafana:3000/api/health
+    - kuma.grafana.name=Grafana
+    - kuma.grafana.interval=60
+    - kuma.grafana.accepted_statuscodes=200
+    - kuma.grafana.tags=monitoring,visualization
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/grafana-icon.png
+    - net.unraid.docker.webui=http://[IP]:[PORT:3006]
     networks:
-      - monitoring_net
-      - db_net
+    - monitoring_net
+    - db_net
     user: ${PUID}:${PGID}
     deploy:
       resources:
         limits:
-          cpus: "0.75"
+          cpus: '0.75'
           memory: 512M
         reservations:
-          cpus: "0.2"
+          cpus: '0.2'
           memory: 256M
 networks:
   monitoring_net:

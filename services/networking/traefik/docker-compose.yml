@@ -1,44 +1,52 @@
 services:
   traefik:
-    image: traefik:v3.1
+    image: traefik:v3.6.8
     container_name: traefik
     restart: always
     command:
-      - "--log.level=INFO"
+    - --api=true
+    - --api.dashboard=true
+    - --log.level=DEBUG
+    - --entrypoints.websecure.address=:443
+    - --entrypoints.websecure.http.tls=true
+    - --entrypoints.web.address=:80
     environment:
-      - TZ=${TZ}
-      # Cloudflare DNS challenge (recommended if using tunnels or no port-forward)
-      - CF_DNS_API_TOKEN=${CLOUDFLARE_DNS_API_TOKEN}
-      - ACME_EMAIL=${ACME_EMAIL}
-      - TRAEFIK_DASHBOARD_AUTH=${TRAEFIK_DASHBOARD_AUTH}
+    - TZ=${TZ}
+    - CF_DNS_API_TOKEN=${CLOUDFLARE_DNS_API_TOKEN}
+    - ACME_EMAIL=${ACME_EMAIL}
+    - TRAEFIK_DASHBOARD_AUTH=${TRAEFIK_DASHBOARD_AUTH}
     ports:
-      - "8090:80"
-      - "8443:443"
+    - 8090:80
+    - 8443:443
     volumes:
-      - ${APPDATA_PATH}/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
-      - ${APPDATA_PATH}/traefik/dynamic.yml:/etc/traefik/dynamic.yml:ro
-      - ${APPDATA_PATH}/traefik/acme:/etc/traefik/acme
-      - ${APPDATA_PATH}/traefik/logs:/var/log/traefik
+    - ${APPDATA_PATH}/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+    - ${APPDATA_PATH}/traefik/dynamic.yml:/etc/traefik/dynamic.yml:ro
+    - ${APPDATA_PATH}/traefik/acme:/etc/traefik/acme
+    - ${APPDATA_PATH}/traefik/logs:/var/log/traefik
     labels:
-      - traefik.enable=true
-      # Single HTTP router (tunnel handles TLS termination)
-      - traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN}`)
-      - traefik.http.routers.traefik.entrypoints=web
-      - traefik.http.routers.traefik.service=api@internal
-      - traefik.http.routers.traefik.middlewares=traefik-auth@file
+    - traefik.enable=true
+    - traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN}`)
+    - traefik.http.routers.traefik.entrypoints=web
+    - traefik.http.routers.traefik.service=api@internal
+    - traefik.http.routers.traefik.middlewares=traefik-auth@file
+    - kuma.traefik.type=http
+    - kuma.traefik.url=http://traefik:80/ping
+    - kuma.traefik.name=Traefik Proxy
+    - kuma.traefik.interval=60
+    - kuma.traefik.keyword=OK
+    - kuma.traefik.tags=networking,proxy
     depends_on: []
     networks:
-      - public_net
-      - docker_proxy_net
-      - iot_net
-      - monitoring_net
-      - internal_net
+    - public_net
+    - docker_proxy_net
+    - iot_net
+    - monitoring_net
+    - internal_net
     logging:
-      driver: "json-file"
+      driver: json-file
       options:
-        max-size: "10m"
-        max-file: "3"
-
+        max-size: 10m
+        max-file: '3'
 networks:
   public_net:
     external: true
