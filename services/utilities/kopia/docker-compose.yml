@@ -1,6 +1,6 @@
 services:
   kopia-backblaze:
-    image: kopia/kopia:20251215.0.232403
+    image: kopia/kopia:20260211.0.64946
     container_name: kopia-backblaze
     restart: unless-stopped
     environment:
@@ -9,59 +9,60 @@ services:
       KOPIA_SERVER_USERNAME: ${KOPIA_B2_USERNAME}
       KOPIA_SERVER_PASSWORD: ${KOPIA_B2_PASSWORD}
       KOPIA_CONFIG_PATH: /app/config/repository.config
-      KOPIA_PERSIST_CREDENTIALS_ON_CONNECT: "true"
+      KOPIA_PERSIST_CREDENTIALS_ON_CONNECT: 'true'
     volumes:
-      - ${APPDATA_PATH}/kopia/backblaze/config:/app/config
-      - ${APPDATA_PATH}/kopia/backblaze/cache:/app/cache
-      - ${APPDATA_PATH}/kopia/backblaze/logs:/app/logs
-      - ${APPDATA_PATH}/kopia/backblaze/repository:/repository
-      - ${APPDATA_PATH}/kopia/scripts:/app/scripts:ro
-      - /mnt:/mnt:ro
-      - /mnt/user:/data/user:ro
-      - /mnt/user/backups:/data/backups
-      - /usr/sbin/zfs:/usr/sbin/zfs:ro
-      - /usr/sbin/zpool:/usr/sbin/zpool:ro
-      - /sbin/mount:/sbin/mount:ro
-      - /sbin/umount:/sbin/umount:ro
+    - ${APPDATA_PATH}/kopia/backblaze/config:/app/config
+    - ${APPDATA_PATH}/kopia/backblaze/cache:/app/cache
+    - ${APPDATA_PATH}/kopia/backblaze/logs:/app/logs
+    - ${APPDATA_PATH}/kopia/backblaze/repository:/repository
+    - ${APPDATA_PATH}/kopia/scripts:/app/scripts:ro
+    - /mnt:/mnt:ro
+    - /mnt/user:/data/user:ro
+    - /mnt/user/backups:/data/backups
+    - /usr/sbin/zfs:/usr/sbin/zfs:ro
+    - /usr/sbin/zpool:/usr/sbin/zpool:ro
+    - /sbin/mount:/sbin/mount:ro
+    - /sbin/umount:/sbin/umount:ro
     ports:
-      - 51515:51515
+    - 51515:51515
     devices:
-      - /dev/zfs:/dev/zfs
+    - /dev/zfs:/dev/zfs
     cap_add:
-      - SYS_ADMIN
+    - SYS_ADMIN
     command:
-      - server
-      - start
-      - --address=0.0.0.0:51515
-      - --disable-csrf-token-checks
-      - --server-username=admin
-      - --server-password=${KOPIA_SERVER_PASSWORD}
+    - server
+    - start
+    - --address=0.0.0.0:51515
+    - --disable-csrf-token-checks
+    - --server-username=admin
+    - --server-password=${KOPIA_SERVER_PASSWORD}
+    - --insecure
     user: 0:0
     deploy:
       resources:
         limits:
-          cpus: "2"
+          cpus: '2'
           memory: 2G
         reservations:
-          cpus: "0.5"
+          cpus: '0.5'
           memory: 1G
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.kopia-b2.rule=Host(`kopia-b2.${DOMAIN}`)
-      - traefik.http.routers.kopia-b2.entrypoints=web
-      - traefik.http.services.kopia-b2.loadbalancer.server.port=51515
-      - kuma.kopia-backblaze.type=http
-      - kuma.kopia-backblaze.url=http://kopia-backblaze:51515
-      - kuma.kopia-backblaze.name=Kopia Backup (Backblaze)
-      - kuma.kopia-backblaze.interval=60
-      - kuma.kopia-backblaze.keyword=Kopia
-      - kuma.kopia-backblaze.tags=utilities,backup,backblaze
-      - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/kopia-icon.png
-      - net.unraid.docker.webui=http://[IP]:[PORT:51515]
+    - traefik.enable=true
+    - traefik.http.routers.kopia-b2.rule=Host(`kopia-b2.${DOMAIN}`)
+    - traefik.http.routers.kopia-b2.entrypoints=web
+    - traefik.http.services.kopia-b2.loadbalancer.server.port=51515
+    - kuma.kopia-backblaze.type=http
+    - kuma.kopia-backblaze.url=http://kopia-backblaze:51515
+    - kuma.kopia-backblaze.name=Kopia Backup (Backblaze)
+    - kuma.kopia-backblaze.interval=60
+    - kuma.kopia-backblaze.keyword=Kopia
+    - kuma.kopia-backblaze.tags=utilities,backup,backblaze
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/kopia-icon.png
+    - net.unraid.docker.webui=http://[IP]:[PORT:51515]
     networks:
-      - internal_net
+    - internal_net
   kopia-local:
-    image: kopia/kopia:20251215.0.232403
+    image: kopia/kopia:20260211.0.64946
     container_name: kopia-truenas
     restart: unless-stopped
     environment:
@@ -70,54 +71,54 @@ services:
       KOPIA_SERVER_USERNAME: ${KOPIA_TNAS_USERNAME}
       KOPIA_SERVER_PASSWORD: ${KOPIA_TNAS_PASSWORD}
     volumes:
-      - ${APPDATA_PATH}/kopia/truenas/config:/app/config
-      - ${APPDATA_PATH}/kopia/truenas/cache:/app/cache
-      - ${APPDATA_PATH}/kopia/truenas/logs:/app/logs
-      - ${APPDATA_PATH}/kopia/truenas/repository:/repository
-      - ${APPDATA_PATH}/kopia/scripts:/app/scripts:ro
-      - /mnt:/mnt:ro
-      - /mnt/user:/data/user:ro
-      - /mnt/user/backups:/data/backups
-      - /usr/sbin/zfs:/usr/sbin/zfs:ro
-      - /usr/sbin/zpool:/usr/sbin/zpool:ro
-      - /sbin/mount:/sbin/mount:ro
-      - /sbin/umount:/sbin/umount:ro
+    - ${APPDATA_PATH}/kopia/truenas/config:/app/config
+    - ${APPDATA_PATH}/kopia/truenas/cache:/app/cache
+    - ${APPDATA_PATH}/kopia/truenas/logs:/app/logs
+    - ${APPDATA_PATH}/kopia/truenas/repository:/repository
+    - ${APPDATA_PATH}/kopia/scripts:/app/scripts:ro
+    - /mnt:/mnt:ro
+    - /mnt/user:/data/user:ro
+    - /mnt/user/backups:/data/backups
+    - /usr/sbin/zfs:/usr/sbin/zfs:ro
+    - /usr/sbin/zpool:/usr/sbin/zpool:ro
+    - /sbin/mount:/sbin/mount:ro
+    - /sbin/umount:/sbin/umount:ro
     devices:
-      - /dev/zfs:/dev/zfs
+    - /dev/zfs:/dev/zfs
     ports:
-      - 51516:51515
+    - 51516:51515
     command:
-      - server
-      - start
-      - --address=0.0.0.0:51515
-      - --disable-csrf-token-checks
-      - --server-username=admin
-      - --server-password=${KOPIA_SERVER_PASSWORD}
+    - server
+    - start
+    - --address=0.0.0.0:51515
+    - --disable-csrf-token-checks
+    - --server-username=admin
+    - --server-password=${KOPIA_SERVER_PASSWORD}
+    - --insecure
     user: 0:0
     deploy:
       resources:
         limits:
-          cpus: "2"
+          cpus: '2'
           memory: 2G
         reservations:
-          cpus: "0.5"
+          cpus: '0.5'
           memory: 1G
     labels:
-      - kuma.kopia-truenas.type=http
-      - traefik.enable=true
-      - traefik.http.routers.kopia-local.rule=Host(`kopia-local.${DOMAIN}`)
-      - traefik.http.routers.kopia-local.entrypoints=web
-      - traefik.http.services.kopia-local.loadbalancer.server.port=51515
-      - kuma.kopia-truenas.url=http://kopia-truenas:51515
-      - kuma.kopia-truenas.name=Kopia Backup (Local)
-      - kuma.kopia-truenas.interval=60
-      - kuma.kopia-truenas.keyword=Kopia
-      - kuma.kopia-truenas.tags=utilities,backup,truenas
-      - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/kopia-icon.png
-      - net.unraid.docker.webui=http://[IP]:[PORT:51516]
+    - kuma.kopia-truenas.type=http
+    - traefik.enable=true
+    - traefik.http.routers.kopia-local.rule=Host(`kopia-local.${DOMAIN}`)
+    - traefik.http.routers.kopia-local.entrypoints=web
+    - traefik.http.services.kopia-local.loadbalancer.server.port=51515
+    - kuma.kopia-truenas.url=http://kopia-truenas:51515
+    - kuma.kopia-truenas.name=Kopia Backup (Local)
+    - kuma.kopia-truenas.interval=60
+    - kuma.kopia-truenas.keyword=Kopia
+    - kuma.kopia-truenas.tags=utilities,backup,truenas
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/kopia-icon.png
+    - net.unraid.docker.webui=http://[IP]:[PORT:51516]
     networks:
-      - internal_net
-
+    - internal_net
 networks:
   internal_net:
     external: true

@@ -1,7 +1,6 @@
-
 services:
   uptimekuma:
-    image: louislam/uptime-kuma:2.0.2
+    image: louislam/uptime-kuma:2.1.1
     container_name: UptimeKuma
     restart: unless-stopped
     environment:
@@ -24,7 +23,6 @@ services:
     - traefik.http.routers.uptimekuma.rule=Host(`uptimekuma.${DOMAIN}`)
     - traefik.http.routers.uptimekuma.entrypoints=web
     - traefik.http.services.uptimekuma.loadbalancer.server.port=3001
-    - public_net
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/uptimekuma-icon.png
     - net.unraid.docker.webui=http://[IP]:[PORT:3002]
     networks:
@@ -38,7 +36,9 @@ services:
     - HOST_OS=Unraid
     - HOST_HOSTNAME=JP-Dell
     - HOST_CONTAINERNAME=AutoKuma
-    - AUTOKUMA_UPTIME_KUMA_URL=http://UptimeKuma:3001
+    - AUTOKUMA__KUMA__URL=http://UptimeKuma:3001
+    - AUTOKUMA__KUMA__USERNAME=${UPTIME_KUMA_USERNAME:-}
+    - AUTOKUMA__KUMA__PASSWORD=${UPTIME_KUMA_PASSWORD:-}
     labels:
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/autokuma-icon.png
     volumes:
@@ -68,6 +68,6 @@ networks:
     external: true
   iot_net:
     external: true
-  teslamate_net:
+  teslamate_net: null
   public_net:
     external: true

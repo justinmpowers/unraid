@@ -1,82 +1,83 @@
 services:
   nextcloud:
-    image: nextcloud:32.0.5
+    image: nextcloud:32.0.6
     container_name: Nextcloud
     restart: unless-stopped
     environment:
-      - TZ=${TZ}
-      - HOST_OS=Unraid
-      - HOST_HOSTNAME=JP-Dell
-      - HOST_CONTAINERNAME=Nextcloud
-      - POSTGRES_HOST=nextcloud-postgres
-      - POSTGRES_DB=${NEXTCLOUD_DB_NAME}
-      - POSTGRES_USER=${NEXTCLOUD_DB_USER}
-      - POSTGRES_PASSWORD=${NEXTCLOUD_DB_PASSWORD}
-      - NEXTCLOUD_TRUSTED_DOMAINS=nextcloud.azuleluna.xyz
-      - OVERWRITEPROTOCOL=https
-      - OVERWRITEHOST=nextcloud.azuleluna.xyz
-      - PUID=33
-      - PGID=33
-    user: "33:33"
+    - TZ=${TZ}
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=JP-Dell
+    - HOST_CONTAINERNAME=Nextcloud
+    - POSTGRES_HOST=nextcloud-postgres
+    - POSTGRES_DB=${NEXTCLOUD_DB_NAME}
+    - POSTGRES_USER=${NEXTCLOUD_DB_USER}
+    - POSTGRES_PASSWORD=${NEXTCLOUD_DB_PASSWORD}
+    - NEXTCLOUD_TRUSTED_DOMAINS=nextcloud.azuleluna.xyz
+    - OVERWRITEPROTOCOL=https
+    - OVERWRITEHOST=nextcloud.azuleluna.xyz
+    - PUID=33
+    - PGID=33
+    user: '33:33'
     ports:
-      - 8666:80
+    - 8666:80
     volumes:
-      - ${APPDATA_PATH}/nextcloud/html:/var/www/html
-      - ${APPDATA_PATH}/nextcloud/apps:/var/www/html/custom_apps
-      - ${APPDATA_PATH}/nextcloud/config:/var/www/html/config
-      - ${APPDATA_PATH}/nextcloud/data:/var/www/html/data
+    - ${APPDATA_PATH}/nextcloud/html:/var/www/html
+    - ${APPDATA_PATH}/nextcloud/apps:/var/www/html/custom_apps
+    - ${APPDATA_PATH}/nextcloud/config:/var/www/html/config
+    - ${APPDATA_PATH}/nextcloud/data:/var/www/html/data
     deploy:
       resources:
         limits:
-          cpus: "2"
+          cpus: '2'
           memory: 2G
         reservations:
-          cpus: "0.5"
+          cpus: '0.5'
           memory: 512M
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.nextcloud.rule=Host(`nextcloud.${DOMAIN}`)
-      - traefik.http.routers.nextcloud.entrypoints=web
-      - traefik.http.services.nextcloud.loadbalancer.server.port=80
-      - kuma.nextcloud.type=http
-      - kuma.nextcloud.url=http://Nextcloud:80/status.php
-      - kuma.nextcloud.name=Nextcloud
-      - kuma.nextcloud.interval=60
-      - kuma.nextcloud.keyword=installed
-      - kuma.nextcloud.tags=productivity,cloud
-      - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/nextcloud-icon.png
+    - traefik.enable=true
+    - traefik.docker.network=internal_net
+    - traefik.http.routers.nextcloud.rule=Host(`nextcloud.${DOMAIN}`)
+    - traefik.http.routers.nextcloud.entrypoints=web
+    - traefik.http.services.nextcloud.loadbalancer.server.port=80
+    - kuma.nextcloud.type=http
+    - kuma.nextcloud.url=http://Nextcloud:80/status.php
+    - kuma.nextcloud.name=Nextcloud
+    - kuma.nextcloud.interval=60
+    - kuma.nextcloud.keyword=installed
+    - kuma.nextcloud.tags=productivity,cloud
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/nextcloud-icon.png
     networks:
-      - internal_net
-      - db_net
+    - internal_net
+    - db_net
     depends_on:
-      - nextcloud-postgres
+    - nextcloud-postgres
   nextcloud-postgres:
-    image: postgres:18.1
+    image: postgres:18.2
     container_name: Nextcloud-PostGres
     restart: unless-stopped
     environment:
-      - TZ=${TZ}
-      - HOST_OS=Unraid
-      - HOST_HOSTNAME=JP-Dell
-      - HOST_CONTAINERNAME=Nextcloud-PostGres
-      - POSTGRES_DB=${NEXTCLOUD_DB_NAME}
-      - POSTGRES_USER=${NEXTCLOUD_DB_USER}
-      - POSTGRES_PASSWORD=${NEXTCLOUD_DB_PASSWORD}
-      - PGDATA=/var/lib/postgresql/18/main
+    - TZ=${TZ}
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=JP-Dell
+    - HOST_CONTAINERNAME=Nextcloud-PostGres
+    - POSTGRES_DB=${NEXTCLOUD_DB_NAME}
+    - POSTGRES_USER=${NEXTCLOUD_DB_USER}
+    - POSTGRES_PASSWORD=${NEXTCLOUD_DB_PASSWORD}
+    - PGDATA=/var/lib/postgresql/18/main
     volumes:
-      - nextcloud_pgdata:/var/lib/postgresql
+    - nextcloud_pgdata:/var/lib/postgresql
     deploy:
       resources:
         limits:
-          cpus: "1"
+          cpus: '1'
           memory: 2G
         reservations:
-          cpus: "0.25"
+          cpus: '0.25'
           memory: 512M
     labels:
-      - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png
     networks:
-      - db_net
+    - db_net
 volumes:
   nextcloud_pgdata:
     driver: local

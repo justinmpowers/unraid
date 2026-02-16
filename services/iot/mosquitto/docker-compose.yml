@@ -28,6 +28,12 @@ services:
       - traefik.http.routers.mosquitto.rule=Host(`mosquitto.${DOMAIN}`)
       - traefik.http.routers.mosquitto.entrypoints=web
       - traefik.http.services.mosquitto.loadbalancer.server.port=9001
+      - kuma.mosquitto.type=port
+      - kuma.mosquitto.hostname=mosquitto
+      - kuma.mosquitto.port=1883
+      - kuma.mosquitto.name=Mosquitto MQTT
+      - kuma.mosquitto.interval=60
+      - kuma.mosquitto.tags=iot,mqtt
       - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/mosquitto-icon.png
       - net.unraid.docker.webui=http://[IP]:[PORT:9001]
     networks:
