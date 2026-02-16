@@ -26,16 +26,17 @@ services:
       - HOST_OS=Unraid
       - HOST_HOSTNAME=JP-Dell
       - HOST_CONTAINERNAME=Docker-Compose-Runner
-    volumes:
-      # Docker socket for container management
-      - /var/run/docker.sock:/var/run/docker.sock:rw
       
+      # Docker socket proxy configuration
+      - DOCKER_HOST=tcp://docker-socket-proxy:2375
+    volumes:
       # Docker-compose workspace (read-only for deployments)
       - /mnt/user/appdata/docker-compose:/workspace:rw
       
       # NO persistent runner data - fresh container each time!
     networks:
       - monitoring_net
+      - docker_proxy_net
     deploy:
       resources:
         limits:
@@ -56,4 +57,6 @@ services:
 
 networks:
   monitoring_net:
+    external: true
+  docker_proxy_net:
     external: true
