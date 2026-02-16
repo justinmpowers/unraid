@@ -6,21 +6,28 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
+      # Granted by default (mostly harmless)
       - PING=1
-      - INFO=1
-      - CONTAINERS=1
-      - IMAGES=1
-      - NETWORKS=1
-      - VOLUMES=1
-      - EVENTS=1
-      - SERVICES=1
-      - TASKS=1
       - VERSION=1
-      - EXEC=1
-      - EXEC_CREATE=1
-      - EXEC_START=1
-      - BUILD=1
-      - AUTH=1
+      - EVENTS=1
+      
+      # Required for docker-compose deployments
+      - INFO=1
+      - CONTAINERS=1        # manage containers
+      - IMAGES=1            # pull images
+      - NETWORKS=1          # manage networks
+      - VOLUMES=1           # manage volumes
+      - SERVICES=1          # Swarm services
+      - TASKS=1             # Swarm tasks
+      - POST=1              # allow write operations (create/start/stop)
+      
+      # Security-critical - keep disabled
+      - EXEC=0              # don't allow arbitrary command execution
+      - BUILD=0             # not needed for docker-compose
+      - AUTH=0              # don't expose authentication
+      - SECRETS=0           # don't expose secrets
+      - PLUGINS=0           # don't allow plugin management
+      - SWARM=0             # restrict Swarm management
     ports:
       - '2375:2375'
     deploy:
