@@ -29,7 +29,7 @@ services:
       - DOCKER_HOST=tcp://docker-socket-proxy:2375
     volumes:
       # Docker-compose workspace (read-only for deployments)
-      - /mnt/user/appdata/docker-compose:/workspace:rw
+      - /mnt/user/appdata/renovate/unraid:/workspace:rw
       
       # NO persistent runner data - fresh container each time!
       # NO direct docker socket - uses docker-socket-proxy for security
