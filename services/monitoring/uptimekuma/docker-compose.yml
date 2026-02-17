@@ -20,6 +20,7 @@ services:
           memory: 256M
     labels:
     - traefik.enable=true
+    - traefik.docker.network=monitoring_net
     - traefik.http.routers.uptimekuma.rule=Host(`uptime.${DOMAIN}`)
     - traefik.http.routers.uptimekuma.entrypoints=web
     - traefik.http.routers.uptimekuma.middlewares=crowdsec@file
