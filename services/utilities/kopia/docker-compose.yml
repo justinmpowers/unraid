@@ -50,6 +50,7 @@ services:
     - traefik.enable=true
     - traefik.http.routers.kopia-b2.rule=Host(`kopia-b2.${DOMAIN}`)
     - traefik.http.routers.kopia-b2.entrypoints=web
+    - traefik.http.routers.kopia-b2.middlewares=crowdsec@file
     - traefik.http.services.kopia-b2.loadbalancer.server.port=51515
     - kuma.kopia-backblaze.type=http
     - kuma.kopia-backblaze.url=http://kopia-backblaze:51515

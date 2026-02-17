@@ -29,6 +29,7 @@ services:
     - traefik.docker.network=internal_net
     - traefik.http.routers.actualserver.rule=Host(`actual.${DOMAIN}`)
     - traefik.http.routers.actualserver.entrypoints=web
+    - traefik.http.routers.actualserver.middlewares=crowdsec@file
     - traefik.http.services.actualserver.loadbalancer.server.port=5006
     - kuma.actualserver.type=http
     - kuma.actualserver.url=http://ActualServer:5006

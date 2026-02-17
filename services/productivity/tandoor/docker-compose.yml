@@ -51,6 +51,7 @@ services:
     - traefik.docker.network=internal_net
     - traefik.http.routers.tandoor.rule=Host(`tandoor.${DOMAIN}`)
     - traefik.http.routers.tandoor.entrypoints=web
+    - traefik.http.routers.tandoor.middlewares=crowdsec@file
     - traefik.http.services.tandoor.loadbalancer.server.port=8080
     - kuma.tandoor.type=http
     - kuma.tandoor.url=http://tandoor:8080

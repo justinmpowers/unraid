@@ -18,6 +18,7 @@ services:
     - traefik.docker.network=internal_net
     - traefik.http.routers.romm.rule=Host(`romm.${DOMAIN}`)
     - traefik.http.routers.romm.entrypoints=web
+    - traefik.http.routers.romm.middlewares=crowdsec@file
     - traefik.http.services.romm.loadbalancer.server.port=8080
     - kuma.romm.type=http
     - kuma.romm.url=http://romm:8080

@@ -38,6 +38,7 @@ services:
     - traefik.docker.network=internal_net
     - traefik.http.routers.nextcloud.rule=Host(`nextcloud.${DOMAIN}`)
     - traefik.http.routers.nextcloud.entrypoints=web
+    - traefik.http.routers.nextcloud.middlewares=crowdsec@file
     - traefik.http.services.nextcloud.loadbalancer.server.port=80
     - kuma.nextcloud.type=http
     - kuma.nextcloud.url=http://Nextcloud:80/status.php

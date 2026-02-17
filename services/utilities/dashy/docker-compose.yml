@@ -31,6 +31,7 @@ services:
       - traefik.docker.network=internal_net
       - traefik.http.routers.dashy.rule=Host(`dashy.${DOMAIN}`)
       - traefik.http.routers.dashy.entrypoints=web
+      - traefik.http.routers.dashy.middlewares=crowdsec@file
       - traefik.http.services.dashy.loadbalancer.server.port=8080
       - kuma.dashy.type=http
       - kuma.dashy.url=http://dashy:8080

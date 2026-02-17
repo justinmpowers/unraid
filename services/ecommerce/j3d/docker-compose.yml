@@ -92,6 +92,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.j3d.rule=Host(`j3d.${DOMAIN}`)
       - traefik.http.routers.j3d.entrypoints=web
+      - traefik.http.routers.j3d.middlewares=crowdsec@file
       - traefik.http.services.j3d.loadbalancer.server.port=5000
       - kuma.backend.type=http
       - kuma.backend.url=http://j3d-backend:5000/api/health

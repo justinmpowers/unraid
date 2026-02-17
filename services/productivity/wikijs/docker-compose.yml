@@ -17,8 +17,11 @@ services:
     volumes:
     - ${APPDATA_PATH}/wikijs:/wiki/data
     labels:
-    - traefik.enable=true    - traefik.docker.network=internal_net      - traefik.http.routers.wikijs.rule=Host(`wikijs.${DOMAIN}`)
+    - traefik.enable=true
+    - traefik.docker.network=internal_net
+    - traefik.http.routers.wikijs.rule=Host(`wikijs.${DOMAIN}`)
     - traefik.http.routers.wikijs.entrypoints=web
+    - traefik.http.routers.wikijs.middlewares=crowdsec@file
     - traefik.http.services.wikijs.loadbalancer.server.port=3000
     - kuma.wikijs.type=http
     - kuma.wikijs.url=http://wikijs:3000
