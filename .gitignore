@@ -133,3 +133,6 @@ unraid/
 _update.sh
 all_services.txt
 changed_services.txt
+services/networking/traefik/dynamic.yml
+services/networking/traefik/traefik.yml
+*.example
