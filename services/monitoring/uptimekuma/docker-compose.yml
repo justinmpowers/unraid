@@ -20,7 +20,7 @@ services:
           memory: 256M
     labels:
     - traefik.enable=true
-    - traefik.http.routers.uptimekuma.rule=Host(`uptimekuma.${DOMAIN}`)
+    - traefik.http.routers.uptimekuma.rule=Host(`uptime.${DOMAIN}`)
     - traefik.http.routers.uptimekuma.entrypoints=web
     - traefik.http.routers.uptimekuma.middlewares=crowdsec@file
     - traefik.http.services.uptimekuma.loadbalancer.server.port=3001
@@ -49,7 +49,6 @@ services:
     - db_net
     - internal_net
     - iot_net
-    - teslamate_net
     depends_on:
     - uptimekuma
     deploy:
@@ -69,6 +68,5 @@ networks:
     external: true
   iot_net:
     external: true
-  teslamate_net: null
   public_net:
     external: true
