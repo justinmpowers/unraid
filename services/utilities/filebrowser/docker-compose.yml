@@ -1,6 +1,6 @@
 services:
   filebrowser:
-    image: filebrowser/filebrowser:v2.59.0
+    image: filebrowser/filebrowser:v2.60.0
     container_name: FileBrowser
     restart: unless-stopped
     privileged: true

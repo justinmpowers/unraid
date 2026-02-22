@@ -1,6 +1,6 @@
 services:
   docker-socket-proxy:
-    image: tecnativa/docker-socket-proxy:latest@sha256:bd2241b3bec83abcff25927a0a7ae518e0c5bef624b3cc247dcb31e68b53f417
+    image: tecnativa/docker-socket-proxy:latest@sha256:1f3a6f303320723d199d2316a3e82b2e2685d86c275d5e3deeaf182573b47476
     container_name: docker-socket-proxy
     restart: always
     volumes:
