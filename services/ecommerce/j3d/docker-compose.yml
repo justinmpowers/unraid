@@ -93,7 +93,7 @@ services:
       - traefik.http.routers.print-ops-backend.middlewares=crowdsec@file
       - traefik.http.services.print-ops-backend.loadbalancer.server.port=5000
       - kuma.backend.type=http
-      - kuma.backend.url=http://j3d-backend:5000/api/health
+      - kuma.backend.url=http://print-ops-backend:5000/api/health
       - kuma.backend.name=J3D Backend
       - kuma.backend.interval=60
       - kuma.backend.tags=j3d,api
@@ -109,7 +109,7 @@ services:
     container_name: print-ops-frontend
     restart: unless-stopped
     depends_on:
-      - j3d-backend
+      - print-ops-backend
     environment:
       TZ: ${TZ}
     deploy:
