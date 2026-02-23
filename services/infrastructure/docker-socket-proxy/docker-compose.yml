@@ -20,6 +20,7 @@ services:
       - SERVICES=1          # Swarm services
       - TASKS=1             # Swarm tasks
       - POST=1              # allow write operations (create/start/stop)
+      - SYSTEM=1            # system info (df, events, etc.)
       
       # Security-critical - keep disabled
       - EXEC=0              # don't allow arbitrary command execution
