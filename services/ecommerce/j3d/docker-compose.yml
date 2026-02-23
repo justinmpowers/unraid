@@ -1,5 +1,3 @@
-version: "3.8"
-
 # J3D - Etsy Orders & Filament Tracker
 # Version: 2.0.0
 # For Unraid deployment with shared networks
@@ -46,9 +44,9 @@ services:
       - kuma.postgres.tags=j3d,database
       - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png
 
-  j3d-backend:
-    image: ghcr.io/justinmpowers/j3d-backend:2.1.6
-    container_name: j3d-backend
+  print-ops-backend:
+    image: ghcr.io/justinmpowers/print-ops-backend:2.1.6
+    container_name: print-ops-backend
     restart: unless-stopped
     depends_on:
       postgres:
@@ -73,7 +71,7 @@ services:
       TZ: ${TZ}
       HOST_OS: Unraid
       HOST_HOSTNAME: ${HOST_HOSTNAME}
-      HOST_CONTAINERNAME: j3d-backend
+      HOST_CONTAINERNAME: print-ops-backend
       MIGRATIONS_DIR: /tmp/migrations
     volumes:
       - ${APPDATA_PATH}/j3d/backend:/app/instance
@@ -90,10 +88,10 @@ services:
           memory: 256M
     labels:
       - traefik.enable=true
-      - traefik.http.routers.j3d.rule=Host(`j3d.${DOMAIN}`)
-      - traefik.http.routers.j3d.entrypoints=web
-      - traefik.http.routers.j3d.middlewares=crowdsec@file
-      - traefik.http.services.j3d.loadbalancer.server.port=5000
+      - traefik.http.routers.print-ops-backend.rule=Host(`j3d.${DOMAIN}`)
+      - traefik.http.routers.print-ops-backend.entrypoints=web
+      - traefik.http.routers.print-ops-backend.middlewares=crowdsec@file
+      - traefik.http.services.print-ops-backend.loadbalancer.server.port=5000
       - kuma.backend.type=http
       - kuma.backend.url=http://j3d-backend:5000/api/health
       - kuma.backend.name=J3D Backend
@@ -106,9 +104,9 @@ services:
       - db_net
       - public_net
 
-  j3d-frontend:
-    image: ghcr.io/justinmpowers/j3d-frontend:2.1.1
-    container_name: j3d-frontend
+  print-ops-frontend:
+    image: ghcr.io/justinmpowers/print-ops-frontend:2.1.1
+    container_name: print-ops-frontend
     restart: unless-stopped
     depends_on:
       - j3d-backend
@@ -124,12 +122,12 @@ services:
           memory: 256M
     labels:
       - kuma.frontend.type=http
-      - kuma.frontend.url=http://j3d-frontend:4200/health
-      - kuma.frontend.name=J3D Frontend
+      - kuma.frontend.url=http://print-ops-frontend:4200/health
+      - kuma.frontend.name=Print Ops Frontend
       - kuma.frontend.interval=60
-      - kuma.frontend.tags=j3d,web
+      - kuma.frontend.tags=print-ops,web
       - traefik.enable=true
-      - traefik.http.routers.j3d-frontend.rule=Host(`j3d.${DOMAIN}`)
+      - traefik.http.routers.print-ops-frontend.rule=Host(`j3d.${DOMAIN}`)
     networks:
       - internal_net
       - public_net
