@@ -50,7 +50,7 @@ services:
         max-file: '3'
 
   crowdsec:
-    image: crowdsecurity/crowdsec:v1.6.4
+    image: crowdsecurity/crowdsec:v1.7.6
     container_name: crowdsec
     restart: always
     environment:

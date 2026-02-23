@@ -1,6 +1,6 @@
 services:
   promtail:
-    image: grafana/promtail:3.6.5
+    image: grafana/promtail:3.6.6
     container_name: GrafanaPromtail
     restart: unless-stopped
     environment:
