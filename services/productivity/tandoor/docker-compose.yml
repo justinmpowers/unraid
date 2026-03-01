@@ -62,7 +62,7 @@ services:
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/tandoor-icon.png
     - net.unraid.docker.webui=http://[IP]:[PORT:8084]
   tandoor-postgres:
-    image: postgres:18.2
+    image: postgres:18.3
     container_name: tandoor-postgres
     restart: unless-stopped
     environment:
