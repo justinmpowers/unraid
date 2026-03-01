@@ -1,6 +1,6 @@
 services:
   loki:
-    image: grafana/loki:3.6.6
+    image: grafana/loki:3.6.7
     container_name: GrafanaLoki
     restart: unless-stopped
     environment:
