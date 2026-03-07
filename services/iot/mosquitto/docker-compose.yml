@@ -25,6 +25,7 @@ services:
           memory: 128M
     labels:
       - traefik.enable=true
+      - traefik.docker.network=iot_net
       - traefik.http.routers.mosquitto.rule=Host(`mosquitto.${DOMAIN}`)
       - traefik.http.routers.mosquitto.entrypoints=web
       - traefik.http.services.mosquitto.loadbalancer.server.port=9001

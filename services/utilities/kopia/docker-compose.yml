@@ -48,6 +48,7 @@ services:
           memory: 1G
     labels:
     - traefik.enable=true
+    - traefik.docker.network=internal_net
     - traefik.http.routers.kopia-b2.rule=Host(`kopia-b2.${DOMAIN}`)
     - traefik.http.routers.kopia-b2.entrypoints=web
     - traefik.http.routers.kopia-b2.middlewares=crowdsec@file
@@ -108,6 +109,7 @@ services:
     labels:
     - kuma.kopia-truenas.type=http
     - traefik.enable=true
+    - traefik.docker.network=internal_net
     - traefik.http.routers.kopia-local.rule=Host(`kopia-local.${DOMAIN}`)
     - traefik.http.routers.kopia-local.entrypoints=web
     - traefik.http.services.kopia-local.loadbalancer.server.port=51515

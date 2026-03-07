@@ -88,6 +88,7 @@ services:
           memory: 256M
     labels:
       - traefik.enable=true
+      - traefik.docker.network=internal_net
       - traefik.http.routers.print-ops-backend.rule=Host(`j3d.${DOMAIN}`)
       - traefik.http.routers.print-ops-backend.entrypoints=web
       - traefik.http.routers.print-ops-backend.middlewares=crowdsec@file
@@ -127,6 +128,7 @@ services:
       - kuma.frontend.interval=60
       - kuma.frontend.tags=print-ops,web
       - traefik.enable=true
+      - traefik.docker.network=internal_net
       - traefik.http.routers.print-ops-frontend.rule=Host(`j3d.${DOMAIN}`)
     networks:
       - internal_net

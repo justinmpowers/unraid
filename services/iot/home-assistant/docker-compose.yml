@@ -15,6 +15,7 @@ services:
     - 8123:8123
     labels:
     - traefik.enable=true
+    - traefik.docker.network=iot_net
     - traefik.http.routers.homeassistant.rule=Host(`homeassistant.${DOMAIN}`)
     - traefik.http.routers.homeassistant.entrypoints=web
     - traefik.http.services.homeassistant.loadbalancer.server.port=8123

@@ -26,6 +26,7 @@ services:
     - ${APPDATA_PATH}/traefik/logs:/var/log/traefik
     labels:
     - traefik.enable=true
+    - traefik.docker.network=public_net
     - traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN}`)
     - traefik.http.routers.traefik.entrypoints=web
     - traefik.http.routers.traefik.service=api@internal

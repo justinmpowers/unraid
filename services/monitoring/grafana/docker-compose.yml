@@ -19,6 +19,7 @@ services:
     - 3006:3000
     labels:
     - traefik.enable=true
+    - traefik.docker.network=monitoring_net
     - traefik.http.routers.grafana.rule=Host(`grafana.${DOMAIN}`)
     - traefik.http.routers.grafana.entrypoints=web
     - traefik.http.routers.grafana.middlewares=crowdsec@file

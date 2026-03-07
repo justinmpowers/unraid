@@ -23,6 +23,7 @@ services:
       - 9090:9090
     labels:
       - traefik.enable=true
+      - traefik.docker.network=monitoring_net
       - traefik.http.routers.prometheus.rule=Host(`prometheus.${DOMAIN}`)
       - traefik.http.routers.prometheus.entrypoints=web
       - traefik.http.services.prometheus.loadbalancer.server.port=9090
