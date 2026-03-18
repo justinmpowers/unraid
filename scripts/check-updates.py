@@ -135,6 +135,17 @@ VERSION_PATTERNS = {
     'portainer-ce': r'^\d+\.\d+\.\d+$',
 }
 
+FLOATING_TAGS = {
+    'latest',
+    'experimental',
+    'nightly',
+    'edge',
+    'stable',
+    'dev',
+    'main',
+    'master',
+}
+
 def compare_versions(current: str, latest: str) -> bool:
     """Compare two version strings and return True if latest > current"""
     try:
@@ -151,6 +162,60 @@ def clean_version(ver: str) -> str:
     ver = re.sub(r'^(release-|v)', '', ver)
     ver = re.sub(r'(-alpine|-slim|-lts)$', '', ver)
     return ver
+
+def is_floating_tag(tag: str) -> bool:
+    """Return True for tags that do not represent an ordered version stream."""
+    return tag.lower() in FLOATING_TAGS
+
+def is_comparable_version(tag: str) -> bool:
+    """Return True when a tag can be parsed as an ordered version."""
+    if is_floating_tag(tag):
+        return False
+
+    try:
+        version.parse(clean_version(tag))
+        return True
+    except Exception:
+        return False
+
+def parse_image_reference(image_ref: str) -> Optional[Tuple[str, str, Optional[str]]]:
+    """Split an image reference into image name, tag, and optional digest."""
+    digest = None
+    ref_without_digest = image_ref
+
+    if '@' in image_ref:
+        ref_without_digest, digest = image_ref.split('@', 1)
+
+    last_slash = ref_without_digest.rfind('/')
+    last_colon = ref_without_digest.rfind(':')
+
+    if last_colon <= last_slash:
+        return None
+
+    image_name = ref_without_digest[:last_colon]
+    tag = ref_without_digest[last_colon + 1:]
+    return image_name, tag, digest
+
+def select_highest_version_tag(candidate_tags: List[str]) -> Optional[str]:
+    """Return the highest comparable tag from a list of candidates."""
+    comparable_tags = []
+
+    for candidate in set(candidate_tags):
+        if not is_comparable_version(candidate):
+            continue
+        comparable_tags.append(candidate)
+
+    if not comparable_tags:
+        return None
+
+    return max(comparable_tags, key=lambda tag: version.parse(clean_version(tag)))
+
+def build_image_reference(image_name: str, tag: str, digest: Optional[str] = None) -> str:
+    """Rebuild an image reference from its parsed components."""
+    image_ref = f"{image_name}:{tag}"
+    if digest:
+        image_ref = f"{image_ref}@{digest}"
+    return image_ref
 
 class RateLimitManager:
     """Manages rate limiting across different registries"""
@@ -268,21 +333,22 @@ def get_ghcr_latest_tag(registry_path: str, rate_limiter: RateLimitManager) -> O
         if not versions:
             return None
         
-        # Find the latest version with a semantic version tag
+        # Collect matching tags and then choose the highest version.
         image_key = get_image_key(registry_path)
         pattern = VERSION_PATTERNS.get(image_key)
+        candidate_tags = []
         
-        for version in versions:
-            tags = version.get('metadata', {}).get('container', {}).get('tags', [])
+        for version_info in versions:
+            tags = version_info.get('metadata', {}).get('container', {}).get('tags', [])
             for tag in tags:
                 if pattern and re.match(pattern, tag):
-                    return tag
+                    candidate_tags.append(tag)
                 elif re.match(r'^\d+\.\d+(\.\d+)?$', tag):
-                    return tag
+                    candidate_tags.append(tag)
                 elif re.match(r'^v\d+\.\d+(\.\d+)?$', tag):
-                    return tag
-        
-        return None
+                    candidate_tags.append(tag)
+
+        return select_highest_version_tag(candidate_tags)
         
     except Exception as e:
         print(f"Error checking GHCR {registry_path}: {e}")
@@ -360,11 +426,9 @@ def get_dockerhub_latest_tag(registry_path: str, rate_limiter: RateLimitManager)
         if not valid_tags:
             return None
         
-        # Find the HIGHEST version, not just the first one
+        # Find the highest comparable version, not just the first one.
         try:
-            # Sort by semantic version (highest first)
-            sorted_tags = sorted(valid_tags, key=lambda x: version.parse(clean_version(x)), reverse=True)
-            return sorted_tags[0]
+            return select_highest_version_tag(valid_tags)
         except Exception as e:
             print(f"Error sorting versions for {registry_path}: {e}")
             return valid_tags[0]
@@ -453,23 +517,34 @@ def check_service_for_updates(compose_file_path: str, rate_limiter: RateLimitMan
             continue
             
         current_image = service_config['image']
-        
-        # Skip latest tags
-        if current_image.endswith(':latest'):
-            print(f"Skipping {service_name}: uses ':latest' tag")
-            continue
-        
-        # Parse image name and tag
-        if ':' in current_image:
-            image_name, current_tag = current_image.rsplit(':', 1)
-        else:
+
+        parsed_image = parse_image_reference(current_image)
+        if not parsed_image:
             print(f"Skipping {service_name}: no tag specified")
+            continue
+
+        image_name, current_tag, current_digest = parsed_image
+
+        if is_floating_tag(current_tag):
+            print(f"  Skipping ordered update check: floating tag '{current_tag}' requires manual review")
             continue
         
         print(f"Checking {service_name} ({current_image})...")
         
         # Get latest version with rate limiting
         latest_tag = get_latest_docker_tag(image_name, rate_limiter)
+
+        if latest_tag and is_floating_tag(latest_tag):
+            print(f"  Latest published tag '{latest_tag}' is floating; manual review required")
+            continue
+
+        if latest_tag and not is_comparable_version(current_tag):
+            print(f"  Current tag '{current_tag}' is not an ordered version; manual review required")
+            continue
+
+        if latest_tag and not is_comparable_version(latest_tag):
+            print(f"  Latest tag '{latest_tag}' is not an ordered version; manual review required")
+            continue
         
         if latest_tag and compare_versions(current_tag, latest_tag):
             print(f"  Update available: {current_tag} -> {latest_tag}")
@@ -481,7 +556,7 @@ def check_service_for_updates(compose_file_path: str, rate_limiter: RateLimitMan
                 changelog = get_github_releases(repo_name, current_tag, latest_tag, rate_limiter)
             
             # Update the compose file
-            service_config['image'] = f"{image_name}:{latest_tag}"
+            service_config['image'] = build_image_reference(image_name, latest_tag)
             modified = True
             
             updates.append({
@@ -497,7 +572,10 @@ def check_service_for_updates(compose_file_path: str, rate_limiter: RateLimitMan
             if latest_tag:
                 print(f"  Up to date or downgrade rejected: {current_tag} >= {latest_tag}")
             else:
-                print(f"  Could not check: {current_tag}")
+                if current_digest:
+                    print(f"  Could not check version for digest-pinned image: {current_tag}@{current_digest}")
+                else:
+                    print(f"  Could not check: {current_tag}")
     
     # Save modified file
     if modified:
