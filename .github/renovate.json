@@ -1,32 +1,54 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended"],
+  "extends": [
+    "config:recommended"
+  ],
   "onboarding": false,
   "dependencyDashboard": true,
-  "labels": ["automated", "container-updates", "infrastructure"],
+  "labels": [
+    "automated",
+    "container-updates",
+    "infrastructure"
+  ],
   "branchPrefix": "renovate/",
   "timezone": "UTC",
-  "baseBranches": ["main"],
+  "baseBranchPatterns": [
+    "main"
+  ],
   "recreateWhen": "always",
   "rebaseWhen": "conflicted",
   "rangeStrategy": "pin",
   "respectLatest": true,
-  "enabledManagers": ["docker-compose"],
+  "enabledManagers": [
+    "docker-compose"
+  ],
   "packageRules": [
     {
-      "matchManagers": ["docker-compose"],
-      "matchFileNames": ["services/**/docker-compose.yml"],
+      "matchManagers": [
+        "docker-compose"
+      ],
+      "matchFileNames": [
+        "services/**/docker-compose.yml"
+      ],
       "groupName": "Weekly container updates",
       "groupSlug": "weekly-container-updates",
       "separateMajorMinor": true,
       "minimumReleaseAge": "1 day",
       "commitMessagePrefix": "chore: ",
       "commitMessageTopic": "{{depName}}",
-      "labels": ["automated", "container-updates", "infrastructure"]
+      "labels": [
+        "automated",
+        "container-updates",
+        "infrastructure"
+      ]
     },
     {
-      "matchUpdateTypes": ["major"],
-      "labels": ["breaking-change?"],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "labels": [
+        "breaking-change?"
+      ],
       "prPriority": -1
     }
   ]
