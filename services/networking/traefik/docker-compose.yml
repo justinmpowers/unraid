@@ -47,7 +47,7 @@ services:
         max-size: 10m
         max-file: '3'
   crowdsec:
-    image: crowdsecurity/crowdsec:v1.7.6
+    image: crowdsecurity/crowdsec:v1.7.7
     container_name: crowdsec
     restart: always
     environment:
