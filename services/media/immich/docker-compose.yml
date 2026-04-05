@@ -1,6 +1,6 @@
 services:
   immich:
-    image: ghcr.io/imagegenius/immich:2.5.6
+    image: ghcr.io/imagegenius/immich:2.6.3
     container_name: immich
     restart: unless-stopped
     devices:
