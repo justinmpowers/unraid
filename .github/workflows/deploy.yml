@@ -359,7 +359,16 @@ jobs:
           
           # Show disk usage
           echo "💽 Docker disk usage:"
-          docker system df
+          if docker system df; then
+            echo "✅ Docker disk usage collected successfully"
+          else
+            echo "⚠️ docker system df is blocked (likely by docker-socket-proxy permissions)."
+            echo "📌 Continuing deployment with fallback usage summary..."
+            echo "🐳 Containers: $(docker ps -aq | wc -l) total"
+            echo "🖼️ Images: $(docker images -q | sort -u | wc -l) unique"
+            echo "🌐 Networks: $(docker network ls -q | wc -l) total"
+            echo "💾 Volumes: $(docker volume ls -q | wc -l) total"
+          fi
 
       - name: Generate Deployment Report
         if: always()
@@ -371,6 +380,12 @@ jobs:
           COMMIT_MSG="${{ github.event.head_commit.message }}"
           
           # Create deployment summary
+          if DOCKER_DF_OUTPUT=$(docker system df 2>&1); then
+            DOCKER_USAGE_BLOCK="$DOCKER_DF_OUTPUT"
+          else
+            DOCKER_USAGE_BLOCK="docker system df unavailable (likely blocked by docker-socket-proxy).\n$DOCKER_DF_OUTPUT"
+          fi
+
           cat > deployment_report.md << EOF
           # Deployment Report - $TIMESTAMP
           
@@ -393,7 +408,7 @@ jobs:
           
           ## 💾 System Resources
           \`\`\`
-          $(docker system df)
+          $DOCKER_USAGE_BLOCK
           \`\`\`
           
           ---
