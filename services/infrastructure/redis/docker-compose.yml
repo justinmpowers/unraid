@@ -9,7 +9,7 @@ services:
     - HOST_HOSTNAME=JP-Dell
     - HOST_CONTAINERNAME=Redis
     volumes:
-    - redis_data:/data
+    - ${CACHE_PATH}/redis:/data
     networks:
     - db_net
     healthcheck:
@@ -38,13 +38,6 @@ services:
     - kuma.redis.interval=60
     - kuma.redis.tags=infrastructure,cache
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/redis-icon.png
-volumes:
-  redis_data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ${CACHE_PATH}/redis
 networks:
   db_net:
     external: true
