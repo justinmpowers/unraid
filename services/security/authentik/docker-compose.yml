@@ -13,7 +13,7 @@ services:
     - POSTGRES_PASSWORD=${AUTHENTIK_DB_PASSWORD}
     - PGDATA=/var/lib/postgresql/18/main
     volumes:
-    - authentik_pgdata:/var/lib/postgresql
+    - ${CACHE_PATH}/authentik/pg18:/var/lib/postgresql
     networks:
     - db_net
     healthcheck:
@@ -214,13 +214,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 90s
-volumes:
-  authentik_pgdata:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ${CACHE_PATH}/authentik/pg18
 networks:
   db_net:
     external: true
