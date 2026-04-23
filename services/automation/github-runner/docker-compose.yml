@@ -1,6 +1,6 @@
 services:
   github-runner:
-    image: myoung34/github-runner:2.333.1
+    image: myoung34/github-runner:2.334.0
     container_name: Docker-Compose-Runner
     restart: unless-stopped  # Service will restart the container after each job
     environment:
