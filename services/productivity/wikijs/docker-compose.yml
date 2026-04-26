@@ -61,7 +61,7 @@ services:
     volumes:
       - type: bind
         source: ${APPDATA_PATH}/wikijs/postgres
-        target: /var/lib/postgresql/data
+        target: /var/lib/postgresql
     deploy:
       resources:
         limits:
