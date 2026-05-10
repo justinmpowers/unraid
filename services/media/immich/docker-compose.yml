@@ -56,7 +56,7 @@ services:
     - immich-postgres
     - immich-redis
   immich-postgres:
-    image: ghcr.io/immich-app/postgres:18-vectorchord0.5.3
+    image: ghcr.io/immich-app/postgres:16-vectorchord0.4.2-pgvectors0.3.0
     container_name: Immich_PostgreSQL
     restart: unless-stopped
     environment:
@@ -68,7 +68,7 @@ services:
     - POSTGRES_USER=${IMMICH_DB_USER}
     - POSTGRES_PASSWORD=${IMMICH_DB_PASSWORD}
     volumes:
-    - ${CACHE_PATH}/PostgreSQL_Immich:/var/lib/postgresql
+    - ${CACHE_PATH}/PostgreSQL_Immich:/var/lib/postgresql/data
     deploy:
       resources:
         limits:
