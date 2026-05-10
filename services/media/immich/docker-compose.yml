@@ -68,7 +68,7 @@ services:
     - POSTGRES_USER=${IMMICH_DB_USER}
     - POSTGRES_PASSWORD=${IMMICH_DB_PASSWORD}
     volumes:
-    - ${CACHE_PATH}/PostgreSQL_Immich:/var/lib/postgresql/data
+    - ${CACHE_PATH}/PostgreSQL_Immich:/var/lib/postgresql
     deploy:
       resources:
         limits:
