@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   renovate:
-    runs-on: self-hosted
+    runs-on: [self-hosted, unraid, docker-compose, automation]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
