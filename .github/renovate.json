@@ -14,6 +14,7 @@
   "baseBranchPatterns": [
     "main"
   ],
+  "fetchChangeLogs": "off",
   "internalChecksFilter": "none",
   "recreateWhen": "always",
   "rebaseWhen": "conflicted",
@@ -27,10 +28,92 @@
         "docker-compose"
       ],
       "matchFileNames": [
-        "services/**/docker-compose.yml"
+        "services/automation/**/docker-compose.yml",
+        "services/infrastructure/**/docker-compose.yml"
       ],
-      "groupName": "Weekly container updates",
-      "groupSlug": "weekly-container-updates",
+      "groupName": "Weekly container updates - automation and infrastructure",
+      "groupSlug": "weekly-container-updates-automation-infrastructure",
+      "separateMajorMinor": true,
+      "minimumReleaseAge": "1 day",
+      "commitMessagePrefix": "chore: ",
+      "commitMessageTopic": "{{depName}}",
+      "labels": [
+        "automated",
+        "container-updates",
+        "infrastructure"
+      ]
+    },
+    {
+      "matchManagers": [
+        "docker-compose"
+      ],
+      "matchFileNames": [
+        "services/iot/**/docker-compose.yml",
+        "services/media/**/docker-compose.yml"
+      ],
+      "groupName": "Weekly container updates - iot and media",
+      "groupSlug": "weekly-container-updates-iot-media",
+      "separateMajorMinor": true,
+      "minimumReleaseAge": "1 day",
+      "commitMessagePrefix": "chore: ",
+      "commitMessageTopic": "{{depName}}",
+      "labels": [
+        "automated",
+        "container-updates",
+        "infrastructure"
+      ]
+    },
+    {
+      "matchManagers": [
+        "docker-compose"
+      ],
+      "matchFileNames": [
+        "services/monitoring/**/docker-compose.yml",
+        "services/networking/**/docker-compose.yml"
+      ],
+      "groupName": "Weekly container updates - monitoring and networking",
+      "groupSlug": "weekly-container-updates-monitoring-networking",
+      "separateMajorMinor": true,
+      "minimumReleaseAge": "1 day",
+      "commitMessagePrefix": "chore: ",
+      "commitMessageTopic": "{{depName}}",
+      "labels": [
+        "automated",
+        "container-updates",
+        "infrastructure"
+      ]
+    },
+    {
+      "matchManagers": [
+        "docker-compose"
+      ],
+      "matchFileNames": [
+        "services/productivity/**/docker-compose.yml",
+        "services/security/**/docker-compose.yml"
+      ],
+      "groupName": "Weekly container updates - productivity and security",
+      "groupSlug": "weekly-container-updates-productivity-security",
+      "separateMajorMinor": true,
+      "minimumReleaseAge": "1 day",
+      "commitMessagePrefix": "chore: ",
+      "commitMessageTopic": "{{depName}}",
+      "labels": [
+        "automated",
+        "container-updates",
+        "infrastructure"
+      ]
+    },
+    {
+      "matchManagers": [
+        "docker-compose"
+      ],
+      "matchFileNames": [
+        "services/utilities/**/docker-compose.yml",
+        "services/ecommerce/**/docker-compose.yml",
+        "services/gaming/**/docker-compose.yml"
+      ],
+      "groupName": "Weekly container updates - utilities ecommerce and gaming",
+      "groupSlug": "weekly-container-updates-utilities-ecommerce-gaming",
       "separateMajorMinor": true,
       "minimumReleaseAge": "1 day",
       "commitMessagePrefix": "chore: ",
