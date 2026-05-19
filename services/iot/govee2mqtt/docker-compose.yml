@@ -1,0 +1,35 @@
+services:
+  govee2mqtt:
+    image: ghcr.io/wez/govee2mqtt:2026.03.25-ab9deb66
+    container_name: govee2mqtt
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - RUST_LOG_STYLE=always
+      - GOVEE_EMAIL=${GOVEE_EMAIL:-}
+      - GOVEE_PASSWORD=${GOVEE_PASSWORD:-}
+      - GOVEE_API_KEY=${GOVEE_API_KEY:-}
+      - GOVEE_MQTT_HOST=${GOVEE_MQTT_HOST}
+      - GOVEE_MQTT_PORT=${GOVEE_MQTT_PORT:-1883}
+      - GOVEE_MQTT_USER=${GOVEE_MQTT_USER:-}
+      - GOVEE_MQTT_PASSWORD=${GOVEE_MQTT_PASSWORD:-}
+      - GOVEE_TEMPERATURE_SCALE=${GOVEE_TEMPERATURE_SCALE:-C}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=govee2mqtt
+    volumes:
+      - ${HOME_ASSISTANT_PATH}/govee2mqtt:/data
+    network_mode: host
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+        reservations:
+          cpus: "0.1"
+          memory: 256M
+    labels:
+      - kuma.govee2mqtt.type=docker
+      - kuma.govee2mqtt.name=Govee2MQTT
+      - kuma.govee2mqtt.interval=60
+      - kuma.govee2mqtt.tags=iot,mqtt,govee

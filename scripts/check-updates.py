@@ -38,6 +38,7 @@ REPO_MAPPINGS = {
     'ghcr.io/home-assistant/home-assistant': 'home-assistant/core',
     'eclipse-mosquitto': 'eclipse/mosquitto',
     'koenkk/zigbee2mqtt': 'Koenkk/zigbee2mqtt',
+    'ghcr.io/wez/govee2mqtt': 'wez/govee2mqtt',
     'ghcr.io/home-assistant-libs/python-matter-server': 'home-assistant-libs/python-matter-server',
     
     # Media
@@ -97,6 +98,7 @@ VERSION_PATTERNS = {
     'home-assistant': r'^\d{4}\.\d+$',
     'mosquitto': r'^\d+\.\d+\.\d+$',
     'zigbee2mqtt': r'^\d+\.\d+\.\d+$',
+    'govee2mqtt': r'^\d{4}\.\d{2}\.\d{2}-[0-9a-f]{8}$',
     'matter-server': r'^\d+\.\d+\.\d+$',
     
     # Media

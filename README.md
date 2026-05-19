@@ -30,6 +30,7 @@ services/
 │   └── redis/           # In-memory cache
 ├── iot/                 # Smart home and IoT
 │   ├── home-assistant/  # Home automation hub
+│   ├── govee2mqtt/      # Govee bridge to MQTT/Home Assistant
 │   ├── mosquitto/       # MQTT message broker
 │   └── zigbee2mqtt/     # Zigbee to MQTT bridge
 ├── media/               # Media management
@@ -64,7 +65,7 @@ services/
 ## 🔧 Service Categories & Resource Limits
 
 ### Light Services (0.25-0.5 CPU, 128-512MB RAM)
-- Dashy, GoAccess, Honeygain, Cloudflared, Mosquitto, Portainer
+- Dashy, GoAccess, Honeygain, Cloudflared, Mosquitto, Govee2MQTT, Portainer
 - These are dashboards, analytics, and lightweight utilities
 
 ### Medium Services (0.5-1 CPU, 512MB-2GB RAM)
@@ -165,7 +166,7 @@ See LICENSE file for details
 
 ---
 
-**Last Updated**: January 2026  
+**Last Updated**: May 2026  
 **Services**: 35+  
 **Total CPU Limit**: ~25 cores  
 **Total Memory Limit**: ~35GB
