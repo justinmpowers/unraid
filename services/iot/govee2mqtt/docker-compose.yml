@@ -6,9 +6,7 @@ services:
     environment:
       - TZ=${TZ}
       - RUST_LOG_STYLE=always
-      - GOVEE_EMAIL=${GOVEE_EMAIL:-}
-      - GOVEE_PASSWORD=${GOVEE_PASSWORD:-}
-      - GOVEE_API_KEY=${GOVEE_API_KEY:-}
+      - GOVEE_API_KEY=${GOVEE_API_KEY}
       - GOVEE_MQTT_HOST=${GOVEE_MQTT_HOST}
       - GOVEE_MQTT_PORT=${GOVEE_MQTT_PORT:-1883}
       - GOVEE_MQTT_USER=${GOVEE_MQTT_USER:-}
