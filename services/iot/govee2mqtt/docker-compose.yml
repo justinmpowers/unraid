@@ -18,7 +18,7 @@ services:
       - HOST_HOSTNAME=JP-Dell
       - HOST_CONTAINERNAME=govee2mqtt
     volumes:
-      - ${HOME_ASSISTANT_PATH}/govee2mqtt:/data
+      - ${APPDATA_PATH}/govee2mqtt:/data
     network_mode: host
     deploy:
       resources:
