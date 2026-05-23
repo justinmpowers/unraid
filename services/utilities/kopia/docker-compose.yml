@@ -32,8 +32,8 @@ services:
     - /dev/zfs:/dev/zfs
     cap_add:
     - SYS_ADMIN
+    entrypoint: /bin/bash
     command:
-    - /bin/bash
     - -c
     - |
       set -e
@@ -110,8 +110,8 @@ services:
     - /dev/zfs:/dev/zfs
     ports:
     - 51516:51515
+    entrypoint: /bin/bash
     command:
-    - /bin/bash
     - -c
     - |
       set -e
