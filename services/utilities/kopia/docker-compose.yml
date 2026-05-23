@@ -44,6 +44,11 @@ services:
           --bucket="$$KOPIA_B2_BUCKET" \
           --access-key="$$KOPIA_B2_KEY_ID" \
           --secret-access-key="$$KOPIA_B2_KEY" \
+          --endpoint="$$KOPIA_B2_ENDPOINT" \
+        || kopia repository create s3 \
+          --bucket="$$KOPIA_B2_BUCKET" \
+          --access-key="$$KOPIA_B2_KEY_ID" \
+          --secret-access-key="$$KOPIA_B2_KEY" \
           --endpoint="$$KOPIA_B2_ENDPOINT"
       fi
       exec kopia server start \
