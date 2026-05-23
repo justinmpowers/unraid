@@ -21,7 +21,7 @@ services:
     - ${APPDATA_PATH}/kopia/scripts:/app/scripts:ro
     - /mnt:/mnt:ro
     - /mnt/user:/data/user:ro
-    - /mnt/user/backups:/data/backups
+    - ${APPDATA_PATH}/backups:/data/backups
     - /usr/sbin/zfs:/usr/sbin/zfs:ro
     - /usr/sbin/zpool:/usr/sbin/zpool:ro
     - /sbin/mount:/sbin/mount:ro
@@ -101,7 +101,7 @@ services:
     - ${APPDATA_PATH}/kopia/scripts:/app/scripts:ro
     - /mnt:/mnt:ro
     - /mnt/user:/data/user:ro
-    - /mnt/user/backups:/data/backups
+    - ${APPDATA_PATH}/backups:/data/backups
     - /usr/sbin/zfs:/usr/sbin/zfs:ro
     - /usr/sbin/zpool:/usr/sbin/zpool:ro
     - /sbin/mount:/sbin/mount:ro
