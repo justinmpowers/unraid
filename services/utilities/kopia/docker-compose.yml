@@ -10,6 +10,9 @@ services:
       KOPIA_SERVER_PASSWORD: ${KOPIA_B2_PASSWORD}
       KOPIA_CONFIG_PATH: /app/config/repository.config
       KOPIA_PERSIST_CREDENTIALS_ON_CONNECT: 'true'
+      KOPIA_B2_BUCKET: ${KOPIA_B2_BUCKET}
+      KOPIA_B2_KEY_ID: ${KOPIA_B2_KEY_ID}
+      KOPIA_B2_KEY: ${KOPIA_B2_KEY}
     volumes:
     - ${APPDATA_PATH}/kopia/backblaze/config:/app/config
     - ${APPDATA_PATH}/kopia/backblaze/cache:/app/cache
@@ -30,13 +33,23 @@ services:
     cap_add:
     - SYS_ADMIN
     command:
-    - server
-    - start
-    - --address=0.0.0.0:51515
-    - --disable-csrf-token-checks
-    - --server-username=admin
-    - --server-password=${KOPIA_SERVER_PASSWORD}
-    - --insecure
+    - /bin/bash
+    - -c
+    - |
+      set -e
+      if ! kopia repository status >/dev/null 2>&1; then
+        echo "Repository not connected — reconnecting to Backblaze B2..."
+        kopia repository connect b2 \
+          --bucket="$$KOPIA_B2_BUCKET" \
+          --key-id="$$KOPIA_B2_KEY_ID" \
+          --key="$$KOPIA_B2_KEY"
+      fi
+      exec kopia server start \
+        --address=0.0.0.0:51515 \
+        --disable-csrf-token-checks \
+        --server-username=admin \
+        --server-password="$$KOPIA_SERVER_PASSWORD" \
+        --insecure
     user: 0:0
     deploy:
       resources:
@@ -72,6 +85,14 @@ services:
       KOPIA_PASSWORD: ${KOPIA_TNAS_PASSWORD}
       KOPIA_SERVER_USERNAME: ${KOPIA_TNAS_USERNAME}
       KOPIA_SERVER_PASSWORD: ${KOPIA_TNAS_PASSWORD}
+      KOPIA_CONFIG_PATH: /app/config/repository.config
+      KOPIA_PERSIST_CREDENTIALS_ON_CONNECT: 'true'
+      KOPIA_TNAS_HOST: ${KOPIA_TNAS_HOST}
+      KOPIA_TNAS_SFTP_USER: ${KOPIA_TNAS_SFTP_USER}
+      KOPIA_TNAS_SFTP_PATH: ${KOPIA_TNAS_SFTP_PATH}
+      KOPIA_TNAS_SFTP_PORT: ${KOPIA_TNAS_SFTP_PORT:-22}
+      KOPIA_TNAS_SFTP_KEYFILE: /app/config/ssh/id_rsa
+      KOPIA_TNAS_SFTP_KNOWN_HOSTS: /app/config/ssh/known_hosts
     volumes:
     - ${APPDATA_PATH}/kopia/truenas/config:/app/config
     - ${APPDATA_PATH}/kopia/truenas/cache:/app/cache
@@ -90,13 +111,33 @@ services:
     ports:
     - 51516:51515
     command:
-    - server
-    - start
-    - --address=0.0.0.0:51515
-    - --disable-csrf-token-checks
-    - --server-username=admin
-    - --server-password=${KOPIA_SERVER_PASSWORD}
-    - --insecure
+    - /bin/bash
+    - -c
+    - |
+      set -e
+      if ! kopia repository status >/dev/null 2>&1; then
+        echo "Repository not connected — connecting to TrueNAS via SFTP..."
+        kopia repository connect sftp \
+          --host="$$KOPIA_TNAS_HOST" \
+          --username="$$KOPIA_TNAS_SFTP_USER" \
+          --path="$$KOPIA_TNAS_SFTP_PATH" \
+          --port="$$KOPIA_TNAS_SFTP_PORT" \
+          --keyfile="$$KOPIA_TNAS_SFTP_KEYFILE" \
+          --known-hosts-file="$$KOPIA_TNAS_SFTP_KNOWN_HOSTS" \
+        || kopia repository create sftp \
+          --host="$$KOPIA_TNAS_HOST" \
+          --username="$$KOPIA_TNAS_SFTP_USER" \
+          --path="$$KOPIA_TNAS_SFTP_PATH" \
+          --port="$$KOPIA_TNAS_SFTP_PORT" \
+          --keyfile="$$KOPIA_TNAS_SFTP_KEYFILE" \
+          --known-hosts-file="$$KOPIA_TNAS_SFTP_KNOWN_HOSTS"
+      fi
+      exec kopia server start \
+        --address=0.0.0.0:51515 \
+        --disable-csrf-token-checks \
+        --server-username=admin \
+        --server-password="$$KOPIA_SERVER_PASSWORD" \
+        --insecure
     user: 0:0
     deploy:
       resources:
