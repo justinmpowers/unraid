@@ -108,6 +108,8 @@ services:
     - /sbin/umount:/sbin/umount:ro
     devices:
     - /dev/zfs:/dev/zfs
+    dns:
+    - 100.100.100.100
     ports:
     - 51516:51515
     entrypoint: /bin/bash
