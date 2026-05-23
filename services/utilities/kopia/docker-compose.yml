@@ -123,14 +123,14 @@ services:
           --path="$$KOPIA_TNAS_SFTP_PATH" \
           --port="$$KOPIA_TNAS_SFTP_PORT" \
           --keyfile="$$KOPIA_TNAS_SFTP_KEYFILE" \
-          --known-hosts-file="$$KOPIA_TNAS_SFTP_KNOWN_HOSTS" \
+          --known-hosts="$$KOPIA_TNAS_SFTP_KNOWN_HOSTS" \
         || kopia repository create sftp \
           --host="$$KOPIA_TNAS_HOST" \
           --username="$$KOPIA_TNAS_SFTP_USER" \
           --path="$$KOPIA_TNAS_SFTP_PATH" \
           --port="$$KOPIA_TNAS_SFTP_PORT" \
           --keyfile="$$KOPIA_TNAS_SFTP_KEYFILE" \
-          --known-hosts-file="$$KOPIA_TNAS_SFTP_KNOWN_HOSTS"
+          --known-hosts="$$KOPIA_TNAS_SFTP_KNOWN_HOSTS"
       fi
       exec kopia server start \
         --address=0.0.0.0:51515 \
