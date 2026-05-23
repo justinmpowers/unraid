@@ -13,6 +13,7 @@ services:
       KOPIA_B2_BUCKET: ${KOPIA_B2_BUCKET}
       KOPIA_B2_KEY_ID: ${KOPIA_B2_KEY_ID}
       KOPIA_B2_KEY: ${KOPIA_B2_KEY}
+      KOPIA_B2_ENDPOINT: ${KOPIA_B2_ENDPOINT}
     volumes:
     - ${APPDATA_PATH}/kopia/backblaze/config:/app/config
     - ${APPDATA_PATH}/kopia/backblaze/cache:/app/cache
@@ -38,11 +39,12 @@ services:
     - |
       set -e
       if ! kopia repository status >/dev/null 2>&1; then
-        echo "Repository not connected — reconnecting to Backblaze B2..."
-        kopia repository connect b2 \
+        echo "Repository not connected — reconnecting to Backblaze B2 (S3-compatible)..."
+        kopia repository connect s3 \
           --bucket="$$KOPIA_B2_BUCKET" \
-          --key-id="$$KOPIA_B2_KEY_ID" \
-          --key="$$KOPIA_B2_KEY"
+          --access-key="$$KOPIA_B2_KEY_ID" \
+          --secret-access-key="$$KOPIA_B2_KEY" \
+          --endpoint="$$KOPIA_B2_ENDPOINT"
       fi
       exec kopia server start \
         --address=0.0.0.0:51515 \
