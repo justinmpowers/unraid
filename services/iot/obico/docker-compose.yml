@@ -102,7 +102,6 @@ services:
     - traefik.docker.network=iot_net
     - traefik.http.routers.obico.rule=Host(`obico.${DOMAIN}`)
     - traefik.http.routers.obico.entrypoints=web
-    - traefik.http.routers.obico.middlewares=force-https-scheme@file,default-headers@file
     - traefik.http.services.obico.loadbalancer.server.port=3334
     - kuma.obico.type=http
     - kuma.obico.url=http://obico:3334/hc/
