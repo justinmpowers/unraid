@@ -32,7 +32,7 @@ services:
           cpus: '0.05'
           memory: 64M
   obico-ml-api:
-    image: ghcr.io/justinmpowers/obico-ml-api:${OBICO_TAG:-latest}
+    image: ghcr.io/justinmpowers/obico-ml-api:2025.05.26
     container_name: obico-ml-api
     restart: unless-stopped
     tty: true
@@ -63,7 +63,7 @@ services:
           cpus: '0.5'
           memory: 512M
   obico:
-    image: ghcr.io/justinmpowers/obico-web:${OBICO_TAG:-latest}
+    image: ghcr.io/justinmpowers/obico-web:2025.05.26
     container_name: obico
     restart: unless-stopped
     command: sh -c 'python manage.py migrate && python manage.py collectstatic -v 2
@@ -134,7 +134,7 @@ services:
           cpus: '0.25'
           memory: 256M
   obico-tasks:
-    image: ghcr.io/justinmpowers/obico-web:${OBICO_TAG:-latest}
+    image: ghcr.io/justinmpowers/obico-web:2025.05.26
     container_name: obico-tasks
     restart: unless-stopped
     command: sh -c "celery -A config worker --beat -l info -c 2 -Q realtime,celery"
