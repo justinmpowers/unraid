@@ -62,7 +62,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '16'
           cache: 'yarn'
           cache-dependency-path: obico-server/frontend/yarn.lock
 
