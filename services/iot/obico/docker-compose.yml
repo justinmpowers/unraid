@@ -192,6 +192,50 @@ services:
         reservations:
           cpus: '0.1'
           memory: 128M
+  octoprint:
+    image: octoprint/octoprint:1.11.7
+    container_name: octoprint
+    restart: unless-stopped
+    environment:
+    - TZ=${TZ}
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=JP-Dell
+    - HOST_CONTAINERNAME=octoprint
+    volumes:
+    - ${APPDATA_PATH}/octoprint:/octoprint
+    ports:
+    - 5000:5000
+    labels:
+    - traefik.enable=true
+    - traefik.docker.network=iot_net
+    - traefik.http.routers.octoprint.rule=Host(`octoprint.${DOMAIN}`)
+    - traefik.http.routers.octoprint.entrypoints=web
+    - traefik.http.services.octoprint.loadbalancer.server.port=5000
+    - kuma.octoprint.type=http
+    - kuma.octoprint.url=http://octoprint:5000
+    - kuma.octoprint.name=OctoPrint
+    - kuma.octoprint.interval=60
+    - kuma.octoprint.tags=iot,3dprinting
+    - net.unraid.docker.icon=https://octoprint.org/assets/img/logo.png
+    - net.unraid.docker.webui=http://[IP]:[PORT:5000]
+    networks:
+    - iot_net
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - wget --no-verbose --tries=1 --spider --no-check-certificate http://127.0.0.1:5000/
+      start_period: 60s
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
 networks:
   iot_net:
     external: true
