@@ -1,0 +1,198 @@
+services:
+  obico-redis:
+    image: redis:7.2-alpine
+    container_name: obico-redis
+    restart: unless-stopped
+    environment:
+    - TZ=${TZ}
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=JP-Dell
+    - HOST_CONTAINERNAME=obico-redis
+    volumes:
+    - ${APPDATA_PATH}/obico/redis:/data
+    networks:
+    - iot_net
+    healthcheck:
+      test:
+      - CMD
+      - redis-cli
+      - --raw
+      - incr
+      - ping
+      start_period: 15s
+      interval: 15s
+      timeout: 10s
+      retries: 20
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+  obico-ml-api:
+    image: ghcr.io/justinmpowers/obico-ml-api:${OBICO_TAG:-latest}
+    container_name: obico-ml-api
+    restart: unless-stopped
+    tty: true
+    command: bash -c "gunicorn --bind 0.0.0.0:3333 --workers 1 wsgi"
+    environment:
+    - TZ=${TZ}
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=JP-Dell
+    - HOST_CONTAINERNAME=obico-ml-api
+    - DEBUG=True
+    - FLASK_APP=server.py
+    networks:
+    - iot_net
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - wget --no-verbose --tries=1 --spider --no-check-certificate http://localhost:3333/hc/
+      start_period: 30s
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+  obico:
+    image: ghcr.io/justinmpowers/obico-web:${OBICO_TAG:-latest}
+    container_name: obico
+    restart: unless-stopped
+    command: sh -c 'python manage.py migrate && python manage.py collectstatic -v 2
+      --noinput && daphne -b 0.0.0.0 -p 3334 config.routing:application'
+    environment:
+    - TZ=${TZ}
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=JP-Dell
+    - HOST_CONTAINERNAME=obico
+    - REDIS_URL=redis://obico-redis:6379
+    - DATABASE_URL=${OBICO_DATABASE_URL:-sqlite:////app/data/db.sqlite3}
+    - DJANGO_SECRET_KEY=${OBICO_DJANGO_SECRET_KEY}
+    - SITE_USES_HTTPS=${OBICO_SITE_USES_HTTPS:-False}
+    - SITE_IS_PUBLIC=${OBICO_SITE_IS_PUBLIC:-False}
+    - CSRF_TRUSTED_ORIGINS=${OBICO_CSRF_TRUSTED_ORIGINS:-}
+    - ACCOUNT_ALLOW_SIGN_UP=${OBICO_ACCOUNT_ALLOW_SIGN_UP:-False}
+    - INTERNAL_MEDIA_HOST=http://obico:3334
+    - ML_API_HOST=http://obico-ml-api:3333
+    - EMAIL_HOST=${OBICO_EMAIL_HOST:-}
+    - EMAIL_HOST_USER=${OBICO_EMAIL_HOST_USER:-}
+    - EMAIL_HOST_PASSWORD=${OBICO_EMAIL_HOST_PASSWORD:-}
+    - EMAIL_PORT=${OBICO_EMAIL_PORT:-587}
+    - EMAIL_USE_TLS=${OBICO_EMAIL_USE_TLS:-True}
+    - DEFAULT_FROM_EMAIL=${OBICO_DEFAULT_FROM_EMAIL:-changeme@example.com}
+    - TELEGRAM_BOT_TOKEN=${OBICO_TELEGRAM_BOT_TOKEN:-}
+    - ADMIN_IP_WHITELIST=${OBICO_ADMIN_IP_WHITELIST:-}
+    - WEBPACK_LOADER_ENABLED=False
+    - OCTOPRINT_TUNNEL_PORT_RANGE=0-0
+    volumes:
+    - ${APPDATA_PATH}/obico/data:/app/data
+    - ${APPDATA_PATH}/obico/media:/app/media
+    ports:
+    - 3334:3334
+    labels:
+    - traefik.enable=true
+    - traefik.docker.network=iot_net
+    - traefik.http.routers.obico.rule=Host(`obico.${DOMAIN}`)
+    - traefik.http.routers.obico.entrypoints=web
+    - traefik.http.routers.obico.middlewares=force-https-scheme@file,default-headers@file
+    - traefik.http.services.obico.loadbalancer.server.port=3334
+    - kuma.obico.type=http
+    - kuma.obico.url=http://obico:3334/hc/
+    - kuma.obico.name=Obico
+    - kuma.obico.interval=60
+    - kuma.obico.keyword=ok
+    - kuma.obico.tags=iot,3dprinting
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/TheSpaghettiDetective/obico-server/release/frontend/src/assets/img/logo-compact.svg
+    - net.unraid.docker.webui=http://[IP]:[PORT:3334]
+    networks:
+    - iot_net
+    depends_on:
+    - obico-redis
+    - obico-ml-api
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - wget --no-verbose --tries=1 --spider --no-check-certificate http://localhost:3334/hc/
+      start_period: 90s
+      interval: 90s
+      timeout: 20s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+  obico-tasks:
+    image: ghcr.io/justinmpowers/obico-web:${OBICO_TAG:-latest}
+    container_name: obico-tasks
+    restart: unless-stopped
+    command: sh -c "celery -A config worker --beat -l info -c 2 -Q realtime,celery"
+    environment:
+    - TZ=${TZ}
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=JP-Dell
+    - HOST_CONTAINERNAME=obico-tasks
+    - REDIS_URL=redis://obico-redis:6379
+    - DATABASE_URL=${OBICO_DATABASE_URL:-sqlite:////app/data/db.sqlite3}
+    - DJANGO_SECRET_KEY=${OBICO_DJANGO_SECRET_KEY}
+    - SITE_USES_HTTPS=${OBICO_SITE_USES_HTTPS:-False}
+    - SITE_IS_PUBLIC=${OBICO_SITE_IS_PUBLIC:-False}
+    - CSRF_TRUSTED_ORIGINS=${OBICO_CSRF_TRUSTED_ORIGINS:-}
+    - ACCOUNT_ALLOW_SIGN_UP=${OBICO_ACCOUNT_ALLOW_SIGN_UP:-False}
+    - INTERNAL_MEDIA_HOST=http://obico:3334
+    - ML_API_HOST=http://obico-ml-api:3333
+    - EMAIL_HOST=${OBICO_EMAIL_HOST:-}
+    - EMAIL_HOST_USER=${OBICO_EMAIL_HOST_USER:-}
+    - EMAIL_HOST_PASSWORD=${OBICO_EMAIL_HOST_PASSWORD:-}
+    - EMAIL_PORT=${OBICO_EMAIL_PORT:-587}
+    - EMAIL_USE_TLS=${OBICO_EMAIL_USE_TLS:-True}
+    - DEFAULT_FROM_EMAIL=${OBICO_DEFAULT_FROM_EMAIL:-changeme@example.com}
+    - TELEGRAM_BOT_TOKEN=${OBICO_TELEGRAM_BOT_TOKEN:-}
+    - ADMIN_IP_WHITELIST=${OBICO_ADMIN_IP_WHITELIST:-}
+    - WEBPACK_LOADER_ENABLED=False
+    - OCTOPRINT_TUNNEL_PORT_RANGE=0-0
+    volumes:
+    - ${APPDATA_PATH}/obico/data:/app/data
+    - ${APPDATA_PATH}/obico/media:/app/media
+    labels:
+    - kuma.obico_tasks.type=docker
+    - kuma.obico_tasks.docker_container=obico-tasks
+    - kuma.obico_tasks.docker_host=unix:///var/run/docker.sock
+    - kuma.obico_tasks.name=Obico Tasks
+    - kuma.obico_tasks.interval=60
+    - kuma.obico_tasks.tags=iot,3dprinting,worker
+    networks:
+    - iot_net
+    depends_on:
+    - obico-redis
+    - obico
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - celery -A config inspect ping
+      start_period: 15s
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+networks:
+  iot_net:
+    external: true

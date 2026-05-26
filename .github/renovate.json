@@ -125,6 +125,13 @@
       ]
     },
     {
+      "matchPackageNames": [
+        "ghcr.io/justinmpowers/obico-web",
+        "ghcr.io/justinmpowers/obico-ml-api"
+      ],
+      "versioning": "calver:YYYY.0M.0D"
+    },
+    {
       "matchUpdateTypes": [
         "major"
       ],
