@@ -1,6 +1,6 @@
 services:
   redis:
-    image: redis:8.6.3-alpine
+    image: redis:8.8.0-alpine
     container_name: Redis
     restart: unless-stopped
     environment:
