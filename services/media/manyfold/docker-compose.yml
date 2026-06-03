@@ -1,0 +1,99 @@
+services:
+  manyfold:
+    image: manyfold3d/manyfold:v0.143.0
+    container_name: manyfold
+    restart: unless-stopped
+    depends_on:
+    - manyfold-postgres
+    - manyfold-redis
+    environment:
+    - TZ=${TZ}
+    - PUID=${PUID}
+    - PGID=${PGID}
+    - SECRET_KEY_BASE=${MANYFOLD_SECRET_KEY_BASE}
+    - DATABASE_ADAPTER=${MANYFOLD_DATABASE_ADAPTER}
+    - DATABASE_HOST=${MANYFOLD_DATABASE_HOST}
+    - DATABASE_PORT=${MANYFOLD_DATABASE_PORT}
+    - DATABASE_USER=${MANYFOLD_DATABASE_USER}
+    - DATABASE_PASSWORD=${MANYFOLD_DATABASE_PASSWORD}
+    - DATABASE_NAME=${MANYFOLD_DATABASE_NAME}
+    - REDIS_URL=${MANYFOLD_REDIS_URL}
+    - PUBLIC_HOSTNAME=${MANYFOLD_PUBLIC_HOSTNAME}
+    - PUBLIC_PORT=${MANYFOLD_PUBLIC_PORT}
+    - MULTIUSER=${MANYFOLD_MULTIUSER}
+    - HTTPS_ONLY=${MANYFOLD_HTTPS_ONLY}
+    volumes:
+    - ${MANYFOLD_MODELS_PATH}:/models
+    security_opt:
+    - no-new-privileges:true
+    cap_drop:
+    - ALL
+    cap_add:
+    - CHOWN
+    - DAC_OVERRIDE
+    - SETUID
+    - SETGID
+    networks:
+    - public_net
+    - db_net
+    labels:
+    - traefik.enable=true
+    - traefik.docker.network=public_net
+    - traefik.http.routers.manyfold.rule=Host(`manyfold.${DOMAIN}`)
+    - traefik.http.routers.manyfold.entrypoints=web
+    - traefik.http.routers.manyfold.middlewares=crowdsec@file
+    - traefik.http.services.manyfold.loadbalancer.server.port=3214
+    - kuma.manyfold.type=http
+    - kuma.manyfold.url=http://manyfold:3214
+    - kuma.manyfold.name=Manyfold
+    - kuma.manyfold.interval=60
+    - kuma.manyfold.keyword=Manyfold
+    - kuma.manyfold.tags=media,3d,library
+
+  manyfold-postgres:
+    image: postgres:15
+    container_name: manyfold-postgres
+    restart: unless-stopped
+    environment:
+    - TZ=${TZ}
+    - POSTGRES_DB=${MANYFOLD_DATABASE_NAME}
+    - POSTGRES_USER=${MANYFOLD_DATABASE_USER}
+    - POSTGRES_PASSWORD=${MANYFOLD_DATABASE_PASSWORD}
+    volumes:
+    - ${APPDATA_PATH}/manyfold/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - pg_isready -U ${MANYFOLD_DATABASE_USER} -d ${MANYFOLD_DATABASE_NAME}
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+    - db_net
+
+  manyfold-redis:
+    image: redis:7
+    container_name: manyfold-redis
+    restart: unless-stopped
+    command:
+    - redis-server
+    - --appendonly
+    - yes
+    volumes:
+    - ${APPDATA_PATH}/manyfold/redis:/data
+    healthcheck:
+      test:
+      - CMD
+      - redis-cli
+      - ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+    - db_net
+
+networks:
+  public_net:
+    external: true
+  db_net:
+    external: true
