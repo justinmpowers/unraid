@@ -1,0 +1,343 @@
+services:
+  mcp-gateway:
+    image: nginx:1.29.1-alpine
+    container_name: mcp-gateway
+    restart: unless-stopped
+    environment:
+    - MCP_GATEWAY_TOKEN=${MCP_GATEWAY_TOKEN}
+    volumes:
+    - ./nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
+    depends_on:
+    - mcp-filesystem
+    - mcp-git
+    - mcp-github
+    - mcp-postgres
+    - mcp-fetch
+    networks:
+    - internal_net
+    # Internal-only by default. If you need host access, uncomment and bind localhost.
+    # ports:
+    # - 127.0.0.1:8811:8080
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - wget --no-verbose --tries=1 --spider http://localhost:8080/healthz || exit 1
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    security_opt:
+    - no-new-privileges:true
+
+  mcp-filesystem:
+    image: supercorp/supergateway:uvx
+    container_name: mcp-filesystem
+    restart: unless-stopped
+    command:
+    - --stdio
+    - npx -y @modelcontextprotocol/server-filesystem /workspace /data/models
+    - --outputTransport
+    - streamableHttp
+    - --streamableHttpPath
+    - /mcp
+    - --port
+    - '8000'
+    - --healthEndpoint
+    - /healthz
+    volumes:
+    - ${MCP_WORKSPACE_PATH}:/workspace
+    - ${MCP_MODELS_PATH}:/data/models
+    networks:
+    - internal_net
+
+  mcp-git:
+    image: supercorp/supergateway:uvx
+    container_name: mcp-git
+    restart: unless-stopped
+    command:
+    - --stdio
+    - uvx mcp-server-git --repository /workspace
+    - --outputTransport
+    - streamableHttp
+    - --streamableHttpPath
+    - /mcp
+    - --port
+    - '8000'
+    - --healthEndpoint
+    - /healthz
+    volumes:
+    - ${MCP_WORKSPACE_PATH}:/workspace:ro
+    networks:
+    - internal_net
+
+  mcp-github:
+    image: supercorp/supergateway:uvx
+    container_name: mcp-github
+    restart: unless-stopped
+    environment:
+    - GITHUB_PERSONAL_ACCESS_TOKEN=${MCP_GITHUB_TOKEN}
+    command:
+    - --stdio
+    - npx -y @modelcontextprotocol/server-github
+    - --outputTransport
+    - streamableHttp
+    - --streamableHttpPath
+    - /mcp
+    - --port
+    - '8000'
+    - --healthEndpoint
+    - /healthz
+    networks:
+    - internal_net
+
+  mcp-postgres:
+    image: supercorp/supergateway:uvx
+    container_name: mcp-postgres
+    restart: unless-stopped
+    command:
+    - --stdio
+    - npx -y @modelcontextprotocol/server-postgres ${MCP_POSTGRES_URL}
+    - --outputTransport
+    - streamableHttp
+    - --streamableHttpPath
+    - /mcp
+    - --port
+    - '8000'
+    - --healthEndpoint
+    - /healthz
+    networks:
+    - internal_net
+    - db_net
+
+  # Optional: one MCP Postgres endpoint per DB service in this repo.
+  # Enable with: docker compose --profile postgres-all up -d
+  mcp-postgres-manyfold:
+    image: supercorp/supergateway:uvx
+    container_name: mcp-postgres-manyfold
+    restart: unless-stopped
+    profiles:
+    - postgres-all
+    command:
+    - --stdio
+    - npx -y @modelcontextprotocol/server-postgres ${MCP_POSTGRES_URL_MANYFOLD}
+    - --outputTransport
+    - streamableHttp
+    - --streamableHttpPath
+    - /mcp
+    - --port
+    - '8000'
+    - --healthEndpoint
+    - /healthz
+    networks:
+    - internal_net
+    - db_net
+
+  mcp-postgres-authentik:
+    image: supercorp/supergateway:uvx
+    container_name: mcp-postgres-authentik
+    restart: unless-stopped
+    profiles:
+    - postgres-all
+    command:
+    - --stdio
+    - npx -y @modelcontextprotocol/server-postgres ${MCP_POSTGRES_URL_AUTHENTIK}
+    - --outputTransport
+    - streamableHttp
+    - --streamableHttpPath
+    - /mcp
+    - --port
+    - '8000'
+    - --healthEndpoint
+    - /healthz
+    networks:
+    - internal_net
+    - db_net
+
+  mcp-postgres-tandoor:
+    image: supercorp/supergateway:uvx
+    container_name: mcp-postgres-tandoor
+    restart: unless-stopped
+    profiles:
+    - postgres-all
+    command:
+    - --stdio
+    - npx -y @modelcontextprotocol/server-postgres ${MCP_POSTGRES_URL_TANDOOR}
+    - --outputTransport
+    - streamableHttp
+    - --streamableHttpPath
+    - /mcp
+    - --port
+    - '8000'
+    - --healthEndpoint
+    - /healthz
+    networks:
+    - internal_net
+    - db_net
+
+  mcp-postgres-wikijs:
+    image: supercorp/supergateway:uvx
+    container_name: mcp-postgres-wikijs
+    restart: unless-stopped
+    profiles:
+    - postgres-all
+    command:
+    - --stdio
+    - npx -y @modelcontextprotocol/server-postgres ${MCP_POSTGRES_URL_WIKIJS}
+    - --outputTransport
+    - streamableHttp
+    - --streamableHttpPath
+    - /mcp
+    - --port
+    - '8000'
+    - --healthEndpoint
+    - /healthz
+    networks:
+    - internal_net
+    - db_net
+
+  mcp-postgres-nextcloud:
+    image: supercorp/supergateway:uvx
+    container_name: mcp-postgres-nextcloud
+    restart: unless-stopped
+    profiles:
+    - postgres-all
+    command:
+    - --stdio
+    - npx -y @modelcontextprotocol/server-postgres ${MCP_POSTGRES_URL_NEXTCLOUD}
+    - --outputTransport
+    - streamableHttp
+    - --streamableHttpPath
+    - /mcp
+    - --port
+    - '8000'
+    - --healthEndpoint
+    - /healthz
+    networks:
+    - internal_net
+    - db_net
+
+  mcp-postgres-j3d:
+    image: supercorp/supergateway:uvx
+    container_name: mcp-postgres-j3d
+    restart: unless-stopped
+    profiles:
+    - postgres-all
+    command:
+    - --stdio
+    - npx -y @modelcontextprotocol/server-postgres ${MCP_POSTGRES_URL_J3D}
+    - --outputTransport
+    - streamableHttp
+    - --streamableHttpPath
+    - /mcp
+    - --port
+    - '8000'
+    - --healthEndpoint
+    - /healthz
+    networks:
+    - internal_net
+    - db_net
+
+  mcp-fetch:
+    image: supercorp/supergateway:uvx
+    container_name: mcp-fetch
+    restart: unless-stopped
+    command:
+    - --stdio
+    - npx -y @modelcontextprotocol/server-fetch
+    - --outputTransport
+    - streamableHttp
+    - --streamableHttpPath
+    - /mcp
+    - --port
+    - '8000'
+    - --healthEndpoint
+    - /healthz
+    networks:
+    - internal_net
+
+  # Optional phase-2 servers (disabled unless profile is enabled)
+  mcp-sqlite:
+    image: supercorp/supergateway:uvx
+    container_name: mcp-sqlite
+    restart: unless-stopped
+    profiles:
+    - optional
+    command:
+    - --stdio
+    - npx -y @modelcontextprotocol/server-sqlite ${MCP_SQLITE_PATH}
+    - --outputTransport
+    - streamableHttp
+    - --streamableHttpPath
+    - /mcp
+    - --port
+    - '8000'
+    volumes:
+    - ${MCP_SQLITE_HOST_DIR}:/data:ro
+    networks:
+    - internal_net
+
+  mcp-docker:
+    image: supercorp/supergateway:uvx
+    container_name: mcp-docker
+    restart: unless-stopped
+    profiles:
+    - optional
+    environment:
+    - DOCKER_HOST=tcp://docker-socket-proxy:2375
+    command:
+    - --stdio
+    - npx -y mcp-server-docker
+    - --outputTransport
+    - streamableHttp
+    - --streamableHttpPath
+    - /mcp
+    - --port
+    - '8000'
+    networks:
+    - internal_net
+    - docker_proxy_net
+
+  mcp-playwright:
+    image: supercorp/supergateway:uvx
+    container_name: mcp-playwright
+    restart: unless-stopped
+    profiles:
+    - optional
+    command:
+    - --stdio
+    - npx -y @playwright/mcp
+    - --outputTransport
+    - streamableHttp
+    - --streamableHttpPath
+    - /mcp
+    - --port
+    - '8000'
+    networks:
+    - internal_net
+
+  mcp-search:
+    image: supercorp/supergateway:uvx
+    container_name: mcp-search
+    restart: unless-stopped
+    profiles:
+    - optional
+    environment:
+    - TAVILY_API_KEY=${MCP_TAVILY_API_KEY}
+    command:
+    - --stdio
+    - npx -y tavily-mcp
+    - --outputTransport
+    - streamableHttp
+    - --streamableHttpPath
+    - /mcp
+    - --port
+    - '8000'
+    networks:
+    - internal_net
+
+networks:
+  internal_net:
+    external: true
+  db_net:
+    external: true
+  docker_proxy_net:
+    external: true
