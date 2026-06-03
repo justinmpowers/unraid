@@ -24,6 +24,8 @@ services:
     - HTTPS_ONLY=${MANYFOLD_HTTPS_ONLY}
     volumes:
     - ${MANYFOLD_MODELS_PATH}:/models
+    ports:
+    - 3214:3214
     security_opt:
     - no-new-privileges:true
     cap_drop:
