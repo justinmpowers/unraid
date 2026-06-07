@@ -58,7 +58,7 @@ services:
     - kuma.manyfold.tags=media,3d,library
 
   manyfold-postgres:
-    image: postgres:15
+    image: postgres:18
     container_name: manyfold-postgres
     restart: unless-stopped
     environment:
@@ -79,7 +79,7 @@ services:
     - db_net
 
   manyfold-redis:
-    image: redis:7
+    image: redis:8
     container_name: manyfold-redis
     restart: unless-stopped
     command:

@@ -1,6 +1,6 @@
 services:
   obico-redis:
-    image: redis:7.4-alpine
+    image: redis:8.8-alpine
     container_name: obico-redis
     restart: unless-stopped
     environment:
