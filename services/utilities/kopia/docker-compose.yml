@@ -1,6 +1,6 @@
 services:
   kopia-backblaze:
-    image: kopia/kopia:20260604.0.55837
+    image: kopia/kopia:20260604.0.62817
     container_name: kopia-backblaze
     restart: unless-stopped
     environment:
@@ -84,7 +84,7 @@ services:
     networks:
     - internal_net
   kopia-local:
-    image: kopia/kopia:20260604.0.55837
+    image: kopia/kopia:20260604.0.62817
     container_name: kopia-truenas
     restart: unless-stopped
     environment:
