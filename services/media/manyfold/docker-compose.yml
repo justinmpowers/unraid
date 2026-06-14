@@ -1,6 +1,6 @@
 services:
   manyfold:
-    image: manyfold3d/manyfold:0.143.0
+    image: manyfold3d/manyfold:0.143.2
     container_name: manyfold
     restart: unless-stopped
     depends_on:
