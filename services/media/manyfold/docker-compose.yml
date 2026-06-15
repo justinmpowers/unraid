@@ -66,6 +66,7 @@ services:
     - POSTGRES_DB=${MANYFOLD_DATABASE_NAME}
     - POSTGRES_USER=${MANYFOLD_DATABASE_USER}
     - POSTGRES_PASSWORD=${MANYFOLD_DATABASE_PASSWORD}
+    - PGDATA=/var/lib/postgresql/18/main
     volumes:
     - ${APPDATA_PATH}/manyfold/postgres:/var/lib/postgresql
     healthcheck:
