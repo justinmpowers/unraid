@@ -67,7 +67,7 @@ services:
     - POSTGRES_USER=${MANYFOLD_DATABASE_USER}
     - POSTGRES_PASSWORD=${MANYFOLD_DATABASE_PASSWORD}
     volumes:
-    - ${APPDATA_PATH}/manyfold/postgres:/var/lib/postgresql/data
+    - ${APPDATA_PATH}/manyfold/postgres:/var/lib/postgresql
     healthcheck:
       test:
       - CMD-SHELL
