@@ -1,0 +1,16 @@
+{
+  "name": "postiz-stack-scripts",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Utilities for Postiz + n8n automation on Unraid",
+  "main": "analytics-normalization.js",
+  "scripts": {
+    "check": "node --check analytics-normalization.js && node --check etsy-draft-creator.js",
+    "demo:analytics": "node analytics-normalization.js",
+    "etsy:create": "node etsy-draft-creator.js"
+  },
+  "dependencies": {
+    "axios": "^1.13.1",
+    "form-data": "^4.0.4"
+  }
+}

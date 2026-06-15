@@ -1,0 +1,225 @@
+services:
+  postiz-postgres:
+    image: postgres:18
+    container_name: postiz-postgres
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=${HOST_HOSTNAME}
+      - HOST_CONTAINERNAME=postiz-postgres
+      - POSTGRES_DB=${POSTIZ_DB_NAME}
+      - POSTGRES_USER=${POSTIZ_DB_USER}
+      - POSTGRES_PASSWORD=${POSTIZ_DB_PASSWORD}
+      - PGDATA=/var/lib/postgresql/18/main
+    volumes:
+      - ${APPDATA_PATH}/postiz-stack/postgres:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTIZ_DB_USER} -d ${POSTIZ_DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - db_net
+
+  postiz-redis:
+    image: redis:8
+    container_name: postiz-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - ${APPDATA_PATH}/postiz-stack/redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - db_net
+
+  temporal:
+    image: temporalio/auto-setup:1.26.2
+    container_name: postiz-temporal
+    restart: unless-stopped
+    depends_on:
+      postiz-postgres:
+        condition: service_healthy
+    environment:
+      - DB=postgres12
+      - DB_PORT=5432
+      - POSTGRES_SEEDS=postiz-postgres
+      - POSTGRES_USER=${POSTIZ_DB_USER}
+      - POSTGRES_PWD=${POSTIZ_DB_PASSWORD}
+      - DBNAME=${POSTIZ_TEMPORAL_DB_NAME:-postiz_temporal}
+      - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development-sql.yaml
+    volumes:
+      - ${APPDATA_PATH}/postiz-stack/temporal:/etc/temporal/config/dynamicconfig
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 7233 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    networks:
+      - db_net
+      - internal_net
+
+  postiz-api:
+    image: ${POSTIZ_API_IMAGE:-ghcr.io/gitroomhq/postiz-api:latest}
+    container_name: postiz-api
+    restart: unless-stopped
+    depends_on:
+      postiz-postgres:
+        condition: service_healthy
+      postiz-redis:
+        condition: service_healthy
+      temporal:
+        condition: service_healthy
+    environment:
+      - TZ=${TZ}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=${HOST_HOSTNAME}
+      - HOST_CONTAINERNAME=postiz-api
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://${POSTIZ_DB_USER}:${POSTIZ_DB_PASSWORD}@postiz-postgres:5432/${POSTIZ_DB_NAME}
+      - REDIS_URL=redis://postiz-redis:6379
+      - TEMPORAL_ADDRESS=temporal:7233
+      - POSTIZ_JWT_SECRET=${POSTIZ_JWT_SECRET}
+      - POSTIZ_PUBLIC_URL=https://postiz.${DOMAIN}
+      - POSTIZ_UPLOADS_PATH=/app/uploads
+    volumes:
+      - ${APPDATA_PATH}/postiz-stack/uploads:/app/uploads
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 45s
+    networks:
+      - db_net
+      - internal_net
+
+  postiz-frontend:
+    image: ${POSTIZ_FRONTEND_IMAGE:-ghcr.io/gitroomhq/postiz-frontend:latest}
+    container_name: postiz-frontend
+    restart: unless-stopped
+    depends_on:
+      postiz-api:
+        condition: service_healthy
+    environment:
+      - TZ=${TZ}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=${HOST_HOSTNAME}
+      - HOST_CONTAINERNAME=postiz-frontend
+      - NODE_ENV=production
+      - POSTIZ_API_URL=http://postiz-api:3000
+      - NEXT_PUBLIC_POSTIZ_API_URL=https://postiz-api.${DOMAIN}
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:4200 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=internal_net
+      - traefik.http.routers.postiz.rule=Host(`postiz.${DOMAIN}`)
+      - traefik.http.routers.postiz.entrypoints=web
+      - traefik.http.routers.postiz.middlewares=crowdsec@file
+      - traefik.http.services.postiz.loadbalancer.server.port=4200
+      - kuma.postiz.type=http
+      - kuma.postiz.url=http://postiz-frontend:4200
+      - kuma.postiz.name=Postiz Frontend
+      - kuma.postiz.interval=60
+      - kuma.postiz.tags=automation,social
+    networks:
+      - internal_net
+
+  n8n:
+    image: n8nio/n8n:1.104.2
+    container_name: n8n-postiz
+    restart: unless-stopped
+    depends_on:
+      postiz-api:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+    environment:
+      - TZ=${TZ}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=${HOST_HOSTNAME}
+      - HOST_CONTAINERNAME=n8n-postiz
+      - N8N_HOST=n8n.${DOMAIN}
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=https
+      - WEBHOOK_URL=https://n8n.${DOMAIN}
+      - N8N_EDITOR_BASE_URL=https://n8n.${DOMAIN}
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+      - N8N_SECURE_COOKIE=true
+      - N8N_DIAGNOSTICS_ENABLED=false
+      - N8N_COMMUNITY_PACKAGES_ENABLED=true
+      - N8N_CUSTOM_EXTENSIONS=/home/node/.n8n/custom
+      - N8N_RUNNERS_ENABLED=true
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - POSTIZ_BASE_URL=http://postiz-api:3000
+      - N8N_METRICS=true
+    volumes:
+      - ${APPDATA_PATH}/postiz-stack/n8n:/home/node/.n8n
+      - ./appdata/n8n/custom:/home/node/.n8n/custom
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=internal_net
+      - traefik.http.routers.n8n-postiz.rule=Host(`n8n.${DOMAIN}`)
+      - traefik.http.routers.n8n-postiz.entrypoints=web
+      - traefik.http.routers.n8n-postiz.middlewares=crowdsec@file
+      - traefik.http.services.n8n-postiz.loadbalancer.server.port=5678
+      - kuma.n8n_postiz.type=http
+      - kuma.n8n_postiz.url=http://n8n:5678/healthz
+      - kuma.n8n_postiz.name=n8n Postiz
+      - kuma.n8n_postiz.interval=60
+      - kuma.n8n_postiz.tags=automation,workflows
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:5678/healthz || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    networks:
+      - internal_net
+
+  ollama:
+    image: ollama/ollama:0.12.1
+    container_name: ollama-postiz
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=${HOST_HOSTNAME}
+      - HOST_CONTAINERNAME=ollama-postiz
+      - OLLAMA_KEEP_ALIVE=5m
+    volumes:
+      - ${APPDATA_PATH}/postiz-stack/ollama:/root/.ollama
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:11434/api/tags || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          cpus: "4.0"
+          memory: 8G
+        reservations:
+          cpus: "1.0"
+          memory: 2G
+    networks:
+      - internal_net
+
+networks:
+  db_net:
+    external: true
+  internal_net:
+    external: true
