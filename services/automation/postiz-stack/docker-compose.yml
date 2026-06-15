@@ -1,8 +1,10 @@
 services:
   postiz-postgres:
-    image: postgres:18
+    image: postgres:17-alpine
     container_name: postiz-postgres
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     environment:
       - TZ=${TZ}
       - HOST_OS=Unraid
@@ -23,10 +25,12 @@ services:
       - db_net
 
   postiz-redis:
-    image: redis:8
+    image: redis:7.2
     container_name: postiz-redis
     restart: unless-stopped
     command: ["redis-server", "--appendonly", "yes"]
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - ${APPDATA_PATH}/postiz-stack/redis:/data
     healthcheck:
@@ -38,9 +42,11 @@ services:
       - db_net
 
   temporal:
-    image: temporalio/auto-setup:1.26.2
+    image: temporalio/auto-setup:1.28.1
     container_name: postiz-temporal
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     depends_on:
       postiz-postgres:
         condition: service_healthy
@@ -65,9 +71,11 @@ services:
       - internal_net
 
   postiz-api:
-    image: ${POSTIZ_API_IMAGE:-ghcr.io/gitroomhq/postiz-api:latest}
+    image: ${POSTIZ_API_IMAGE}
     container_name: postiz-api
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     depends_on:
       postiz-postgres:
         condition: service_healthy
@@ -90,7 +98,7 @@ services:
     volumes:
       - ${APPDATA_PATH}/postiz-stack/uploads:/app/uploads
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/health || exit 1"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000${POSTIZ_API_HEALTH_PATH:-/health} || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -100,9 +108,11 @@ services:
       - internal_net
 
   postiz-frontend:
-    image: ${POSTIZ_FRONTEND_IMAGE:-ghcr.io/gitroomhq/postiz-frontend:latest}
+    image: ${POSTIZ_FRONTEND_IMAGE}
     container_name: postiz-frontend
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     depends_on:
       postiz-api:
         condition: service_healthy
@@ -115,7 +125,7 @@ services:
       - POSTIZ_API_URL=http://postiz-api:3000
       - NEXT_PUBLIC_POSTIZ_API_URL=https://postiz-api.${DOMAIN}
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:4200 || exit 1"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:4200${POSTIZ_FRONTEND_HEALTH_PATH:-/} || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -136,9 +146,11 @@ services:
       - internal_net
 
   n8n:
-    image: n8nio/n8n:1.104.2
+    image: docker.n8n.io/n8nio/n8n:1.123.56
     container_name: n8n-postiz
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     depends_on:
       postiz-api:
         condition: service_healthy
@@ -146,6 +158,7 @@ services:
         condition: service_healthy
     environment:
       - TZ=${TZ}
+      - GENERIC_TIMEZONE=${TZ}
       - HOST_OS=Unraid
       - HOST_HOSTNAME=${HOST_HOSTNAME}
       - HOST_CONTAINERNAME=n8n-postiz
@@ -160,6 +173,7 @@ services:
       - N8N_COMMUNITY_PACKAGES_ENABLED=true
       - N8N_CUSTOM_EXTENSIONS=/home/node/.n8n/custom
       - N8N_RUNNERS_ENABLED=true
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
       - OLLAMA_BASE_URL=http://ollama:11434
       - POSTIZ_BASE_URL=http://postiz-api:3000
       - N8N_METRICS=true
@@ -191,6 +205,8 @@ services:
     image: ollama/ollama:0.12.1
     container_name: ollama-postiz
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     environment:
       - TZ=${TZ}
       - HOST_OS=Unraid
