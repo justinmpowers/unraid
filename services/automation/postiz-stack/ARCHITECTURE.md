@@ -4,7 +4,7 @@ This stack provides a decoupled automation system for social content generation,
 
 ## Components
 
-- Postiz API and Frontend
+- Postiz single app service
 - PostgreSQL and Redis for Postiz state
 - Temporal for workflow durability
 - n8n for orchestration and webhook approval loops
@@ -19,11 +19,10 @@ flowchart LR
   Etsy[Etsy API v3] --> n8n[n8n]
   n8n --> Ollama[Ollama Local LLM]
   n8n --> Telegram[Telegram Approval]
-  n8n --> PostizAPI[Postiz API]
-  PostizUI[Postiz Frontend] --> PostizAPI
-  PostizAPI --> PG[(PostgreSQL)]
-  PostizAPI --> Redis[(Redis)]
-  PostizAPI --> Temporal[Temporal]
+  n8n --> Postiz[Postiz App]
+  Postiz --> PG[(PostgreSQL)]
+  Postiz --> Redis[(Redis)]
+  Postiz --> Temporal[Temporal]
   n8n --> Meta[Meta Graph API]
   n8n --> Pinterest[Pinterest v5 API]
 ```
@@ -56,7 +55,7 @@ sequenceDiagram
   autonumber
   participant U as Reviewer Browser
   participant B as n8n Workflow B
-  participant P as Postiz API
+  participant P as Postiz App
   participant S as Postiz Scheduler
 
   U->>B: GET editor webhook
