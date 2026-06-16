@@ -11,8 +11,6 @@ This file defines the full variable contract for the Postiz automation stack.
 
 ## Postiz service variables
 
-- POSTIZ_API_IMAGE: Explicit Postiz API image tag or digest.
-- POSTIZ_FRONTEND_IMAGE: Explicit Postiz frontend image tag or digest.
 - POSTIZ_JWT_SECRET: JWT signing secret for Postiz authentication.
 - POSTIZ_DB_NAME: Postiz database name.
 - POSTIZ_DB_USER: Postiz database user.

@@ -71,7 +71,7 @@ services:
       - internal_net
 
   postiz-api:
-    image: ${POSTIZ_API_IMAGE}
+    image: ghcr.io/gitroomhq/postiz-api:v2.21.8
     container_name: postiz-api
     restart: unless-stopped
     security_opt:
@@ -108,7 +108,7 @@ services:
       - internal_net
 
   postiz-frontend:
-    image: ${POSTIZ_FRONTEND_IMAGE}
+    image: ghcr.io/gitroomhq/postiz-frontend:v2.21.8
     container_name: postiz-frontend
     restart: unless-stopped
     security_opt:
