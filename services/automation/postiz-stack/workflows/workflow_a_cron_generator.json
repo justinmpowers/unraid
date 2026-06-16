@@ -1,0 +1,274 @@
+{
+  "name": "Workflow A - Weekly Generator + Approval Pause",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtDay": [
+                "sunday"
+              ],
+              "triggerAtHour": 8,
+              "triggerAtMinute": 0
+            }
+          ]
+        }
+      },
+      "id": "cron_weekly",
+      "name": "Weekly Sunday 08:00",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1.3,
+      "position": [
+        220,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://openapi.etsy.com/v3/application/shops/{{$env.ETSY_SHOP_ID}}/listings/active",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "={{$env.ETSY_CLIENT_ID}}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "etsy_active_listings",
+      "name": "Fetch Etsy Active Listings",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        460,
+        280
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_WITH_N8N_CREDENTIAL_ID",
+          "name": "Etsy Bearer Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://ollama:11434/api/generate",
+        "sendBody": true,
+        "contentType": "json",
+        "jsonBody": "={\n  \"model\": \"llama3:8b\",\n  \"stream\": false,\n  \"prompt\": \"You are a social media copywriter. Draft a high-performing caption for Etsy listing data: \" + JSON.stringify($json.results || $json)\n}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "ollama_generate",
+      "name": "Generate Content via Ollama",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        710,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "approval_state",
+              "name": "approval_state",
+              "type": "string",
+              "value": "PENDING_APPROVAL"
+            },
+            {
+              "id": "generated_caption",
+              "name": "generated_caption",
+              "type": "string",
+              "value": "={{$json.response || $json.text || 'Generated draft unavailable'}}"
+            },
+            {
+              "id": "resume_url",
+              "name": "resume_url",
+              "type": "string",
+              "value": "={{$execution.resumeUrl}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set_pending",
+      "name": "Set Pending Approval + Resume URL",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        970,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{$env.TELEGRAM_APPROVAL_CHAT_ID}}",
+        "text": "=New content draft is ready for review.\\n\\nState: {{$json.approval_state}}\\n\\nCaption: {{$json.generated_caption}}\\n\\nApprove here: {{$json.resume_url}}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "replyMarkup": "={\"inline_keyboard\":[[{\"text\":\"Approve & Continue\",\"url\":\"\" + $json.resume_url + \"\"}]]}"
+        }
+      },
+      "id": "telegram_notify",
+      "name": "Send Telegram Approval Button",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1230,
+        280
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_WITH_N8N_CREDENTIAL_ID",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resume": "webhook",
+        "options": {
+          "ignoreBots": false
+        }
+      },
+      "id": "wait_for_approval",
+      "name": "Wait For Webhook Approval",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1490,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "approval_result",
+              "name": "approval_result",
+              "type": "string",
+              "value": "={{$json.query.approved || 'approved'}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "approval_captured",
+      "name": "Capture Approval Payload",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1760,
+        280
+      ]
+    }
+  ],
+  "connections": {
+    "Weekly Sunday 08:00": {
+      "main": [
+        [
+          {
+            "node": "Fetch Etsy Active Listings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Etsy Active Listings": {
+      "main": [
+        [
+          {
+            "node": "Generate Content via Ollama",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Content via Ollama": {
+      "main": [
+        [
+          {
+            "node": "Set Pending Approval + Resume URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Pending Approval + Resume URL": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram Approval Button",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Telegram Approval Button": {
+      "main": [
+        [
+          {
+            "node": "Wait For Webhook Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait For Webhook Approval": {
+      "main": [
+        [
+          {
+            "node": "Capture Approval Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true,
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "notes": "Decoupled trigger workflow. This flow intentionally stops at approval capture and hands off to Workflow B listener/scheduler."
+  },
+  "tags": [
+    {
+      "name": "postiz"
+    },
+    {
+      "name": "approval"
+    }
+  ]
+}

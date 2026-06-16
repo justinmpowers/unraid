@@ -1,0 +1,405 @@
+{
+  "name": "Workflow B - Approval Listener + Postiz Schedule",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "postiz-approval-editor",
+        "httpMethod": "GET",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "editor_webhook",
+      "name": "Approval Editor Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        220,
+        120
+      ],
+      "webhookId": "postiz-approval-editor"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "html_form",
+              "name": "html_form",
+              "type": "string",
+              "value": "=<html><body><h2>Post Approval Editor</h2><form method='POST' action='/webhook/postiz-approval-submit'><label>Caption</label><br/><textarea name='caption' rows='8' cols='80'>{{$json.query.caption || ''}}</textarea><br/><label>Postiz Media Source (URL or file reference to upload)</label><br/><input type='text' name='media_source' value='{{$json.query.media_source || ''}}' size='80'/><br/><label>Schedule Time (ISO)</label><br/><input type='text' name='schedule_time' value='{{$json.query.schedule_time || ''}}' size='40'/><br/><label>Target Channels (comma separated)</label><br/><input type='text' name='channels' value='{{$json.query.channels || ''}}' size='80'/><br/><button type='submit'>Submit For Schedule</button></form></body></html>"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "render_form",
+      "name": "Build Editable HTML Form",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        480,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{$json.html_form}}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "text/html; charset=utf-8"
+              }
+            ]
+          }
+        }
+      },
+      "id": "respond_html",
+      "name": "Respond With HTML Form",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        740,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "path": "postiz-approval-submit",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "submit_webhook",
+      "name": "Approval Submit Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        220,
+        440
+      ],
+      "webhookId": "postiz-approval-submit"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const body = $json.body || {};\nconst channels = String(body.channels || '').split(',').map((x) => x.trim()).filter(Boolean);\nreturn [{\n  caption: body.caption || '',\n  media_source: body.media_source || '',\n  schedule_time: body.schedule_time || '',\n  channels\n}];"
+      },
+      "id": "normalize_payload",
+      "name": "Normalize Approval Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "content": "Media upload gate is mandatory: do not schedule with raw external URLs or local file paths. Meta/TikTok-style publish APIs reject unhosted/unverified assets. Upload first to Postiz (/api/uploads or CLI) to obtain a verified hosted media URL, then schedule.",
+        "height": 260,
+        "width": 440
+      },
+      "id": "sticky_gate_note",
+      "name": "Mandatory Upload Gate Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        840,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "needs_upload",
+              "leftValue": "={{$json.media_source}}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "validate_media_source",
+      "name": "Validate Media Source Present",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        780,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.POSTIZ_BASE_URL || 'http://postiz-api:3000'}}/api/uploads",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "jsonBody": "={\n  \"source\": $json.media_source,\n  \"strict_validation\": true\n}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "postiz_upload_gate",
+      "name": "Postiz Upload Gate (/api/uploads)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1050,
+        380
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_WITH_N8N_CREDENTIAL_ID",
+          "name": "Postiz API Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "is_verified_url",
+              "leftValue": "={{$json.url || $json.hostedUrl || ''}}",
+              "rightValue": "http",
+              "operator": {
+                "type": "string",
+                "operation": "startsWith"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "verify_hosted_url",
+      "name": "Verify Hosted Media URL",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1300,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.POSTIZ_BASE_URL || 'http://postiz-api:3000'}}/api/schedules",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "json",
+        "jsonBody": "={\n  \"caption\": $('Normalize Approval Payload').item.json.caption,\n  \"media_url\": $json.url || $json.hostedUrl,\n  \"scheduled_at\": $('Normalize Approval Payload').item.json.schedule_time,\n  \"channels\": $('Normalize Approval Payload').item.json.channels\n}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "schedule_post",
+      "name": "Schedule via Postiz",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1560,
+        320
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_WITH_N8N_CREDENTIAL_ID",
+          "name": "Postiz API Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"scheduled\",\n  \"schedule_response\": $json\n}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "respond_success",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1810,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"rejected\",\n  \"reason\": \"Media source missing or invalid. Upload through Postiz first to obtain a verified hosted URL.\"\n}",
+        "options": {
+          "responseCode": 422
+        }
+      },
+      "id": "respond_reject",
+      "name": "Reject Invalid Media",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1060,
+        560
+      ]
+    }
+  ],
+  "connections": {
+    "Approval Editor Webhook": {
+      "main": [
+        [
+          {
+            "node": "Build Editable HTML Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Editable HTML Form": {
+      "main": [
+        [
+          {
+            "node": "Respond With HTML Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approval Submit Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize Approval Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Approval Payload": {
+      "main": [
+        [
+          {
+            "node": "Validate Media Source Present",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Media Source Present": {
+      "main": [
+        [
+          {
+            "node": "Postiz Upload Gate (/api/uploads)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reject Invalid Media",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postiz Upload Gate (/api/uploads)": {
+      "main": [
+        [
+          {
+            "node": "Verify Hosted Media URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify Hosted Media URL": {
+      "main": [
+        [
+          {
+            "node": "Schedule via Postiz",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reject Invalid Media",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule via Postiz": {
+      "main": [
+        [
+          {
+            "node": "Respond Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "notes": "Decoupled listener workflow. This workflow receives approval/editor callbacks and enforces Postiz media upload validation before scheduling."
+  },
+  "tags": [
+    {
+      "name": "postiz"
+    },
+    {
+      "name": "listener"
+    }
+  ]
+}
