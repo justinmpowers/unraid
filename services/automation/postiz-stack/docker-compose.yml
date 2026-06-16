@@ -70,9 +70,9 @@ services:
       - db_net
       - internal_net
 
-  postiz-api:
-    image: ghcr.io/gitroomhq/postiz-api:v2.21.8
-    container_name: postiz-api
+  postiz:
+    image: ghcr.io/gitroomhq/postiz-app:v2.21.8
+    container_name: postiz
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
@@ -87,62 +87,43 @@ services:
       - TZ=${TZ}
       - HOST_OS=Unraid
       - HOST_HOSTNAME=${HOST_HOSTNAME}
-      - HOST_CONTAINERNAME=postiz-api
-      - NODE_ENV=production
+      - HOST_CONTAINERNAME=postiz
+      - MAIN_URL=https://postiz.${DOMAIN}
+      - FRONTEND_URL=https://postiz.${DOMAIN}
+      - NEXT_PUBLIC_BACKEND_URL=https://postiz.${DOMAIN}/api
+      - BACKEND_INTERNAL_URL=http://localhost:3000
+      - JWT_SECRET=${POSTIZ_JWT_SECRET}
       - DATABASE_URL=postgresql://${POSTIZ_DB_USER}:${POSTIZ_DB_PASSWORD}@postiz-postgres:5432/${POSTIZ_DB_NAME}
       - REDIS_URL=redis://postiz-redis:6379
       - TEMPORAL_ADDRESS=temporal:7233
-      - POSTIZ_JWT_SECRET=${POSTIZ_JWT_SECRET}
-      - POSTIZ_PUBLIC_URL=https://postiz.${DOMAIN}
-      - POSTIZ_UPLOADS_PATH=/app/uploads
+      - IS_GENERAL=true
+      - DISABLE_REGISTRATION=false
+      - STORAGE_PROVIDER=local
+      - UPLOAD_DIRECTORY=/uploads
+      - NEXT_PUBLIC_UPLOAD_DIRECTORY=/uploads
     volumes:
-      - ${APPDATA_PATH}/postiz-stack/uploads:/app/uploads
+      - ${APPDATA_PATH}/postiz-stack/postiz-config:/config
+      - ${APPDATA_PATH}/postiz-stack/uploads:/uploads
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:3000${POSTIZ_API_HEALTH_PATH:-/health} || exit 1"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:5000${POSTIZ_HEALTH_PATH:-/} || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
       start_period: 45s
-    networks:
-      - db_net
-      - internal_net
-
-  postiz-frontend:
-    image: ghcr.io/gitroomhq/postiz-frontend:v2.21.8
-    container_name: postiz-frontend
-    restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
-    depends_on:
-      postiz-api:
-        condition: service_healthy
-    environment:
-      - TZ=${TZ}
-      - HOST_OS=Unraid
-      - HOST_HOSTNAME=${HOST_HOSTNAME}
-      - HOST_CONTAINERNAME=postiz-frontend
-      - NODE_ENV=production
-      - POSTIZ_API_URL=http://postiz-api:3000
-      - NEXT_PUBLIC_POSTIZ_API_URL=https://postiz-api.${DOMAIN}
-    healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:4200${POSTIZ_FRONTEND_HEALTH_PATH:-/} || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
     labels:
       - traefik.enable=true
       - traefik.docker.network=internal_net
       - traefik.http.routers.postiz.rule=Host(`postiz.${DOMAIN}`)
       - traefik.http.routers.postiz.entrypoints=web
       - traefik.http.routers.postiz.middlewares=crowdsec@file
-      - traefik.http.services.postiz.loadbalancer.server.port=4200
+      - traefik.http.services.postiz.loadbalancer.server.port=5000
       - kuma.postiz.type=http
-      - kuma.postiz.url=http://postiz-frontend:4200
-      - kuma.postiz.name=Postiz Frontend
+      - kuma.postiz.url=http://postiz:5000
+      - kuma.postiz.name=Postiz
       - kuma.postiz.interval=60
       - kuma.postiz.tags=automation,social
     networks:
+      - db_net
       - internal_net
 
   n8n:
@@ -152,7 +133,7 @@ services:
     security_opt:
       - no-new-privileges:true
     depends_on:
-      postiz-api:
+      postiz:
         condition: service_healthy
       ollama:
         condition: service_healthy
@@ -175,7 +156,7 @@ services:
       - N8N_RUNNERS_ENABLED=true
       - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
       - OLLAMA_BASE_URL=http://ollama:11434
-      - POSTIZ_BASE_URL=http://postiz-api:3000
+      - POSTIZ_BASE_URL=http://postiz:5000
       - N8N_METRICS=true
     volumes:
       - ${APPDATA_PATH}/postiz-stack/n8n:/home/node/.n8n

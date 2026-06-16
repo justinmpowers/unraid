@@ -10,8 +10,8 @@ This document records the hardening changes applied to the stack and what still 
   - temporalio/auto-setup:1.28.1
   - docker.n8n.io/n8nio/n8n:1.123.56
   - ollama/ollama:0.12.1
-- Postiz application images are set directly in compose today.
-- Those Postiz image references should be pinned to explicit release tags or digests once you select the production release.
+- Postiz application image is set directly in compose as a single upstream app image.
+- Current pin: ghcr.io/gitroomhq/postiz-app:v2.21.8.
 - Added no-new-privileges to all services.
 - Added GENERIC_TIMEZONE for n8n schedule consistency.
 - Added N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true.

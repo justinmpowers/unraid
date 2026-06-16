@@ -16,8 +16,7 @@ This file defines the full variable contract for the Postiz automation stack.
 - POSTIZ_DB_USER: Postiz database user.
 - POSTIZ_DB_PASSWORD: Postiz database password.
 - POSTIZ_TEMPORAL_DB_NAME: Temporal schema database name.
-- POSTIZ_API_HEALTH_PATH: API health endpoint path.
-- POSTIZ_FRONTEND_HEALTH_PATH: Frontend health endpoint path.
+- POSTIZ_HEALTH_PATH: Single Postiz app health endpoint path.
 
 ## n8n variables
 
@@ -29,7 +28,7 @@ This file defines the full variable contract for the Postiz automation stack.
 - ETSY_CLIENT_ID: Etsy client ID (also x-api-key value).
 - ETSY_ACCESS_TOKEN: Etsy OAuth bearer token.
 - TELEGRAM_APPROVAL_CHAT_ID: Telegram target chat/channel for approval link delivery.
-- POSTIZ_BASE_URL: Internal URL for Postiz API from n8n.
+- POSTIZ_BASE_URL: Internal URL for the single Postiz app service from n8n.
 - OLLAMA_BASE_URL: Internal URL for Ollama from n8n.
 
 ## Etsy draft creator script variables

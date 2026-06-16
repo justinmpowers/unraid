@@ -146,7 +146,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{$env.POSTIZ_BASE_URL || 'http://postiz-api:3000'}}/api/uploads",
+        "url": "={{$env.POSTIZ_BASE_URL || 'http://postiz:5000'}}/api/uploads",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -218,7 +218,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{$env.POSTIZ_BASE_URL || 'http://postiz-api:3000'}}/api/schedules",
+        "url": "={{$env.POSTIZ_BASE_URL || 'http://postiz:5000'}}/api/schedules",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
