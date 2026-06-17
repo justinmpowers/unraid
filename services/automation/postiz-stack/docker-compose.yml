@@ -61,7 +61,7 @@ services:
     volumes:
       - ${APPDATA_PATH}/postiz-stack/temporal:/etc/temporal/config/dynamicconfig
     healthcheck:
-      test: ["CMD-SHELL", "nc -z localhost 7233 || exit 1"]
+      test: ["CMD-SHELL", "curl -sf http://localhost:7233 || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -105,7 +105,7 @@ services:
       - ${APPDATA_PATH}/postiz-stack/postiz-config:/config
       - ${APPDATA_PATH}/postiz-stack/uploads:/uploads
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:5000${POSTIZ_HEALTH_PATH:-/} || exit 1"]
+      test: ["CMD-SHELL", "curl -sf http://localhost:5000/ || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -199,7 +199,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:11434/api/tags || exit 1"]
+      test: ["CMD-SHELL", "curl -sf http://localhost:11434/api/tags || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
