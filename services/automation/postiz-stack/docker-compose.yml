@@ -52,6 +52,7 @@ services:
         condition: service_healthy
     environment:
       - DB=postgres12
+      - BIND_ON_IP=0.0.0.0
       - DB_PORT=5432
       - POSTGRES_SEEDS=postiz-postgres
       - POSTGRES_USER=${POSTIZ_DB_USER}
@@ -61,7 +62,7 @@ services:
     volumes:
       - ${APPDATA_PATH}/postiz-stack/temporal:/etc/temporal/config/dynamicconfig
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:7233 || exit 1"]
+      test: ["CMD-SHELL", "temporal operator cluster health --address 127.0.0.1:7233 || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
