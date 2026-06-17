@@ -42,7 +42,7 @@ services:
       - db_net
 
   temporal:
-    image: temporalio/auto-setup:1.28.1
+    image: temporalio/auto-setup:1.29.7
     container_name: postiz-temporal
     restart: unless-stopped
     security_opt:
