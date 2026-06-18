@@ -11,8 +11,6 @@ services:
     volumes:
     - ${HOME_ASSISTANT_PATH}/zigbee2mqtt:/app/data
     - /run/udev:/run/udev:ro
-    ports:
-    - 9442:8080
     devices:
     - /dev/ttyUSB0:/dev/ttyUSB0
     deploy:

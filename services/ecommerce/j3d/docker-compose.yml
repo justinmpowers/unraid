@@ -76,8 +76,6 @@ services:
     volumes:
       - ${APPDATA_PATH}/j3d/backend:/app/instance
       - ${APPDATA_PATH}/j3d/uploads:/app/instance/uploads
-    ports:
-      - "5000:5000"
     deploy:
       resources:
         limits:
@@ -99,7 +97,7 @@ services:
       - kuma.backend.interval=60
       - kuma.backend.tags=j3d,api
       - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/flask-icon.png
-      - net.unraid.docker.webui=http://[IP]:[PORT:5000]
+      - net.unraid.docker.webui=http://j3d.${DOMAIN}
     networks:
       - internal_net
       - db_net

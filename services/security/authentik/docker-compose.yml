@@ -119,10 +119,7 @@ services:
     - kuma.authentik.keyword=ok
     - kuma.authentik.tags=security,auth
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/authentik-icon.png
-    - net.unraid.docker.webui=http://[IP]:[PORT:9000]
-    ports:
-    - 9000:9000
-    - 9443:9443
+    - net.unraid.docker.webui=http://auth.${DOMAIN}
     deploy:
       resources:
         limits:

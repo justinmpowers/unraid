@@ -31,8 +31,6 @@ services:
     - ${ROMM_PATH}/romm/resources:/romm/resources
     - ${ROMM_PATH}/romm/config:/romm/config
     - /mnt/user/roms:/romm/library
-    ports:
-    - 8085:8080
     deploy:
       resources:
         limits:

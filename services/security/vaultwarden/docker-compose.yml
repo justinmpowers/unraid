@@ -19,8 +19,6 @@ services:
     - SMTP_PASSWORD=${AUTHENTIK_EMAIL_PASSWORD}
     volumes:
     - ${VAULTWARDEN_PATH}/vaultwarden:/data
-    ports:
-    - 4743:80
     deploy:
       resources:
         limits:
@@ -43,7 +41,7 @@ services:
     - kuma.vaultwarden.keyword=alive
     - kuma.vaultwarden.tags=security,passwords
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/vaultwarden-icon.png
-    - net.unraid.docker.webui=http://[IP]:[PORT:4743]
+    - net.unraid.docker.webui=http://vaultwarden.${DOMAIN}
     networks:
     - internal_net
 networks:

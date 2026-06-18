@@ -18,8 +18,6 @@ services:
     - PUID=33
     - PGID=33
     user: '33:33'
-    ports:
-    - 8666:80
     volumes:
     - ${APPDATA_PATH}/nextcloud/html:/var/www/html
     - ${APPDATA_PATH}/nextcloud/apps:/var/www/html/custom_apps

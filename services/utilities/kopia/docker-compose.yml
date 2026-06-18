@@ -27,8 +27,6 @@ services:
     - /usr/sbin/zpool:/usr/sbin/zpool:ro
     - /sbin/mount:/sbin/mount:ro
     - /sbin/umount:/sbin/umount:ro
-    ports:
-    - 51515:51515
     devices:
     - /dev/zfs:/dev/zfs
     cap_add:
@@ -80,7 +78,7 @@ services:
     - kuma.kopia-backblaze.keyword=Kopia
     - kuma.kopia-backblaze.tags=utilities,backup,backblaze
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/kopia-icon.png
-    - net.unraid.docker.webui=http://[IP]:[PORT:51515]
+    - net.unraid.docker.webui=http://kopia-b2.${DOMAIN}
     networks:
     - internal_net
   kopia-local:
@@ -117,8 +115,6 @@ services:
     - /dev/zfs:/dev/zfs
     dns:
     - 100.100.100.100
-    ports:
-    - 51516:51515
     entrypoint: /bin/bash
     command:
     - -c
@@ -169,7 +165,7 @@ services:
     - kuma.kopia-truenas.keyword=Kopia
     - kuma.kopia-truenas.tags=utilities,backup,truenas
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/kopia-icon.png
-    - net.unraid.docker.webui=http://[IP]:[PORT:51516]
+    - net.unraid.docker.webui=http://kopia-local.${DOMAIN}
     networks:
     - internal_net
 networks:

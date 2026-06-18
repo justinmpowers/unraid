@@ -31,8 +31,6 @@ services:
     volumes:
     - ${APPDATA_PATH}/tandoor/staticfiles:/opt/recipes/staticfiles
     - ${APPDATA_PATH}/tandoor/mediafiles:/opt/recipes/mediafiles
-    ports:
-    - 8084:8080
     deploy:
       resources:
         limits:
@@ -60,7 +58,7 @@ services:
     - kuma.tandoor.keyword=Tandoor
     - kuma.tandoor.tags=productivity,recipes
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/tandoor-icon.png
-    - net.unraid.docker.webui=http://[IP]:[PORT:8084]
+    - net.unraid.docker.webui=http://tandoor.${DOMAIN}
   tandoor-postgres:
     image: postgres:18.4
     container_name: tandoor-postgres

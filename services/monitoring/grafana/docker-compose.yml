@@ -15,8 +15,6 @@ services:
     - GF_SECURITY_COOKIE_SECURE=true
     volumes:
     - ${OBSERVABILITY_PATH}/grafana:/var/lib/grafana
-    ports:
-    - 3006:3000
     labels:
     - traefik.enable=true
     - traefik.docker.network=monitoring_net
@@ -31,7 +29,7 @@ services:
     - kuma.grafana.accepted_statuscodes=200
     - kuma.grafana.tags=monitoring,visualization
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/grafana-icon.png
-    - net.unraid.docker.webui=http://[IP]:[PORT:3006]
+    - net.unraid.docker.webui=http://grafana.${DOMAIN}
     networks:
     - monitoring_net
     - db_net

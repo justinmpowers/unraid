@@ -95,8 +95,6 @@ services:
     volumes:
     - ${APPDATA_PATH}/obico/data:/app/data
     - ${APPDATA_PATH}/obico/media:/app/media
-    ports:
-    - 3334:3334
     labels:
     - traefik.enable=true
     - traefik.docker.network=iot_net
@@ -110,7 +108,7 @@ services:
     - kuma.obico.keyword=ok
     - kuma.obico.tags=iot,3dprinting
     - net.unraid.docker.icon=https://raw.githubusercontent.com/TheSpaghettiDetective/obico-server/release/frontend/src/assets/img/logo-compact.svg
-    - net.unraid.docker.webui=http://[IP]:[PORT:3334]
+    - net.unraid.docker.webui=http://obico.${DOMAIN}
     networks:
     - iot_net
     depends_on:
@@ -203,8 +201,6 @@ services:
     - HOST_CONTAINERNAME=octoprint
     volumes:
     - ${APPDATA_PATH}/octoprint:/octoprint
-    ports:
-    - 5000:5000
     labels:
     - traefik.enable=true
     - traefik.docker.network=iot_net
@@ -217,7 +213,7 @@ services:
     - kuma.octoprint.interval=60
     - kuma.octoprint.tags=iot,3dprinting
     - net.unraid.docker.icon=https://octoprint.org/assets/img/logo.png
-    - net.unraid.docker.webui=http://[IP]:[PORT:5000]
+    - net.unraid.docker.webui=http://octoprint.${DOMAIN}
     networks:
     - iot_net
     healthcheck:

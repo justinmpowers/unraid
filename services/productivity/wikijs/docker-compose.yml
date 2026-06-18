@@ -30,7 +30,7 @@ services:
       - kuma.wikijs.keyword=Wiki.js
       - kuma.wikijs.tags=productivity,wiki
       - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/wikijs-icon.png
-      - net.unraid.docker.webui=http://[IP]:[PORT:3000]
+      - net.unraid.docker.webui=http://wikijs.${DOMAIN}
     deploy:
       resources:
         limits:
@@ -39,8 +39,6 @@ services:
         reservations:
           cpus: "0.2"
           memory: 256M
-    ports:
-      - 3000:3000
     networks:
       - internal_net
       - db_net
