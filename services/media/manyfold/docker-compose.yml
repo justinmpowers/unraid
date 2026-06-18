@@ -54,6 +54,7 @@ services:
     - kuma.manyfold.interval=60
     - kuma.manyfold.keyword=Manyfold
     - kuma.manyfold.tags=media,3d,library
+    - net.unraid.docker.webui=http://manyfold.${DOMAIN}
 
   manyfold-postgres:
     image: postgres:18

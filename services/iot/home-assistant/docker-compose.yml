@@ -24,6 +24,7 @@ services:
     - kuma.homeassistant.keyword=Home Assistant
     - kuma.homeassistant.tags=iot,smart-home
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/home-assistant-icon.png
+    - net.unraid.docker.webui=http://homeassistant.${DOMAIN}
     deploy:
       resources:
         limits:

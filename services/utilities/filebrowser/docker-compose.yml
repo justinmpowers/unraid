@@ -5,7 +5,7 @@ services:
     restart: unless-stopped
     privileged: true
     environment:
-    - TZ=America/New_York
+    - TZ=${TZ}
     - PUID=${PUID}
     - PGID=${PGID}
     - HOST_OS=Unraid

@@ -4,7 +4,7 @@ services:
     container_name: dashy
     restart: unless-stopped
     environment:
-    - TZ=America/New_York
+    - TZ=${TZ}
     - UID=99
     - GID=100
     - HOST_OS=Unraid
