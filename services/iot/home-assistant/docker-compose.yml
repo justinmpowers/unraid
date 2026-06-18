@@ -11,8 +11,6 @@ services:
     volumes:
     - ${HOME_ASSISTANT_PATH}/Home-Assistant-Container:/config
     - /etc/localtime:/etc/localtime:ro
-    ports:
-    - 8123:8123
     labels:
     - traefik.enable=true
     - traefik.docker.network=iot_net
@@ -26,6 +24,7 @@ services:
     - kuma.homeassistant.keyword=Home Assistant
     - kuma.homeassistant.tags=iot,smart-home
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/home-assistant-icon.png
+    - net.unraid.docker.webui=http://homeassistant.${DOMAIN}
     deploy:
       resources:
         limits:

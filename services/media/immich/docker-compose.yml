@@ -20,8 +20,6 @@ services:
     - DB_PASSWORD=${IMMICH_DB_PASSWORD}
     - DB_DATABASE_NAME=${IMMICH_DB_NAME}
     - REDIS_HOSTNAME=immich-redis
-    ports:
-    - 8083:8080
     volumes:
     - ${APPDATA_PATH}/immich/photos:/photos
     - ${APPDATA_PATH}/immich/libraries:/libraries
@@ -40,7 +38,7 @@ services:
     - kuma.immich.keyword=Immich
     - kuma.immich.tags=media,photos
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/immich-icon.png
-    - net.unraid.docker.webui=http://[IP]:[PORT:8083]
+    - net.unraid.docker.webui=http://immich.${DOMAIN}
     deploy:
       resources:
         limits:

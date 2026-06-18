@@ -29,8 +29,6 @@ services:
     - FORCE_OIDC=${MANYFOLD_FORCE_OIDC:-disabled}
     volumes:
     - ${MANYFOLD_MODELS_PATH}:/models
-    ports:
-    - 3214:3214
     security_opt:
     - no-new-privileges:true
     cap_drop:
@@ -56,6 +54,7 @@ services:
     - kuma.manyfold.interval=60
     - kuma.manyfold.keyword=Manyfold
     - kuma.manyfold.tags=media,3d,library
+    - net.unraid.docker.webui=http://manyfold.${DOMAIN}
 
   manyfold-postgres:
     image: postgres:18

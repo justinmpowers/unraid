@@ -12,8 +12,6 @@ services:
     - ACTUAL_UPLOAD_FILE_SIZE_IMPORT_MB=20
     volumes:
     - ${APPDATA_PATH}/actual-server:/data
-    ports:
-    - 5006:5006
     deploy:
       resources:
         limits:
@@ -38,7 +36,7 @@ services:
     - kuma.actualserver.keyword=Actual
     - kuma.actualserver.tags=productivity,budget
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/actualserver-icon.png
-    - net.unraid.docker.webui=http://[IP]:[PORT:5006]
+    - net.unraid.docker.webui=http://actual.${DOMAIN}
 networks:
   internal_net:
     external: true

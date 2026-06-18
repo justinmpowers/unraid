@@ -12,14 +12,12 @@ services:
     - POSTGRES_DB=${NEXTCLOUD_DB_NAME}
     - POSTGRES_USER=${NEXTCLOUD_DB_USER}
     - POSTGRES_PASSWORD=${NEXTCLOUD_DB_PASSWORD}
-    - NEXTCLOUD_TRUSTED_DOMAINS=nextcloud.azuleluna.xyz
+    - NEXTCLOUD_TRUSTED_DOMAINS=nextcloud.${DOMAIN}
     - OVERWRITEPROTOCOL=https
-    - OVERWRITEHOST=nextcloud.azuleluna.xyz
+    - OVERWRITEHOST=nextcloud.${DOMAIN}
     - PUID=33
     - PGID=33
     user: '33:33'
-    ports:
-    - 8666:80
     volumes:
     - ${APPDATA_PATH}/nextcloud/html:/var/www/html
     - ${APPDATA_PATH}/nextcloud/apps:/var/www/html/custom_apps
@@ -47,6 +45,7 @@ services:
     - kuma.nextcloud.keyword=installed
     - kuma.nextcloud.tags=productivity,cloud
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/nextcloud-icon.png
+    - net.unraid.docker.webui=http://nextcloud.${DOMAIN}
     networks:
     - internal_net
     - db_net

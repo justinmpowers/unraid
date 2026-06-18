@@ -5,7 +5,7 @@ services:
     restart: unless-stopped
     privileged: true
     environment:
-    - TZ=America/New_York
+    - TZ=${TZ}
     - PUID=${PUID}
     - PGID=${PGID}
     - HOST_OS=Unraid
@@ -22,8 +22,6 @@ services:
         reservations:
           cpus: '0.15'
           memory: 256M
-    ports:
-    - 8080:80
     networks:
     - internal_net
     labels:
@@ -40,7 +38,7 @@ services:
     - kuma.filebrowser.keyword=File Browser
     - kuma.filebrowser.tags=utilities,files
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/filebrowser-icon.png
-    - net.unraid.docker.webui=http://[IP]:[PORT:8080]
+    - net.unraid.docker.webui=http://filebrowser.${DOMAIN}
     healthcheck:
       test:
       - CMD-SHELL

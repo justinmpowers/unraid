@@ -15,12 +15,10 @@ services:
       - --web.console.libraries=/etc/prometheus/console_libraries
       - --web.console.templates=/etc/prometheus/consoles
       - --web.enable-lifecycle
-      - --web.external-url=https://prometheus.azuleluna.xyz
+      - --web.external-url=https://prometheus.${DOMAIN}
     volumes:
       - ${OBSERVABILITY_PATH}/prometheus/config:/etc/prometheus
       - ${OBSERVABILITY_PATH}/prometheus/data:/prometheus
-    ports:
-      - 9090:9090
     labels:
       - traefik.enable=true
       - traefik.docker.network=monitoring_net
@@ -34,7 +32,7 @@ services:
       - kuma.prometheus.keyword=Prometheus is Healthy
       - kuma.prometheus.tags=monitoring,metrics
       - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/prometheus-icon.png
-      - net.unraid.docker.webui=http://[IP]:[PORT:9090]
+      - net.unraid.docker.webui=http://prometheus.${DOMAIN}
     networks:
       - monitoring_net
     user: ${PUID}:${PGID}

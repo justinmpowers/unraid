@@ -27,12 +27,11 @@ services:
     - kuma.romm.keyword=ROMM
     - kuma.romm.tags=media,gaming
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/romm-icon.png
+    - net.unraid.docker.webui=http://romm.${DOMAIN}
     volumes:
     - ${ROMM_PATH}/romm/resources:/romm/resources
     - ${ROMM_PATH}/romm/config:/romm/config
     - /mnt/user/roms:/romm/library
-    ports:
-    - 8085:8080
     deploy:
       resources:
         limits:

@@ -12,10 +12,6 @@ services:
     - ${APPDATA_PATH}/portainer:/data
     - /var/run/docker.sock:/var/run/docker.sock:ro
     - /mnt/user/appdata/docker-compose:/compose:ro
-    ports:
-    - 9444:9443
-    - 9002:9000
-    - 8002:8000
     networks:
     - monitoring_net
     - internal_net
@@ -41,7 +37,7 @@ services:
     - kuma.portainer.keyword=Portainer
     - kuma.portainer.tags=utilities,docker-management
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/portainer-icon.png
-    - net.unraid.docker.webui=http://[IP]:[PORT:9000]
+    - net.unraid.docker.webui=http://portainer.${DOMAIN}
     healthcheck:
       test:
       - CMD-SHELL

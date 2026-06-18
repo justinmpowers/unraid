@@ -11,8 +11,6 @@ services:
     volumes:
     - ${HOME_ASSISTANT_PATH}/zigbee2mqtt:/app/data
     - /run/udev:/run/udev:ro
-    ports:
-    - 9442:8080
     devices:
     - /dev/ttyUSB0:/dev/ttyUSB0
     deploy:
@@ -35,6 +33,7 @@ services:
     - kuma.zigbee2mqtt.interval=60
     - kuma.zigbee2mqtt.keyword=Zigbee2MQTT
     - kuma.zigbee2mqtt.tags=iot,smart-home
+    - net.unraid.docker.webui=http://zigbee2mqtt.${DOMAIN}
     networks:
     - iot_net
 networks:
