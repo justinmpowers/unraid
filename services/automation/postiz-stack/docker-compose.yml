@@ -159,6 +159,9 @@ services:
       - OLLAMA_BASE_URL=http://ollama:11434
       - POSTIZ_BASE_URL=http://postiz:5000
       - N8N_METRICS=true
+      - ETSY_SHOP_ID=${ETSY_SHOP_ID}
+      - ETSY_CLIENT_ID=${ETSY_CLIENT_ID}
+      - TELEGRAM_APPROVAL_CHAT_ID=${TELEGRAM_APPROVAL_CHAT_ID}
     volumes:
       - ${APPDATA_PATH}/postiz-stack/n8n:/home/node/.n8n
       - ./appdata/n8n/custom:/home/node/.n8n/custom
