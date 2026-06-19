@@ -198,6 +198,9 @@ services:
       - HOST_HOSTNAME=${HOST_HOSTNAME}
       - HOST_CONTAINERNAME=ollama-postiz
       - OLLAMA_KEEP_ALIVE=5m
+      - OLLAMA_MAX_LOADED_MODELS=1
+      - OLLAMA_NUM_PARALLEL=1
+      - OLLAMA_MAX_QUEUE=1
     volumes:
       - ${APPDATA_PATH}/postiz-stack/ollama:/root/.ollama
     extra_hosts:
@@ -211,11 +214,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "4.0"
-          memory: 8G
+          cpus: "2.0"
+          memory: 3G
         reservations:
-          cpus: "1.0"
-          memory: 2G
+          cpus: "0.5"
+          memory: 1G
     networks:
       - internal_net
 
