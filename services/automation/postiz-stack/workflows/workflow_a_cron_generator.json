@@ -64,11 +64,26 @@
     },
     {
       "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const input = $input.first().json;\nconst listings = input.results || input;\nconst body = JSON.stringify({\n  model: 'qwen2.5:1.5b',\n  stream: false,\n  prompt: 'You are a social media copywriter. Draft a high-performing caption for Etsy listing data: ' + JSON.stringify(listings)\n});\nreturn [{ json: { ollamaBody: body } }];"
+      },
+      "id": "prepare_ollama_body",
+      "name": "Prepare Ollama Body",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        710,
+        280
+      ]
+    },
+    {
+      "parameters": {
         "method": "POST",
         "url": "http://ollama:11434/api/generate",
         "sendBody": true,
-        "contentType": "json",
-        "jsonBody": "={\n  \"model\": \"llama3:8b\",\n  \"stream\": false,\n  \"prompt\": \"You are a social media copywriter. Draft a high-performing caption for Etsy listing data: \" + JSON.stringify($json.results || $json)\n}",
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{$json.ollamaBody}}",
         "options": {
           "response": {
             "response": {
@@ -82,7 +97,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        710,
+        960,
         280
       ]
     },
@@ -117,7 +132,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        970,
+        1220,
         280
       ]
     },
@@ -135,7 +150,7 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        1230,
+        1480,
         280
       ],
       "credentials": {
@@ -157,7 +172,7 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        1490,
+        1740,
         280
       ]
     },
@@ -180,7 +195,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        1760,
+        2010,
         280
       ]
     }
@@ -198,6 +213,17 @@
       ]
     },
     "Fetch Etsy Active Listings": {
+      "main": [
+        [
+          {
+            "node": "Prepare Ollama Body",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Ollama Body": {
       "main": [
         [
           {
