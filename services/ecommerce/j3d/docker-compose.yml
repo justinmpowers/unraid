@@ -87,7 +87,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=internal_net
-      - traefik.http.routers.print-ops-backend.rule=Host(`j3d.${DOMAIN}`)
+      - traefik.http.routers.print-ops-backend.rule=Host(`j3d.${DOMAIN}`) && PathPrefix(`/api`)
       - traefik.http.routers.print-ops-backend.entrypoints=web
       - traefik.http.routers.print-ops-backend.middlewares=crowdsec@file
       - traefik.http.services.print-ops-backend.loadbalancer.server.port=5000
@@ -128,6 +128,9 @@ services:
       - traefik.enable=true
       - traefik.docker.network=internal_net
       - traefik.http.routers.print-ops-frontend.rule=Host(`j3d.${DOMAIN}`)
+      - traefik.http.routers.print-ops-frontend.entrypoints=web
+      - traefik.http.routers.print-ops-frontend.middlewares=crowdsec@file
+      - traefik.http.services.print-ops-frontend.loadbalancer.server.port=4200
     networks:
       - internal_net
       - public_net

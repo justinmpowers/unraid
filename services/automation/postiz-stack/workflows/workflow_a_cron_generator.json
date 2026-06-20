@@ -65,7 +65,7 @@
     {
       "parameters": {
         "mode": "runOnceForAllItems",
-        "jsCode": "const input = $input.first().json;\nconst listings = input.results || input;\nconst body = JSON.stringify({\n  model: 'qwen2.5:1.5b',\n  stream: false,\n  prompt: 'You are a social media copywriter. Draft a high-performing caption for Etsy listing data: ' + JSON.stringify(listings)\n});\nreturn [{ json: { ollamaBody: body } }];"
+        "jsCode": "const input = $input.first().json;\nconst listings = input.results || [];\nconst listing = listings[0] || input;\nconst summary = {\n  title: listing.title || '',\n  description: (listing.description || '').slice(0, 300),\n  price: listing.price,\n  tags: (listing.tags || []).slice(0, 10),\n};\nconst body = JSON.stringify({\n  model: 'qwen2.5:1.5b',\n  stream: false,\n  prompt: 'You are a social media copywriter. Write a single punchy Instagram caption (under 150 words) for this Etsy listing: ' + JSON.stringify(summary)\n});\nreturn [{ json: { ollamaBody: body } }];"
       },
       "id": "prepare_ollama_body",
       "name": "Prepare Ollama Body",
