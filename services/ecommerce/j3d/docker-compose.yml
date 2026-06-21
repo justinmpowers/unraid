@@ -45,7 +45,7 @@ services:
       - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png
 
   print-ops-backend:
-    image: ghcr.io/justinmpowers/print-ops-backend:2.1.6
+    image: ghcr.io/justinmpowers/print-ops-backend:2.2
     container_name: print-ops-backend
     restart: unless-stopped
     depends_on:
@@ -104,7 +104,7 @@ services:
       - public_net
 
   print-ops-frontend:
-    image: ghcr.io/justinmpowers/print-ops-frontend:2.1.1
+    image: ghcr.io/justinmpowers/print-ops-frontend:2.2
     container_name: print-ops-frontend
     restart: unless-stopped
     depends_on:
