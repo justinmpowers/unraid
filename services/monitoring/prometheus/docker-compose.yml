@@ -24,6 +24,7 @@ services:
       - traefik.docker.network=monitoring_net
       - traefik.http.routers.prometheus.rule=Host(`prometheus.${DOMAIN}`)
       - traefik.http.routers.prometheus.entrypoints=web
+      - traefik.http.routers.prometheus.middlewares=crowdsec@file,authentik@file
       - traefik.http.services.prometheus.loadbalancer.server.port=9090
       - kuma.prometheus.type=http
       - kuma.prometheus.url=http://prometheus:9090/-/healthy
