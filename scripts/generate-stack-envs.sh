@@ -33,7 +33,7 @@ while IFS= read -r compose_file; do
   stack=$(echo "$service_dir" | sed 's|services/||; s|/|-|')
 
   # Extract every variable name referenced as ${VAR} or ${VAR:-default}
-  vars=$(grep -oP '\$\{\K[A-Z0-9_a-z]+' "$compose_file" | sort -u)
+  vars=$(grep -oP '\$\{\K[A-Z0-9_a-z]+' "$compose_file" | sort -u || true)
 
   if [ -z "$vars" ]; then
     skipped=$((skipped + 1))
