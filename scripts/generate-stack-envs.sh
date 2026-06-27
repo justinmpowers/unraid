@@ -1,18 +1,28 @@
 #!/bin/bash
 # Generates a trimmed .env for each stack containing only the variables it uses.
-# Usage: ./scripts/generate-stack-envs.sh [path/to/root/.env] [services/dir]
+# Usage: ./scripts/generate-stack-envs.sh [path/to/root/.env] [services/dir] [output/dir]
 #
-# Output: services/<category>/<name>/.env  (already in .gitignore via *.env)
+# Output folder (optional 3rd arg):
+#   Not set → writes alongside each compose file: services/<category>/<name>/.env
+#   Set     → writes to <output/dir>/<category>-<name>.env
 
 set -euo pipefail
 
 ROOT_ENV="${1:-.env}"
 SERVICES_DIR="${2:-services}"
+OUTPUT_DIR="${3:-}"
 
 if [ ! -f "$ROOT_ENV" ]; then
   echo "Error: root .env not found at '$ROOT_ENV'"
-  echo "Usage: $0 [.env] [services/]"
+  echo "Usage: $0 [.env] [services/] [output-dir/]"
   exit 1
+fi
+
+if [ -n "$OUTPUT_DIR" ]; then
+  mkdir -p "$OUTPUT_DIR"
+  echo "Output folder: $OUTPUT_DIR"
+else
+  echo "Output folder: alongside each compose file"
 fi
 
 generated=0
@@ -30,7 +40,11 @@ while IFS= read -r compose_file; do
     continue
   fi
 
-  out="$service_dir/.env"
+  if [ -n "$OUTPUT_DIR" ]; then
+    out="$OUTPUT_DIR/${stack}.env"
+  else
+    out="$service_dir/.env"
+  fi
   > "$out"  # truncate / create
 
   while IFS= read -r var; do
