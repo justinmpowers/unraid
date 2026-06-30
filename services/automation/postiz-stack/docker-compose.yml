@@ -1,6 +1,6 @@
 services:
   postiz-postgres:
-    image: postgres:17-alpine
+    image: postgres:18-alpine
     container_name: postiz-postgres
     restart: unless-stopped
     security_opt:
@@ -25,7 +25,7 @@ services:
       - db_net
 
   postiz-redis:
-    image: redis:7.4
+    image: redis:8.8
     container_name: postiz-redis
     restart: unless-stopped
     command: ["redis-server", "--appendonly", "yes"]
@@ -128,7 +128,7 @@ services:
       - internal_net
 
   n8n:
-    image: docker.n8n.io/n8nio/n8n:1.123.62
+    image: docker.n8n.io/n8nio/n8n:2.28.3
     container_name: n8n-postiz
     restart: unless-stopped
     security_opt:
