@@ -191,7 +191,7 @@ services:
           cpus: '0.1'
           memory: 128M
   octoprint:
-    image: octoprint/octoprint:1.11.7
+    image: octoprint/octoprint:1.11.8
     container_name: octoprint
     restart: unless-stopped
     environment:
