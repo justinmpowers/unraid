@@ -1,6 +1,6 @@
 services:
   actualserver:
-    image: actualbudget/actual-server:26.6.0
+    image: actualbudget/actual-server:26.7.0
     container_name: ActualServer
     restart: unless-stopped
     environment:
