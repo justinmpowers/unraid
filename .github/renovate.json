@@ -11,6 +11,7 @@
   ],
   "branchPrefix": "renovate/",
   "timezone": "UTC",
+  "prHourlyLimit": 0,
   "baseBranchPatterns": [
     "main"
   ],
