@@ -12,7 +12,7 @@ services:
     - ${HOME_ASSISTANT_PATH}/zigbee2mqtt:/app/data
     - /run/udev:/run/udev:ro
     devices:
-    - /dev/ttyUSB0:/dev/ttyUSB0
+    - /dev/serial/by-id/usb-Nabu_Casa_ZBT-2_A4CB8FDOC5A8-if00:/dev/ttyZBT2
     deploy:
       resources:
         limits:
