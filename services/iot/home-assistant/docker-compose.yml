@@ -12,13 +12,13 @@ services:
     - ${HOME_ASSISTANT_PATH}/Home-Assistant-Container:/config
     - /etc/localtime:/etc/localtime:ro
     labels:
-    - traefik.enable=true
-    - traefik.docker.network=iot_net
-    - traefik.http.routers.homeassistant.rule=Host(`homeassistant.${DOMAIN}`)
-    - traefik.http.routers.homeassistant.entrypoints=web
-    - traefik.http.services.homeassistant.loadbalancer.server.port=8123
+    # host networking (needed for mDNS/ESPHome discovery) takes this
+    # container off iot_net, so Traefik's docker label provider can no
+    # longer discover it automatically. Routing for homeassistant.${DOMAIN}
+    # is defined as a static router/service in Traefik's file provider
+    # (dynamic.yml on the host) instead - see services/iot/home-assistant/README.md.
     - kuma.homeassistant.type=http
-    - kuma.homeassistant.url=http://Home-Assistant-Container:8123
+    - kuma.homeassistant.url=http://${UNRAID_HOST_IP}:8123
     - kuma.homeassistant.name=Home Assistant
     - kuma.homeassistant.interval=60
     - kuma.homeassistant.keyword=Home Assistant
@@ -33,8 +33,7 @@ services:
         reservations:
           cpus: '0.2'
           memory: 400M
-    networks:
-    - iot_net
+    network_mode: host
     privileged: true
   matter-server:
     image: ghcr.io/home-assistant-libs/python-matter-server:8.1
@@ -63,6 +62,3 @@ services:
     - kuma.matter_server.interval=60
     - kuma.matter_server.tags=iot,matter
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/matter-server-icon.png
-networks:
-  iot_net:
-    external: true
