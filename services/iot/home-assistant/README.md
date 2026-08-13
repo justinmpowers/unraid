@@ -36,3 +36,19 @@ If `dynamic.yml` already has an `http:` key (e.g. for the `default-headers` or
 `crowdsec` middlewares), add `routers:` and `services:` as siblings under that
 same `http:` key rather than duplicating it. Traefik picks up file provider
 changes automatically - no restart needed.
+
+## ESPHome Dashboard
+`esphome` is the standalone ESPHome Dashboard (what Home Assistant's docs call
+"the ESPHome app"), used to adopt devices and edit their YAML config - e.g. to
+[tweak Voice PE's audio settings](https://www.home-assistant.io/voice_control/troubleshooting/#to-tweak-the-assist-audio-configuration-for-your-device)
+(noise suppression, auto gain, volume). The Supervisor-only "ESPHome" Add-on
+isn't available on Container installs, so this container replaces it.
+
+Also runs on `network_mode: host` for mDNS device discovery/adoption and OTA
+updates. It isn't routed through Traefik - open it directly at
+`http://${UNRAID_HOST_IP}:6052`. Set `ESPHOME_USERNAME`/`ESPHOME_PASSWORD` in
+`.env` if you want the dashboard password-protected.
+
+To adopt Voice PE: open the dashboard, it should show the device under
+"Discovered" once it's on the network - click **Adopt**, then **Edit** to add
+the `voice_assistant:` audio tuning block from the troubleshooting doc above.

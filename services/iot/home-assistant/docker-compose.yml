@@ -62,3 +62,36 @@ services:
     - kuma.matter_server.interval=60
     - kuma.matter_server.tags=iot,matter
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/matter-server-icon.png
+  esphome:
+    image: esphome/esphome:2026.7.4
+    container_name: esphome
+    restart: unless-stopped
+    environment:
+    - TZ=${TZ}
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=JP-Dell
+    - HOST_CONTAINERNAME=esphome
+    - USERNAME=${ESPHOME_USERNAME:-}
+    - PASSWORD=${ESPHOME_PASSWORD:-}
+    volumes:
+    - ${HOME_ASSISTANT_PATH}/esphome:/config
+    - /etc/localtime:/etc/localtime:ro
+    # host networking needed to discover/adopt devices over mDNS and to
+    # push OTA firmware/config updates - same reasoning as home-assistant.
+    # Not routed through Traefik; access directly at http://${UNRAID_HOST_IP}:6052
+    network_mode: host
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    labels:
+    - kuma.esphome.type=http
+    - kuma.esphome.url=http://${UNRAID_HOST_IP}:6052
+    - kuma.esphome.name=ESPHome Dashboard
+    - kuma.esphome.interval=60
+    - kuma.esphome.tags=iot,smart-home
+    - net.unraid.docker.webui=http://${UNRAID_HOST_IP}:6052
