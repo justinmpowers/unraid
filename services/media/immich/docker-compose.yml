@@ -1,6 +1,6 @@
 services:
   immich:
-    image: ghcr.io/imagegenius/immich:3.0.3
+    image: ghcr.io/imagegenius/immich:3.1.0
     container_name: immich
     restart: unless-stopped
     devices:
@@ -80,7 +80,7 @@ services:
     networks:
     - db_net
   immich-redis:
-    image: redis:8.8.1-alpine
+    image: redis:8.10.0-alpine
     container_name: immich-redis
     restart: unless-stopped
     environment:
