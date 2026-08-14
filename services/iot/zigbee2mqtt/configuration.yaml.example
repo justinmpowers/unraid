@@ -16,6 +16,11 @@ mqtt:
 serial:
   port: /dev/ttyZBT2
   adapter: ember
+  # The ZBT-2 runs at 460800 baud with hardware flow control. Without
+  # these two lines z2m defaults to 115200 + software flow control, the
+  # ASH layer never connects, and it loops on "ASH Adapter reset".
+  baudrate: 460800
+  rtscts: true
 
 advanced:
   network_key: GENERATE
