@@ -63,24 +63,63 @@ services:
     - kuma.matter_server.interval=60
     - kuma.matter_server.tags=iot,matter
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/matter-server-icon.png
-  esphome:
-    image: esphome/esphome:2026.7.4
-    container_name: esphome
+  wyoming-whisper:
+    image: rhasspy/wyoming-whisper:3.5.0
+    container_name: wyoming-whisper
     restart: unless-stopped
+    command:
+    - --model
+    - ${WHISPER_MODEL:-tiny-int8}
+    - --language
+    - ${WHISPER_LANGUAGE:-en}
+    - --data-dir
+    - /data
+    - --download-dir
+    - /data
     environment:
     - TZ=${TZ}
     - HOST_OS=Unraid
     - HOST_HOSTNAME=JP-Dell
-    - HOST_CONTAINERNAME=esphome
-    - USERNAME=${ESPHOME_USERNAME:-}
-    - PASSWORD=${ESPHOME_PASSWORD:-}
+    - HOST_CONTAINERNAME=wyoming-whisper
     volumes:
-    - ${HOME_ASSISTANT_PATH}/esphome:/config
+    - ${HOME_ASSISTANT_PATH}/wyoming-whisper:/data
     - /etc/localtime:/etc/localtime:ro
-    # host networking needed to discover/adopt devices over mDNS and to
-    # push OTA firmware/config updates - same reasoning as home-assistant.
-    # Not routed through Traefik; access directly at http://${UNRAID_HOST_IP}:6052
-    network_mode: host
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.1'
+          memory: 256M
+    labels:
+    - kuma.wyoming_whisper.type=tcp
+    - kuma.wyoming_whisper.hostname=wyoming-whisper
+    - kuma.wyoming_whisper.port=10300
+    - kuma.wyoming_whisper.name=Wyoming Whisper (STT)
+    - kuma.wyoming_whisper.interval=60
+    - kuma.wyoming_whisper.tags=iot,smart-home,voice
+    networks:
+    - iot_net
+  wyoming-piper:
+    image: rhasspy/wyoming-piper:2.4.2
+    container_name: wyoming-piper
+    restart: unless-stopped
+    command:
+    - --voice
+    - ${PIPER_VOICE:-en_US-lessac-medium}
+    - --data-dir
+    - /data
+    - --download-dir
+    - /data
+    environment:
+    - TZ=${TZ}
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=JP-Dell
+    - HOST_CONTAINERNAME=wyoming-piper
+    volumes:
+    - ${HOME_ASSISTANT_PATH}/wyoming-piper:/data
+    - /etc/localtime:/etc/localtime:ro
     deploy:
       resources:
         limits:
@@ -90,12 +129,14 @@ services:
           cpus: '0.1'
           memory: 128M
     labels:
-    - kuma.esphome.type=http
-    - kuma.esphome.url=http://${UNRAID_HOST_IP}:6052
-    - kuma.esphome.name=ESPHome Dashboard
-    - kuma.esphome.interval=60
-    - kuma.esphome.tags=iot,smart-home
-    - net.unraid.docker.webui=http://${UNRAID_HOST_IP}:6052
+    - kuma.wyoming_piper.type=tcp
+    - kuma.wyoming_piper.hostname=wyoming-piper
+    - kuma.wyoming_piper.port=10200
+    - kuma.wyoming_piper.name=Wyoming Piper (TTS)
+    - kuma.wyoming_piper.interval=60
+    - kuma.wyoming_piper.tags=iot,smart-home,voice
+    networks:
+    - iot_net
 networks:
   iot_net:
     external: true
