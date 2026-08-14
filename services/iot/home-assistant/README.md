@@ -5,37 +5,26 @@
 2. Start the stack.
 
 ## Networking
-`home-assistant` runs on `network_mode: host` (not `iot_net`) so that mDNS/Zeroconf
-discovery works for ESPHome devices (e.g. Home Assistant Voice Preview Edition),
-HomeKit, and similar. `matter-server` already used host networking for the same
-reason.
+`home-assistant` stays on `iot_net` (bridge networking) behind Traefik as usual,
+via `homeassistant.${DOMAIN}`. `matter-server` and `esphome` run on
+`network_mode: host` for mDNS/Zeroconf discovery (matter-server needed it
+already; esphome needs it to find and adopt devices).
 
-Because it's off `iot_net`, Traefik's Docker label provider can't discover it
-automatically, so `homeassistant.${DOMAIN}` is routed via Traefik's **file
-provider** instead of docker labels. Add the following to the `http:` section of
-Traefik's `dynamic.yml` on the Unraid host (`${APPDATA_PATH}/traefik/dynamic.yml`,
-outside this repo), replacing the IP with your `UNRAID_HOST_IP` and the entrypoint
-with whichever one you use for other routers:
+Trade-off: because `home-assistant` itself is *not* on host networking, it
+won't auto-discover ESPHome devices (e.g. Voice PE) via mDNS the way it would
+on host mode - you won't get the automatic "Discovered device" card for the
+ESPHome integration. Two ways around that:
+- Adopt the device in the `esphome` dashboard first (it can discover it via
+  its own host networking), note the IP it's adopted at, then in Home
+  Assistant go to Settings → Devices & Services → Add Integration → ESPHome
+  and enter that IP manually.
+- Voice PE's initial pairing (Bluetooth + Wi-Fi provisioning via the HA
+  frontend/companion app) doesn't rely on mDNS discovery either way, so
+  first-time setup should work regardless.
 
-```yaml
-http:
-  routers:
-    homeassistant:
-      rule: "Host(`homeassistant.example.com`)"
-      entryPoints:
-        - web
-      service: homeassistant
-  services:
-    homeassistant:
-      loadBalancer:
-        servers:
-          - url: "http://192.168.1.10:8123"
-```
-
-If `dynamic.yml` already has an `http:` key (e.g. for the `default-headers` or
-`crowdsec` middlewares), add `routers:` and `services:` as siblings under that
-same `http:` key rather than duplicating it. Traefik picks up file provider
-changes automatically - no restart needed.
+If you ever want full auto-discovery in Home Assistant itself, see this
+service's git history for the host-networking + Traefik file-provider
+approach that was tried and reverted.
 
 ## ESPHome Dashboard
 `esphome` is the standalone ESPHome Dashboard (what Home Assistant's docs call
@@ -44,10 +33,11 @@ changes automatically - no restart needed.
 (noise suppression, auto gain, volume). The Supervisor-only "ESPHome" Add-on
 isn't available on Container installs, so this container replaces it.
 
-Also runs on `network_mode: host` for mDNS device discovery/adoption and OTA
-updates. It isn't routed through Traefik - open it directly at
-`http://${UNRAID_HOST_IP}:6052`. Set `ESPHOME_USERNAME`/`ESPHOME_PASSWORD` in
-`.env` if you want the dashboard password-protected.
+Runs on `network_mode: host` (see Networking above) for mDNS device
+discovery/adoption and OTA updates. It isn't routed through Traefik - open it
+directly at `http://${UNRAID_HOST_IP}:6052`. Set
+`ESPHOME_USERNAME`/`ESPHOME_PASSWORD` in `.env` if you want the dashboard
+password-protected.
 
 To adopt Voice PE: open the dashboard, it should show the device under
 "Discovered" once it's on the network - click **Adopt**, then **Edit** to add
