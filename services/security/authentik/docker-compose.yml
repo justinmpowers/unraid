@@ -109,8 +109,7 @@ services:
     - traefik.enable=true
     - traefik.docker.network=internal_net
     - traefik.http.routers.authentik.rule=Host(`auth.${DOMAIN}`)
-    - traefik.http.routers.authentik.entrypoints=web,websecure
-    - traefik.http.routers.authentik.tls.certresolver=letsencrypt
+    - traefik.http.routers.authentik.entrypoints=web
     - traefik.http.routers.authentik.middlewares=force-https-scheme@file,default-headers@file
     - traefik.http.services.authentik.loadbalancer.server.port=9000
     - kuma.authentik.type=http
@@ -138,7 +137,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - curl -f http://localhost:9000/-/health/live/ || exit 1
+      - ak healthcheck || exit 1
       interval: 30s
       timeout: 10s
       retries: 3
