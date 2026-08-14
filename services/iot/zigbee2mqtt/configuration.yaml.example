@@ -1,0 +1,23 @@
+# configuration.yaml.example - Template file (safe to commit to git)
+# The real configuration.yaml lives outside this repo, in
+# ${HOME_ASSISTANT_PATH}/zigbee2mqtt/configuration.yaml (bind-mounted to
+# /app/data in the container). It contains the Zigbee network_key,
+# pan_id, and ext_pan_id, so it is intentionally NOT tracked here. Copy
+# the relevant settings below over by hand when standing up a new
+# instance or migrating to new adapter hardware.
+
+homeassistant: false
+frontend: true
+
+mqtt:
+  base_topic: zigbee2mqtt
+  server: mqtt://<mqtt-host>
+
+serial:
+  port: /dev/ttyZBT2
+  adapter: ember
+
+advanced:
+  network_key: GENERATE
+  pan_id: GENERATE
+  ext_pan_id: GENERATE
