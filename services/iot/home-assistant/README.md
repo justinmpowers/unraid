@@ -42,3 +42,29 @@ password-protected.
 To adopt Voice PE: open the dashboard, it should show the device under
 "Discovered" once it's on the network - click **Adopt**, then **Edit** to add
 the `voice_assistant:` audio tuning block from the troubleshooting doc above.
+
+## Local voice processing (Whisper + Piper)
+`wyoming-whisper` (speech-to-text) and `wyoming-piper` (text-to-speech) let
+Assist run fully locally instead of using Nabu Casa's cloud STT/TTS. Both sit
+on `iot_net` with `home-assistant`, so no IP juggling is needed - they're
+reachable by container name and default Wyoming port.
+
+Set up in Home Assistant:
+1. Settings → Devices & Services → **Add Integration** → **Wyoming Protocol**
+   - Host `wyoming-whisper`, port `10300`
+   - Repeat: Host `wyoming-piper`, port `10200`
+2. Settings → Voice Assistants → **Add Assistant**
+   - Conversation agent: Home Assistant (built-in) or your choice
+   - Speech-to-text: Whisper (the entry you just added)
+   - Text-to-speech: Piper (the entry you just added)
+3. Assign this pipeline to Voice PE's `assist_satellite` entity (its device
+   page → gear icon → pick the pipeline, or leave it on "Preferred assistant"
+   if this is your only pipeline).
+
+Tuning: `WHISPER_MODEL`/`WHISPER_LANGUAGE` and `PIPER_VOICE` in `.env` control
+which models get downloaded on first start (into
+`${HOME_ASSISTANT_PATH}/wyoming-whisper` and `.../wyoming-piper`, so re-pulls
+aren't needed after container recreation). Browse Piper voices at
+https://rhasspy.github.io/piper-samples/. `tiny-int8` is the fastest Whisper
+model on CPU-only hardware; step up to `base-int8` or `small-int8` for better
+accuracy if responses feel slow to arrive or transcription is inaccurate.
