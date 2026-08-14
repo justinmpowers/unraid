@@ -137,7 +137,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - curl -f http://localhost:9000/-/health/live/ || exit 1
+      - ak healthcheck || exit 1
       interval: 30s
       timeout: 10s
       retries: 3
