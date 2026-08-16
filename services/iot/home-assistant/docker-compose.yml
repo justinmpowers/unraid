@@ -1,6 +1,6 @@
 services:
   home-assistant:
-    image: ghcr.io/home-assistant/home-assistant:2026.7.4
+    image: ghcr.io/home-assistant/home-assistant:2026.8.2
     container_name: Home-Assistant-Container
     restart: unless-stopped
     environment:
@@ -66,7 +66,7 @@ services:
     - kuma.matter_server.tags=iot,matter
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/matter-server-icon.png
   wyoming-whisper:
-    image: rhasspy/wyoming-whisper:3.5.0
+    image: rhasspy/wyoming-whisper:3.6.0
     container_name: wyoming-whisper
     restart: unless-stopped
     command:
