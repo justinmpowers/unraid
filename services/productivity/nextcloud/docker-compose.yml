@@ -1,6 +1,6 @@
 services:
   nextcloud:
-    image: nextcloud:34.0.2
+    image: nextcloud:34.0.3
     container_name: Nextcloud
     restart: unless-stopped
     environment:
@@ -52,7 +52,7 @@ services:
     depends_on:
     - nextcloud-postgres
   nextcloud-postgres:
-    image: postgres:18.4
+    image: postgres:18.6
     container_name: Nextcloud-PostGres
     restart: unless-stopped
     environment:
