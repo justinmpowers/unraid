@@ -42,6 +42,11 @@ services:
     image: ghcr.io/home-assistant-libs/python-matter-server:8.1
     container_name: matter-server
     restart: unless-stopped
+    command:
+    - --storage-path
+    - /data
+    - --primary-interface
+    - eth1
     environment:
     - TZ=${TZ}
     - HOST_OS=Unraid
