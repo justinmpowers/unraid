@@ -49,7 +49,10 @@ services:
     - HOST_CONTAINERNAME=matter-server
     volumes:
     - ${HOME_ASSISTANT_PATH}/python-matter-server:/data
-    network_mode: host
+    networks:
+      matter_macvlan:
+        ipv4_address: 192.168.3.240
+      iot_net: {}
     deploy:
       resources:
         limits:
@@ -142,3 +145,6 @@ services:
 networks:
   iot_net:
     external: true
+  matter_macvlan:
+    external: true
+    name: matter_vlan2
