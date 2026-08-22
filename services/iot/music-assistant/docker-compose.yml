@@ -1,0 +1,34 @@
+services:
+  music-assistant:
+    image: ghcr.io/music-assistant/server:2.9.13
+    container_name: music-assistant
+    restart: unless-stopped
+    # Host networking is required so Music Assistant can discover and stream to
+    # players on the LAN (Sonos, Chromecast, AirPlay, DLNA, Snapcast) via
+    # mDNS/multicast; this is why it can't join iot_net/traefik like the web UIs.
+    network_mode: host
+    environment:
+      - TZ=${TZ}
+      - LOG_LEVEL=${MUSIC_ASSISTANT_LOG_LEVEL:-info}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=music-assistant
+    volumes:
+      - ${APPDATA_PATH}/music-assistant:/data
+      - /etc/localtime:/etc/localtime:ro
+    deploy:
+      resources:
+        limits:
+          cpus: "1.5"
+          memory: 1G
+        reservations:
+          cpus: "0.2"
+          memory: 256M
+    labels:
+      - kuma.music_assistant.type=http
+      - kuma.music_assistant.url=http://localhost:8095
+      - kuma.music_assistant.name=Music Assistant
+      - kuma.music_assistant.interval=60
+      - kuma.music_assistant.tags=iot,smart-home,music
+      - net.unraid.docker.icon=https://raw.githubusercontent.com/music-assistant/server/main/music_assistant/server/helpers/images/logo.png
+      - net.unraid.docker.webui=http://[IP]:8095

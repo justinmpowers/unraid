@@ -31,6 +31,7 @@ services/
 ├── iot/                 # Smart home and IoT
 │   ├── home-assistant/  # Home automation hub
 │   ├── govee2mqtt/      # Govee bridge to MQTT/Home Assistant
+│   ├── music-assistant/ # Music library manager for Home Assistant
 │   ├── mosquitto/       # MQTT message broker
 │   └── zigbee2mqtt/     # Zigbee to MQTT bridge
 ├── media/               # Media management
