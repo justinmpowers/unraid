@@ -1,0 +1,57 @@
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:v0.6.18
+    container_name: open-webui
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - TZ=${TZ}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=${HOST_HOSTNAME}
+      - HOST_CONTAINERNAME=open-webui
+      # Local models come from the generic Ollama service in this category.
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - WEBUI_SECRET_KEY=${OPENWEBUI_SECRET_KEY}
+      # Private web search via the self-hosted SearXNG instance (no big-tech APIs).
+      - ENABLE_WEB_SEARCH=True
+      - WEB_SEARCH_ENGINE=searxng
+      - SEARXNG_QUERY_URL=http://searxng:8080/search?q=<query>
+      # Back-compat keys for older Open WebUI releases (ignored if unused).
+      - ENABLE_RAG_WEB_SEARCH=True
+      - RAG_WEB_SEARCH_ENGINE=searxng
+    volumes:
+      - ${APPDATA_PATH}/open-webui:/app/backend/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=internal_net
+      - traefik.http.routers.open-webui.rule=Host(`chat.${DOMAIN}`)
+      - traefik.http.routers.open-webui.entrypoints=web
+      - traefik.http.routers.open-webui.middlewares=crowdsec@file
+      - traefik.http.services.open-webui.loadbalancer.server.port=8080
+      - kuma.open_webui.type=http
+      - kuma.open_webui.url=http://open-webui:8080/health
+      - kuma.open_webui.name=Open WebUI
+      - kuma.open_webui.interval=60
+      - kuma.open_webui.tags=ai,chat
+      - net.unraid.docker.icon=https://raw.githubusercontent.com/open-webui/open-webui/main/static/favicon.png
+      - net.unraid.docker.webui=http://chat.${DOMAIN}
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 2G
+        reservations:
+          cpus: '0.2'
+          memory: 256M
+    networks:
+      - internal_net
+networks:
+  internal_net:
+    external: true

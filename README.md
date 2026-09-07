@@ -17,6 +17,10 @@ Comprehensive Docker Compose management for my Unraid server with 35+ containeri
 
 ```
 services/
+├── ai/                  # Local AI (no big-tech cloud)
+│   ├── ollama/          # Local LLM runtime (GPU)
+│   ├── searxng/         # Private metasearch / web-search layer
+│   └── open-webui/      # Local chat UI with web search
 ├── automation/          # CI/CD and automation
 │   ├── github-runner/   # Automated deployment runner
 │   └── jenkins/         # Jenkins CI server with ephemeral agents
@@ -122,39 +126,46 @@ services/
 
 ## 🛠️ Usage
 
-### Deploy a Single Service
-```bash
-cd services/utilities/dashy
-docker-compose --env-file ../../../.env up -d
-```
+All services are deployed as **Portainer Git stacks** — each `services/<category>/<name>/docker-compose.yml`
+is one stack in Portainer, pulled straight from this repo. No local `docker-compose`
+CLI is used.
 
-### Deploy All Services
+### Prerequisites (one-time)
 ```bash
-# Build network dependencies first
-docker network create internal_net
-docker network create monitoring_net
-docker network create db_net
-docker network create iot_net
-docker network create teslamate_net
-docker network create mc_net
-docker network create public_net
-
-# Deploy each service
-for dir in services/*/*/; do
-  cd "$dir"
-  docker-compose --env-file ../../../.env up -d
-  cd ../../..
+# Create the shared external networks the stacks attach to
+for net in internal_net monitoring_net db_net iot_net teslamate_net mc_net public_net; do
+  docker network create "$net"
 done
+
+# Generate the trimmed per-stack .env files from the root .env
+./scripts/generate-stack-envs.sh
 ```
+
+### Deploy a Single Service (Portainer)
+In Portainer → **Stacks → Add stack → Repository**:
+
+| Field | Value |
+|---|---|
+| **Name** | `<category>-<name>` (e.g. `utilities-dashy`, `ai-ollama`) |
+| **Repository URL** | `https://github.com/justinmpowers/unraid` |
+| **Branch** | `main` |
+| **Compose path** | `services/<category>/<name>/docker-compose.yml` |
+| **Env file** | `services/<category>/<name>/.env` |
+
+Then **Deploy the stack**. Enable **automatic updates / re-pull** so Portainer redeploys on new commits.
+
+Print the exact Git-stack config for every service:
+```bash
+./scripts/portainer-stacks-list.sh
+```
+
+### Deploy / Update a Service
+Push to `main`, then in Portainer open the stack and **Pull and redeploy** (or let
+auto-update handle it). Renovate opens weekly PRs for image bumps.
 
 ### Check for Updates
 ```bash
 python3 scripts/check-updates.py
-```
-
-### Deploy a Service Update
-```bash
-./scripts/deploy-service.sh services/utilities/dashy
 ```
 
 ## 📊 Monitoring

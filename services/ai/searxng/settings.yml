@@ -1,0 +1,27 @@
+# SearXNG settings template for the AI stack.
+#
+# On first setup, copy this into the container's config dir (appdata), then deploy:
+#   mkdir -p ${APPDATA_PATH}/searxng
+#   cp settings.yml ${APPDATA_PATH}/searxng/settings.yml
+#
+# The container entrypoint replaces the literal "ultrasecretkey" below with the
+# value of the SEARXNG_SECRET environment variable on startup, so leave it as-is
+# and set SEARXNG_SECRET in your .env (openssl rand -hex 32).
+#
+# `use_default_settings: true` layers these overrides on top of SearXNG's built-in
+# defaults, so this file only needs to declare what differs.
+
+use_default_settings: true
+
+server:
+  secret_key: "ultrasecretkey"
+  # Internal-only instance behind Traefik/CrowdSec; disable the rate limiter so
+  # local consumers (Open WebUI, n8n, Home Assistant) can query the JSON API.
+  limiter: false
+  image_proxy: true
+
+search:
+  # `json` is required for programmatic use (Open WebUI web search, n8n, HA).
+  formats:
+    - html
+    - json

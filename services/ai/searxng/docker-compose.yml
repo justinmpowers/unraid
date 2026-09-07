@@ -1,0 +1,55 @@
+services:
+  searxng:
+    image: searxng/searxng:2025.9.1
+    container_name: searxng
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+    environment:
+      - TZ=${TZ}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=${HOST_HOSTNAME}
+      - HOST_CONTAINERNAME=searxng
+      - SEARXNG_BASE_URL=https://search.${DOMAIN}/
+      - SEARXNG_SECRET=${SEARXNG_SECRET}
+    volumes:
+      - ${APPDATA_PATH}/searxng:/etc/searxng
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/healthz || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=internal_net
+      - traefik.http.routers.searxng.rule=Host(`search.${DOMAIN}`)
+      - traefik.http.routers.searxng.entrypoints=web
+      - traefik.http.routers.searxng.middlewares=crowdsec@file
+      - traefik.http.services.searxng.loadbalancer.server.port=8080
+      - kuma.searxng.type=http
+      - kuma.searxng.url=http://searxng:8080/healthz
+      - kuma.searxng.name=SearXNG
+      - kuma.searxng.interval=60
+      - kuma.searxng.tags=ai,search
+      - net.unraid.docker.icon=https://raw.githubusercontent.com/searxng/searxng/master/src/brand/searxng-wordmark.svg
+      - net.unraid.docker.webui=http://search.${DOMAIN}
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    networks:
+      - internal_net
+networks:
+  internal_net:
+    external: true
