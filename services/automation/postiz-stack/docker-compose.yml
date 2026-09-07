@@ -190,6 +190,7 @@ services:
     image: ollama/ollama:0.33.2
     container_name: ollama-postiz
     restart: unless-stopped
+    runtime: nvidia
     security_opt:
       - no-new-privileges:true
     environment:
@@ -197,6 +198,8 @@ services:
       - HOST_OS=Unraid
       - HOST_HOSTNAME=${HOST_HOSTNAME}
       - HOST_CONTAINERNAME=ollama-postiz
+      - NVIDIA_VISIBLE_DEVICES=GPU-6842393f-bba6-90d5-3a23-080b8836a794
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
       - OLLAMA_KEEP_ALIVE=5m
       - OLLAMA_MAX_LOADED_MODELS=1
       - OLLAMA_NUM_PARALLEL=1

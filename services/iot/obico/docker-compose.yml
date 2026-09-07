@@ -35,6 +35,7 @@ services:
     image: ghcr.io/justinmpowers/obico-ml-api:2026.05.26
     container_name: obico-ml-api
     restart: unless-stopped
+    runtime: nvidia
     tty: true
     command: bash -c "gunicorn --bind 0.0.0.0:3333 --workers 1 wsgi"
     environment:
@@ -44,6 +45,8 @@ services:
     - HOST_CONTAINERNAME=obico-ml-api
     - DEBUG=True
     - FLASK_APP=server.py
+    - NVIDIA_VISIBLE_DEVICES=GPU-6842393f-bba6-90d5-3a23-080b8836a794
+    - NVIDIA_DRIVER_CAPABILITIES=compute,utility
     networks:
     - iot_net
     healthcheck:
