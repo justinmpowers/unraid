@@ -80,7 +80,7 @@ services:
     restart: unless-stopped
     command:
     - --model
-    - ${WHISPER_MODEL:-small-int8}
+    - ${WHISPER_MODEL:-base-int8}
     - --language
     - ${WHISPER_LANGUAGE:-en}
     - --data-dir
@@ -119,6 +119,7 @@ services:
     command:
     - --voice
     - ${PIPER_VOICE:-en_US-lessac-medium}
+    - --streaming
     - --data-dir
     - /data
     - --download-dir
