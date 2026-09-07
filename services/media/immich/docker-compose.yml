@@ -3,15 +3,12 @@ services:
     image: ghcr.io/immich-app/immich-server:v3.1.0
     container_name: immich
     restart: unless-stopped
-    runtime: nvidia
     devices:
     - /dev/dri:/dev/dri
     group_add:
     - '44'
     environment:
     - TZ=${TZ}
-    - NVIDIA_VISIBLE_DEVICES=GPU-6842393f-bba6-90d5-3a23-080b8836a794
-    - NVIDIA_DRIVER_CAPABILITIES=all
     - DB_HOSTNAME=immich-postgres
     - DB_USERNAME=${IMMICH_DB_USER}
     - DB_PASSWORD=${IMMICH_DB_PASSWORD}
@@ -52,14 +49,11 @@ services:
     - immich-postgres
     - immich-redis
   immich-machine-learning:
-    image: ghcr.io/immich-app/immich-machine-learning:v3.1.0-cuda
+    image: ghcr.io/immich-app/immich-machine-learning:v3.1.0
     container_name: immich-ml
     restart: unless-stopped
-    runtime: nvidia
     environment:
     - TZ=${TZ}
-    - NVIDIA_VISIBLE_DEVICES=GPU-6842393f-bba6-90d5-3a23-080b8836a794
-    - NVIDIA_DRIVER_CAPABILITIES=compute,utility
     volumes:
     - ${APPDATA_PATH}/immich/model-cache:/cache
     labels:
@@ -67,7 +61,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '2.0'
+          cpus: '4.0'
           memory: 4G
         reservations:
           cpus: '0.25'
