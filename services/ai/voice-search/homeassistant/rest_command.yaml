@@ -1,0 +1,10 @@
+# Merge this under `rest_command:` in configuration.yaml (or !include it).
+#
+# HA runs on iot_net and n8n on internal_net, so reach n8n through its public
+# Traefik hostname. Replace the domain to match your setup (or use a !secret).
+web_search:
+  url: "https://n8n.YOURDOMAIN.com/webhook/web-search"
+  method: POST
+  content_type: "application/json"
+  payload: '{"query": "{{ query }}"}'
+  timeout: 30

@@ -1,0 +1,14 @@
+# Merge this under `intent_script:` in configuration.yaml (or !include it).
+#
+# Handles the WebSearch intent: calls the n8n webhook (which does SearXNG +
+# Ollama) and speaks the returned answer. n8n replies with {"answer": "..."},
+# which rest_command exposes at result.content.answer.
+WebSearch:
+  action:
+    - action: rest_command.web_search
+      data:
+        query: "{{ query }}"
+      response_variable: result
+  speech:
+    text: >-
+      {{ result.content.answer | default("Sorry, I couldn't find that.") }}
