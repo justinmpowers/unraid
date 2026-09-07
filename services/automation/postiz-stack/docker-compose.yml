@@ -224,9 +224,12 @@ services:
           memory: 1G
     networks:
       - internal_net
+      - iot_net
 
 networks:
   db_net:
     external: true
   internal_net:
+    external: true
+  iot_net:
     external: true
