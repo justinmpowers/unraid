@@ -3,6 +3,7 @@ services:
     image: ghcr.io/imagegenius/immich:3.1.0
     container_name: immich
     restart: unless-stopped
+    runtime: nvidia
     devices:
     - /dev/dri:/dev/dri
     group_add:
@@ -12,6 +13,8 @@ services:
     - HOST_OS=Unraid
     - HOST_HOSTNAME=JP-Dell
     - HOST_CONTAINERNAME=immich
+    - NVIDIA_VISIBLE_DEVICES=GPU-6842393f-bba6-90d5-3a23-080b8836a794
+    - NVIDIA_DRIVER_CAPABILITIES=all
     - PUID=${PUID}
     - PGID=${PGID}
     - UMASK=${UMASK}
