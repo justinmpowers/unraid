@@ -119,7 +119,6 @@ services:
     command:
     - --voice
     - ${PIPER_VOICE:-en_US-lessac-medium}
-    - --streaming
     - --data-dir
     - /data
     - --download-dir
