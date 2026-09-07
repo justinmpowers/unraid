@@ -55,8 +55,9 @@ On the Unraid host, prep the container + model data:
 # 1. Remove the old container (its definition is gone from postiz-stack)
 docker rm -f ollama-postiz
 
-# 2. Move the model data to the generic appdata path (preserves pulled models)
-mv /mnt/user/appdata/postiz-stack/ollama /mnt/user/appdata/ollama
+# 2. Move the model data to the SSD cache pool (CACHE_PATH, e.g. /mnt/cache),
+#    preserving pulled models. Match this to your CACHE_PATH value.
+mv /mnt/user/appdata/postiz-stack/ollama /mnt/cache/ollama
 ```
 
 Then, in **Portainer**:
@@ -121,5 +122,10 @@ questions the built-in agent can't answer, and speak the response.
 
 - **VRAM (8 GB):** only `ollama` uses the GPU; SearXNG and Open WebUI are CPU/RAM
   only. Keep Ollama to 7–8B Q4 models.
+- **Storage:** `ollama` (large model files) and `open-webui` (SQLite DB) use
+  `${CACHE_PATH}` — the SSD cache pool, direct path — for speed and to keep the
+  database off the array. Ensure the cache pool is excluded from the Mover, and
+  watch free space (each 7–8B model is ~5 GB). SearXNG's tiny config stays on
+  `${APPDATA_PATH}`.
 - **Image tags** are starting pins — if a pull 404s, check the current tag;
   Renovate also proposes bumps automatically.
