@@ -1,0 +1,82 @@
+{
+  "name": "HA Web Search (local)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "web-search",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "b1a1a111-1111-4111-8111-111111111111",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 300],
+      "webhookId": "ha-web-search"
+    },
+    {
+      "parameters": {
+        "url": "http://searxng:8080/search",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "q", "value": "={{ $json.body.query }}" },
+            { "name": "format", "value": "json" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b2a2a222-2222-4222-8222-222222222222",
+      "name": "SearXNG",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const q = $('Webhook').first().json.body.query;\nconst results = ($json.results || []).slice(0, 5);\nconst context = results.map((r, i) => `[${i + 1}] ${r.title}\\n${r.content || ''}\\n(${r.url})`).join('\\n\\n');\nconst prompt = `You are a home voice assistant. Using ONLY the search results below, answer the question in one or two short spoken sentences. If the answer is not in the results, say you could not find it.\\n\\nQuestion: ${q}\\n\\nSearch results:\\n${context}`;\nreturn [{ json: { prompt } }];"
+      },
+      "id": "b3a3a333-3333-4333-8333-333333333333",
+      "name": "Build Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://ollama:11434/api/generate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"model\": \"qwen2.5:7b\", \"prompt\": $json.prompt, \"stream\": false } }}",
+        "options": {}
+      },
+      "id": "b4a4a444-4444-4444-8444-444444444444",
+      "name": "Ollama",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"answer\": $json.response } }}",
+        "options": {}
+      },
+      "id": "b5a5a555-5555-4555-8555-555555555555",
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1140, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{ "node": "SearXNG", "type": "main", "index": 0 }]] },
+    "SearXNG": { "main": [[{ "node": "Build Prompt", "type": "main", "index": 0 }]] },
+    "Build Prompt": { "main": [[{ "node": "Ollama", "type": "main", "index": 0 }]] },
+    "Ollama": { "main": [[{ "node": "Respond", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "active": false
+}

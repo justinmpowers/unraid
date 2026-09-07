@@ -1,0 +1,18 @@
+# Home Assistant custom sentences that trigger a private web search.
+# Install to: /config/custom_sentences/en/web_search.yaml  then reload HA.
+#
+# These are matched by HA's built-in intent recognizer, so device control stays
+# instant and only these phrasings are routed out to the search pipeline.
+language: "en"
+intents:
+  WebSearch:
+    data:
+      - sentences:
+          - "look up {query}"
+          - "look up (the|) {query}"
+          - "search (the web|the internet|online) for {query}"
+          - "search for {query}"
+          - "(hey|ok|okay) search for {query}"
+lists:
+  query:
+    wildcard: true
