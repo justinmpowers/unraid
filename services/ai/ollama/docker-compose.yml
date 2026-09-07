@@ -18,7 +18,9 @@ services:
       - OLLAMA_NUM_PARALLEL=1
       - OLLAMA_MAX_QUEUE=1
     volumes:
-      - ${APPDATA_PATH}/ollama:/root/.ollama
+      # Models live on the SSD cache pool (direct path, bypasses the user-share
+      # FUSE layer) for fast loading into VRAM — same convention as the DBs.
+      - ${CACHE_PATH}/ollama:/root/.ollama
     extra_hosts:
       - "host.docker.internal:host-gateway"
     healthcheck:

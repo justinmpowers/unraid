@@ -21,7 +21,9 @@ services:
       - ENABLE_RAG_WEB_SEARCH=True
       - RAG_WEB_SEARCH_ENGINE=searxng
     volumes:
-      - ${APPDATA_PATH}/open-webui:/app/backend/data
+      # SQLite DB + chat history on the SSD cache pool (direct path) — keep
+      # databases off the array and out of the Mover's reach.
+      - ${CACHE_PATH}/open-webui:/app/backend/data
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://localhost:8080/health || exit 1"]
       interval: 30s
