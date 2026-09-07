@@ -133,6 +133,19 @@
       "versioning": "calver:YYYY.0M.0D"
     },
     {
+      "description": "PostgreSQL major upgrades require a manual data migration (pg_upgrade or dump/restore); never auto-bump across major versions.",
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "postgres"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "enabled": false
+    },
+    {
       "matchUpdateTypes": [
         "major"
       ],
