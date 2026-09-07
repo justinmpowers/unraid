@@ -54,10 +54,11 @@ nano .env
 
 ### 2. Start Services
 
-```bash
-# Deploy containers
-docker-compose up -d
+Deploy the **`ecommerce-j3d`** Portainer Git stack from this repo (branch `main`,
+compose path `services/ecommerce/j3d/docker-compose.yml`). The `docker-compose`
+commands below are for host-level maintenance/troubleshooting, not deployment.
 
+```bash
 # Watch logs
 docker-compose logs -f
 

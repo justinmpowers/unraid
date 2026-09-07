@@ -6,13 +6,11 @@ that connects your streaming services and local media to a wide range of players
 with a tight two-way Home Assistant integration.
 
 ## Quick start
-1. Copy `.env.example` to `.env` and update values (or deploy with the shared
-   root `.env` via `--env-file ../../../.env`).
-2. Start the stack:
-   ```bash
-   cd services/iot/music-assistant
-   docker-compose --env-file ../../../.env up -d
-   ```
+1. Set the service's values in the root `.env`, then run
+   `./scripts/generate-stack-envs.sh` to produce `services/iot/music-assistant/.env`.
+2. Deploy the **`iot-music-assistant`** Portainer Git stack from this repo
+   (branch `main`, compose path `services/iot/music-assistant/docker-compose.yml`,
+   env file `services/iot/music-assistant/.env`).
 3. Open the web UI at `http://<unraid-host-ip>:8095` and complete onboarding.
 
 ## Networking

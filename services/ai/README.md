@@ -25,12 +25,21 @@ n8n ─────────┘        │
                       └─► searxng (private web search) ─► the internet (anonymized)
 ```
 
+> **Deployment:** every service here is a **Portainer Git stack** pulled from
+> this repo — no local `docker-compose` CLI. Stack names follow
+> `ai-<name>` (`ai-ollama`, `ai-searxng`, `ai-open-webui`).
+
 ## `.env` additions
+
+Add these to the **root `.env`**, then regenerate the per-stack env files:
 
 ```
 # openssl rand -hex 32
 SEARXNG_SECRET=<random-hex>
 OPENWEBUI_SECRET_KEY=<random-hex>
+```
+```bash
+./scripts/generate-stack-envs.sh      # writes services/ai/<name>/.env for each stack
 ```
 `TZ`, `DOMAIN`, `APPDATA_PATH`, and `HOST_HOSTNAME` are already defined globally.
 
@@ -41,19 +50,20 @@ OPENWEBUI_SECRET_KEY=<random-hex>
 Ollama used to live in `services/automation/postiz-stack` as `ollama-postiz`.
 It now lives here as a generic `ollama`. Migrate **without re-downloading models**:
 
+On the Unraid host, prep the container + model data:
 ```bash
 # 1. Remove the old container (its definition is gone from postiz-stack)
 docker rm -f ollama-postiz
 
 # 2. Move the model data to the generic appdata path (preserves pulled models)
 mv /mnt/user/appdata/postiz-stack/ollama /mnt/user/appdata/ollama
-
-# 3. Bring up the generic ollama
-cd services/ai/ollama && docker-compose --env-file ../../../.env up -d
-
-# 4. Redeploy postiz-stack so n8n reconnects (it now reaches http://ollama:11434)
-cd ../../automation/postiz-stack && docker-compose --env-file ../../../.env up -d
 ```
+
+Then, in **Portainer**:
+3. **Add stack** `ai-ollama` (compose path `services/ai/ollama/docker-compose.yml`,
+   env `services/ai/ollama/.env`) and **Deploy**.
+4. Open the **`automation-postiz-stack`** stack and **Pull and redeploy** so n8n
+   reconnects — it now reaches the generic container at `http://ollama:11434`.
 
 **Home Assistant:** update the Ollama integration URL from
 `http://ollama-postiz:11434` → **`http://ollama:11434`**
@@ -65,15 +75,18 @@ Verify: `docker exec ollama ollama list` should show your existing models.
 
 ## Deploy
 
+**SearXNG** — seed its config on the host first (enables the JSON API + secret),
+then deploy the stack in Portainer:
 ```bash
-# SearXNG — seed its config first (enables the JSON API, sets the secret)
 mkdir -p /mnt/user/appdata/searxng
 cp services/ai/searxng/settings.yml /mnt/user/appdata/searxng/settings.yml
-cd services/ai/searxng && docker-compose --env-file ../../../.env up -d
-
-# Open WebUI
-cd ../open-webui && docker-compose --env-file ../../../.env up -d
 ```
+In **Portainer → Add stack**, create each stack from this repo (branch `main`):
+
+| Stack | Compose path | Env file |
+|---|---|---|
+| `ai-searxng` | `services/ai/searxng/docker-compose.yml` | `services/ai/searxng/.env` |
+| `ai-open-webui` | `services/ai/open-webui/docker-compose.yml` | `services/ai/open-webui/.env` |
 
 - **Chat UI:** `https://chat.${DOMAIN}` — create the first account (it becomes admin), pick a model, toggle **Web Search** in a chat to use SearXNG.
 - **Search:** `https://search.${DOMAIN}` — the SearXNG UI (also the JSON API at `/search?q=...&format=json`).
