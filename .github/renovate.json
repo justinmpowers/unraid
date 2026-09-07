@@ -29,6 +29,7 @@
         "docker-compose"
       ],
       "matchFileNames": [
+        "services/ai/**/docker-compose.yml",
         "services/automation/**/docker-compose.yml",
         "services/infrastructure/**/docker-compose.yml"
       ],

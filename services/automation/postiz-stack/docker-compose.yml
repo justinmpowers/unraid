@@ -136,8 +136,6 @@ services:
     depends_on:
       postiz:
         condition: service_healthy
-      ollama:
-        condition: service_healthy
     environment:
       - TZ=${TZ}
       - GENERIC_TIMEZONE=${TZ}
@@ -186,50 +184,8 @@ services:
     networks:
       - internal_net
 
-  ollama:
-    image: ollama/ollama:0.33.2
-    container_name: ollama-postiz
-    restart: unless-stopped
-    runtime: nvidia
-    security_opt:
-      - no-new-privileges:true
-    environment:
-      - TZ=${TZ}
-      - HOST_OS=Unraid
-      - HOST_HOSTNAME=${HOST_HOSTNAME}
-      - HOST_CONTAINERNAME=ollama-postiz
-      - NVIDIA_VISIBLE_DEVICES=GPU-6842393f-bba6-90d5-3a23-080b8836a794
-      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
-      - OLLAMA_KEEP_ALIVE=5m
-      - OLLAMA_MAX_LOADED_MODELS=1
-      - OLLAMA_NUM_PARALLEL=1
-      - OLLAMA_MAX_QUEUE=1
-    volumes:
-      - ${APPDATA_PATH}/postiz-stack/ollama:/root/.ollama
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    healthcheck:
-      test: ["CMD-SHELL", "ollama list || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 60s
-    deploy:
-      resources:
-        limits:
-          cpus: "2.0"
-          memory: 3G
-        reservations:
-          cpus: "0.5"
-          memory: 1G
-    networks:
-      - internal_net
-      - iot_net
-
 networks:
   db_net:
     external: true
   internal_net:
-    external: true
-  iot_net:
     external: true

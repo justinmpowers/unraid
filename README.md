@@ -17,6 +17,10 @@ Comprehensive Docker Compose management for my Unraid server with 35+ containeri
 
 ```
 services/
+├── ai/                  # Local AI (no big-tech cloud)
+│   ├── ollama/          # Local LLM runtime (GPU)
+│   ├── searxng/         # Private metasearch / web-search layer
+│   └── open-webui/      # Local chat UI with web search
 ├── automation/          # CI/CD and automation
 │   ├── github-runner/   # Automated deployment runner
 │   └── jenkins/         # Jenkins CI server with ephemeral agents
