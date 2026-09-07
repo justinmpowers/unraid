@@ -102,6 +102,11 @@ questions, route through n8n so you sidestep HA's flaky on-device tool loop:
 HA (fallback) ─► n8n webhook ─► SearXNG (JSON) ─► ollama (summarize) ─► answer back to HA (spoken)
 ```
 
+**Ready-made files** are in [`voice-search/`](voice-search/) — import
+`n8n-web-search.json` into n8n and drop the Home Assistant config
+(`custom_sentences` + `rest_command` + `intent_script`) into `/config`. See
+[`voice-search/README.md`](voice-search/README.md) for the full walkthrough.
+
 Sketch of the n8n workflow (you already run n8n in the postiz-stack):
 1. **Webhook** node — receives `{ "query": "..." }` from HA.
 2. **HTTP Request** node — `GET http://searxng:8080/search?q={{$json.query}}&format=json`.
