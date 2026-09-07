@@ -1,6 +1,6 @@
 services:
-  immich:
-    image: ghcr.io/imagegenius/immich:3.1.0
+  immich-server:
+    image: ghcr.io/immich-app/immich-server:v3.1.0
     container_name: immich
     restart: unless-stopped
     runtime: nvidia
@@ -10,35 +10,30 @@ services:
     - '44'
     environment:
     - TZ=${TZ}
-    - HOST_OS=Unraid
-    - HOST_HOSTNAME=JP-Dell
-    - HOST_CONTAINERNAME=immich
     - NVIDIA_VISIBLE_DEVICES=GPU-6842393f-bba6-90d5-3a23-080b8836a794
     - NVIDIA_DRIVER_CAPABILITIES=all
-    - PUID=${PUID}
-    - PGID=${PGID}
-    - UMASK=${UMASK}
     - DB_HOSTNAME=immich-postgres
     - DB_USERNAME=${IMMICH_DB_USER}
     - DB_PASSWORD=${IMMICH_DB_PASSWORD}
     - DB_DATABASE_NAME=${IMMICH_DB_NAME}
     - REDIS_HOSTNAME=immich-redis
+    - IMMICH_MACHINE_LEARNING_URL=http://immich-machine-learning:3003
     volumes:
-    - ${APPDATA_PATH}/immich/photos:/photos
+    - ${APPDATA_PATH}/immich/photos:/usr/src/app/upload
     - ${APPDATA_PATH}/immich/libraries:/libraries
-    - ${APPDATA_PATH}/immich/config:/config
+    - /etc/localtime:/etc/localtime:ro
     labels:
     - traefik.enable=true
     - traefik.docker.network=internal_net
     - traefik.http.routers.immich.rule=Host(`immich.${DOMAIN}`)
     - traefik.http.routers.immich.entrypoints=web
     - traefik.http.routers.immich.middlewares=crowdsec@file
-    - traefik.http.services.immich.loadbalancer.server.port=8080
+    - traefik.http.services.immich.loadbalancer.server.port=2283
     - kuma.immich.type=http
-    - kuma.immich.url=http://immich:8080
+    - kuma.immich.url=http://immich:2283/api/server/ping
     - kuma.immich.name=Immich Photos
     - kuma.immich.interval=60
-    - kuma.immich.keyword=Immich
+    - kuma.immich.keyword=pong
     - kuma.immich.tags=media,photos
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/immich-icon.png
     - net.unraid.docker.webui=http://immich.${DOMAIN}
@@ -56,6 +51,29 @@ services:
     depends_on:
     - immich-postgres
     - immich-redis
+  immich-machine-learning:
+    image: ghcr.io/immich-app/immich-machine-learning:v3.1.0-cuda
+    container_name: immich-ml
+    restart: unless-stopped
+    runtime: nvidia
+    environment:
+    - TZ=${TZ}
+    - NVIDIA_VISIBLE_DEVICES=GPU-6842393f-bba6-90d5-3a23-080b8836a794
+    - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+    volumes:
+    - ${APPDATA_PATH}/immich/model-cache:/cache
+    labels:
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/immich-icon.png
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '0.25'
+          memory: 512M
+    networks:
+    - internal_net
   immich-postgres:
     image: ghcr.io/immich-app/postgres:18-vectorchord0.5.3
     container_name: Immich_PostgreSQL
