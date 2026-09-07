@@ -1,6 +1,6 @@
 services:
   searxng:
-    image: searxng/searxng:2025.9.1
+    image: searxng/searxng:2026.9.6-8b01679e8
     container_name: searxng
     restart: unless-stopped
     security_opt:
