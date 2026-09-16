@@ -10,6 +10,7 @@ services:
     - HOST_CONTAINERNAME=UptimeKuma
     volumes:
     - ${OBSERVABILITY_PATH}/uptimekuma:/app/data
+    - /var/run/docker.sock:/var/run/docker.sock:ro
     deploy:
       resources:
         limits:
