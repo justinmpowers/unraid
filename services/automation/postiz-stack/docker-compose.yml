@@ -128,7 +128,7 @@ services:
       - internal_net
 
   n8n:
-    image: docker.n8n.io/n8nio/n8n:2.39.4
+    image: docker.n8n.io/n8nio/n8n:2.40.3
     container_name: n8n-postiz
     restart: unless-stopped
     security_opt:
