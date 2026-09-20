@@ -46,7 +46,7 @@ services:
     depends_on:
     - romm-mariadb
   romm-mariadb:
-    image: mariadb:12.3.3
+    image: mariadb:13.0.2
     container_name: romm-MariaDB-Official
     restart: unless-stopped
     environment:
