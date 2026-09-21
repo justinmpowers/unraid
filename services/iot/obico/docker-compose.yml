@@ -104,12 +104,11 @@ services:
     - traefik.http.routers.obico.rule=Host(`obico.${DOMAIN}`)
     - traefik.http.routers.obico.entrypoints=web
     - traefik.http.services.obico.loadbalancer.server.port=3334
-    - kuma.obico.type=http
-    - kuma.obico.url=http://obico:3334/hc/
-    - kuma.obico.name=Obico
-    - kuma.obico.interval=60
-    - kuma.obico.keyword=ok
-    - kuma.obico.tags=iot,3dprinting
+    - kuma.obico.keyword.name=Obico
+    - kuma.obico.keyword.url=http://obico:3334/hc/
+    - kuma.obico.keyword.keyword=ok
+    - kuma.obico.keyword.interval=60
+    - 'kuma.obico.keyword.tag_names=[{"name":"tag_iot"},{"name":"tag_3dprinting"}]'
     - net.unraid.docker.icon=https://raw.githubusercontent.com/TheSpaghettiDetective/obico-server/release/frontend/src/assets/img/logo-compact.svg
     - net.unraid.docker.webui=http://obico.${DOMAIN}
     networks:
@@ -166,12 +165,11 @@ services:
     - ${APPDATA_PATH}/obico/data:/app/data
     - ${APPDATA_PATH}/obico/media:/app/media
     labels:
-    - kuma.obico_tasks.type=docker
-    - kuma.obico_tasks.docker_container=obico-tasks
-    - kuma.obico_tasks.docker_host=unix:///var/run/docker.sock
-    - kuma.obico_tasks.name=Obico Tasks
-    - kuma.obico_tasks.interval=60
-    - kuma.obico_tasks.tags=iot,3dprinting,worker
+    - kuma.obico_tasks.docker.name=Obico Tasks
+    - kuma.obico_tasks.docker.docker_container=obico-tasks
+    - kuma.obico_tasks.docker.docker_host_name=local_docker
+    - kuma.obico_tasks.docker.interval=60
+    - 'kuma.obico_tasks.docker.tag_names=[{"name":"tag_iot"},{"name":"tag_3dprinting"},{"name":"tag_worker"}]'
     networks:
     - iot_net
     depends_on:
@@ -210,11 +208,10 @@ services:
     - traefik.http.routers.octoprint.rule=Host(`octoprint.${DOMAIN}`)
     - traefik.http.routers.octoprint.entrypoints=web
     - traefik.http.services.octoprint.loadbalancer.server.port=5000
-    - kuma.octoprint.type=http
-    - kuma.octoprint.url=http://octoprint:5000
-    - kuma.octoprint.name=OctoPrint
-    - kuma.octoprint.interval=60
-    - kuma.octoprint.tags=iot,3dprinting
+    - kuma.octoprint.http.name=OctoPrint
+    - kuma.octoprint.http.url=http://octoprint:5000
+    - kuma.octoprint.http.interval=60
+    - 'kuma.octoprint.http.tag_names=[{"name":"tag_iot"},{"name":"tag_3dprinting"}]'
     - net.unraid.docker.icon=https://octoprint.org/assets/img/logo.png
     - net.unraid.docker.webui=http://octoprint.${DOMAIN}
     networks:
@@ -252,11 +249,10 @@ services:
     volumes:
     - ${APPDATA_PATH}/ankerctl:/root/.config/ankerctl
     labels:
-    - kuma.ankerctl.type=http
-    - kuma.ankerctl.url=http://localhost:4470/
-    - kuma.ankerctl.name=AnkerMake
-    - kuma.ankerctl.interval=60
-    - kuma.ankerctl.tags=iot,3dprinting
+    - kuma.ankerctl.http.name=AnkerMake
+    - kuma.ankerctl.http.url=http://host.docker.internal:4470/
+    - kuma.ankerctl.http.interval=60
+    - 'kuma.ankerctl.http.tag_names=[{"name":"tag_iot"},{"name":"tag_3dprinting"}]'
     - net.unraid.docker.webui=http://[IP]:4470
     healthcheck:
       test:

@@ -27,7 +27,8 @@ services:
           cpus: "0.1"
           memory: 256M
     labels:
-      - kuma.govee2mqtt.type=docker
-      - kuma.govee2mqtt.name=Govee2MQTT
-      - kuma.govee2mqtt.interval=60
-      - kuma.govee2mqtt.tags=iot,mqtt,govee
+      - kuma.govee2mqtt.docker.name=Govee2MQTT
+      - kuma.govee2mqtt.docker.docker_container=govee2mqtt
+      - kuma.govee2mqtt.docker.docker_host_name=local_docker
+      - kuma.govee2mqtt.docker.interval=60
+      - 'kuma.govee2mqtt.docker.tag_names=[{"name":"tag_iot"},{"name":"tag_mqtt"},{"name":"tag_govee"}]'

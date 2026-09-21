@@ -30,12 +30,11 @@ services:
     - traefik.http.routers.portainer.entrypoints=web
     - traefik.http.routers.portainer.middlewares=crowdsec@file
     - traefik.http.services.portainer.loadbalancer.server.port=9000
-    - kuma.portainer.type=http
-    - kuma.portainer.url=http://portainer:9000
-    - kuma.portainer.name=Portainer
-    - kuma.portainer.interval=60
-    - kuma.portainer.keyword=Portainer
-    - kuma.portainer.tags=utilities,docker-management
+    - kuma.portainer.keyword.name=Portainer
+    - kuma.portainer.keyword.url=http://portainer:9000
+    - kuma.portainer.keyword.keyword=Portainer
+    - kuma.portainer.keyword.interval=60
+    - 'kuma.portainer.keyword.tag_names=[{"name":"tag_utilities"},{"name":"tag_docker-management"}]'
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/portainer-icon.png
     - net.unraid.docker.webui=http://portainer.${DOMAIN}
     healthcheck:

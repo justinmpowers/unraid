@@ -38,12 +38,11 @@ services:
     - traefik.http.routers.nextcloud.entrypoints=web
     - traefik.http.routers.nextcloud.middlewares=crowdsec@file
     - traefik.http.services.nextcloud.loadbalancer.server.port=80
-    - kuma.nextcloud.type=http
-    - kuma.nextcloud.url=http://Nextcloud:80/status.php
-    - kuma.nextcloud.name=Nextcloud
-    - kuma.nextcloud.interval=60
-    - kuma.nextcloud.keyword=installed
-    - kuma.nextcloud.tags=productivity,cloud
+    - kuma.nextcloud.keyword.name=Nextcloud
+    - kuma.nextcloud.keyword.url=http://Nextcloud:80/status.php
+    - kuma.nextcloud.keyword.keyword=installed
+    - kuma.nextcloud.keyword.interval=60
+    - 'kuma.nextcloud.keyword.tag_names=[{"name":"tag_productivity"},{"name":"tag_cloud"}]'
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/nextcloud-icon.png
     - net.unraid.docker.webui=http://nextcloud.${DOMAIN}
     networks:

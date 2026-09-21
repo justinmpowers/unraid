@@ -28,12 +28,11 @@ services:
     networks:
     - monitoring_net
     labels:
-    - kuma.promtail.type=http
-    - kuma.promtail.url=http://GrafanaPromtail:9080/ready
-    - kuma.promtail.name=Grafana Promtail
-    - kuma.promtail.interval=60
-    - kuma.promtail.keyword=ready
-    - kuma.promtail.tags=monitoring,logs
+    - kuma.promtail.keyword.name=Grafana Promtail
+    - kuma.promtail.keyword.url=http://GrafanaPromtail:9080/ready
+    - kuma.promtail.keyword.keyword=ready
+    - kuma.promtail.keyword.interval=60
+    - 'kuma.promtail.keyword.tag_names=[{"name":"tag_monitoring"},{"name":"tag_logs"}]'
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/promtail-icon.png
     - net.unraid.docker.webui=http://[IP]:[PORT:9080]
 networks:

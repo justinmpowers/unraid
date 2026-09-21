@@ -21,11 +21,10 @@ services:
         - ${APPDATA_PATH}/hytale/data:/home/container
         - /etc/machine-id:/etc/machine-id:ro
         labels:
-        - kuma.hytale.type=port
-        - kuma.hytale.hostname=hytale-server
-        - kuma.hytale.port=5520
-        - kuma.hytale.name=Hytale Game Server
-        - kuma.hytale.interval=60
-        - kuma.hytale.tags=gaming,server
+        - kuma.hytale.docker.name=Hytale Game Server
+        - kuma.hytale.docker.docker_container=hytale-server
+        - kuma.hytale.docker.docker_host_name=local_docker
+        - kuma.hytale.docker.interval=60
+        - 'kuma.hytale.docker.tag_names=[{"name":"tag_gaming"},{"name":"tag_server"}]'
         tty: true
         stdin_open: true

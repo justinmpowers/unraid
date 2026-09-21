@@ -71,12 +71,11 @@ services:
     - traefik.http.routers.kopia-b2.entrypoints=web
     - traefik.http.routers.kopia-b2.middlewares=crowdsec@file,authentik@file
     - traefik.http.services.kopia-b2.loadbalancer.server.port=51515
-    - kuma.kopia-backblaze.type=http
-    - kuma.kopia-backblaze.url=http://kopia-backblaze:51515
-    - kuma.kopia-backblaze.name=Kopia Backup (Backblaze)
-    - kuma.kopia-backblaze.interval=60
-    - kuma.kopia-backblaze.keyword=Kopia
-    - kuma.kopia-backblaze.tags=utilities,backup,backblaze
+    - kuma.kopia-backblaze.keyword.name=Kopia Backup (Backblaze)
+    - kuma.kopia-backblaze.keyword.url=http://kopia-backblaze:51515
+    - kuma.kopia-backblaze.keyword.keyword=Kopia
+    - kuma.kopia-backblaze.keyword.interval=60
+    - 'kuma.kopia-backblaze.keyword.tag_names=[{"name":"tag_utilities"},{"name":"tag_backup"},{"name":"tag_backblaze"}]'
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/kopia-icon.png
     - net.unraid.docker.webui=http://kopia-b2.${DOMAIN}
     networks:
@@ -153,18 +152,17 @@ services:
           cpus: '0.5'
           memory: 1G
     labels:
-    - kuma.kopia-truenas.type=http
+    - kuma.kopia-truenas.keyword.name=Kopia Backup (Local)
+    - kuma.kopia-truenas.keyword.url=http://kopia-truenas:51515
+    - kuma.kopia-truenas.keyword.keyword=Kopia
+    - kuma.kopia-truenas.keyword.interval=60
+    - 'kuma.kopia-truenas.keyword.tag_names=[{"name":"tag_utilities"},{"name":"tag_backup"},{"name":"tag_truenas"}]'
     - traefik.enable=true
     - traefik.docker.network=internal_net
     - traefik.http.routers.kopia-local.rule=Host(`kopia-local.${DOMAIN}`)
     - traefik.http.routers.kopia-local.entrypoints=web
     - traefik.http.routers.kopia-local.middlewares=crowdsec@file,authentik@file
     - traefik.http.services.kopia-local.loadbalancer.server.port=51515
-    - kuma.kopia-truenas.url=http://kopia-truenas:51515
-    - kuma.kopia-truenas.name=Kopia Backup (Local)
-    - kuma.kopia-truenas.interval=60
-    - kuma.kopia-truenas.keyword=Kopia
-    - kuma.kopia-truenas.tags=utilities,backup,truenas
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/kopia-icon.png
     - net.unraid.docker.webui=http://kopia-local.${DOMAIN}
     networks:

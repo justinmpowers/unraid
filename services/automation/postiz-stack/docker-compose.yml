@@ -118,11 +118,10 @@ services:
       - traefik.http.routers.postiz.entrypoints=web
       - traefik.http.routers.postiz.middlewares=crowdsec@file
       - traefik.http.services.postiz.loadbalancer.server.port=5000
-      - kuma.postiz.type=http
-      - kuma.postiz.url=http://postiz:5000
-      - kuma.postiz.name=Postiz
-      - kuma.postiz.interval=60
-      - kuma.postiz.tags=automation,social
+      - kuma.postiz.http.name=Postiz
+      - kuma.postiz.http.url=http://postiz:5000
+      - kuma.postiz.http.interval=60
+      - 'kuma.postiz.http.tag_names=[{"name":"tag_automation"},{"name":"tag_social"}]'
     networks:
       - db_net
       - internal_net
@@ -170,11 +169,10 @@ services:
       - traefik.http.routers.n8n-postiz.entrypoints=web
       - traefik.http.routers.n8n-postiz.middlewares=crowdsec@file
       - traefik.http.services.n8n-postiz.loadbalancer.server.port=5678
-      - kuma.n8n_postiz.type=http
-      - kuma.n8n_postiz.url=http://n8n:5678/healthz
-      - kuma.n8n_postiz.name=n8n Postiz
-      - kuma.n8n_postiz.interval=60
-      - kuma.n8n_postiz.tags=automation,workflows
+      - kuma.n8n_postiz.http.name=n8n Postiz
+      - kuma.n8n_postiz.http.url=http://n8n:5678/healthz
+      - kuma.n8n_postiz.http.interval=60
+      - 'kuma.n8n_postiz.http.tag_names=[{"name":"tag_automation"},{"name":"tag_workflows"}]'
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:5678/healthz || exit 1"]
       interval: 30s

@@ -29,12 +29,11 @@ services:
     - traefik.http.routers.actualserver.entrypoints=web
     - traefik.http.routers.actualserver.middlewares=crowdsec@file
     - traefik.http.services.actualserver.loadbalancer.server.port=5006
-    - kuma.actualserver.type=http
-    - kuma.actualserver.url=http://ActualServer:5006
-    - kuma.actualserver.name=Actual Budget Server
-    - kuma.actualserver.interval=60
-    - kuma.actualserver.keyword=Actual
-    - kuma.actualserver.tags=productivity,budget
+    - kuma.actualserver.keyword.name=Actual Budget Server
+    - kuma.actualserver.keyword.url=http://ActualServer:5006
+    - kuma.actualserver.keyword.keyword=Actual
+    - kuma.actualserver.keyword.interval=60
+    - 'kuma.actualserver.keyword.tag_names=[{"name":"tag_productivity"},{"name":"tag_budget"}]'
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/actualserver-icon.png
     - net.unraid.docker.webui=http://actual.${DOMAIN}
 networks:

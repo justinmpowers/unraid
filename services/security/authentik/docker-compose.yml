@@ -111,12 +111,11 @@ services:
     - traefik.http.routers.authentik.entrypoints=web
     - traefik.http.routers.authentik.middlewares=force-https-scheme@file,default-headers@file
     - traefik.http.services.authentik.loadbalancer.server.port=9000
-    - kuma.authentik.type=http
-    - kuma.authentik.url=http://authentik:9000/-/health/live/
-    - kuma.authentik.name=Authentik Server
-    - kuma.authentik.interval=60
-    - kuma.authentik.keyword=ok
-    - kuma.authentik.tags=security,auth
+    - kuma.authentik.keyword.name=Authentik Server
+    - kuma.authentik.keyword.url=http://authentik:9000/-/health/live/
+    - kuma.authentik.keyword.keyword=ok
+    - kuma.authentik.keyword.interval=60
+    - 'kuma.authentik.keyword.tag_names=[{"name":"tag_security"},{"name":"tag_auth"}]'
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/authentik-icon.png
     - net.unraid.docker.webui=https://auth.${DOMAIN}
     deploy:
@@ -180,12 +179,11 @@ services:
     - ${APPDATA_PATH}/authentik/certs:/certs
     - ${APPDATA_PATH}/authentik/backups:/backups
     labels:
-    - kuma.authentik_worker.type=docker
-    - kuma.authentik_worker.docker_container=authentik-worker
-    - kuma.authentik_worker.docker_host=unix:///var/run/docker.sock
-    - kuma.authentik_worker.name=Authentik Worker
-    - kuma.authentik_worker.interval=60
-    - kuma.authentik_worker.tags=security,worker
+    - kuma.authentik_worker.docker.name=Authentik Worker
+    - kuma.authentik_worker.docker.docker_container=authentik-worker
+    - kuma.authentik_worker.docker.docker_host_name=local_docker
+    - kuma.authentik_worker.docker.interval=60
+    - 'kuma.authentik_worker.docker.tag_names=[{"name":"tag_security"},{"name":"tag_worker"}]'
     deploy:
       resources:
         limits:

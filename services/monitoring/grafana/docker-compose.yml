@@ -22,12 +22,11 @@ services:
     - traefik.http.routers.grafana.entrypoints=web
     - traefik.http.routers.grafana.middlewares=crowdsec@file
     - traefik.http.services.grafana.loadbalancer.server.port=3000
-    - kuma.grafana.type=http
-    - kuma.grafana.url=http://Grafana:3000/api/health
-    - kuma.grafana.name=Grafana
-    - kuma.grafana.interval=60
-    - kuma.grafana.accepted_statuscodes=200
-    - kuma.grafana.tags=monitoring,visualization
+    - kuma.grafana.http.name=Grafana
+    - kuma.grafana.http.url=http://Grafana:3000/api/health
+    - 'kuma.grafana.http.accepted_statuscodes=["200"]'
+    - kuma.grafana.http.interval=60
+    - 'kuma.grafana.http.tag_names=[{"name":"tag_monitoring"},{"name":"tag_visualization"}]'
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/grafana-icon.png
     - net.unraid.docker.webui=http://grafana.${DOMAIN}
     networks:

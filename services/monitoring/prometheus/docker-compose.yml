@@ -26,12 +26,11 @@ services:
       - traefik.http.routers.prometheus.entrypoints=web
       - traefik.http.routers.prometheus.middlewares=crowdsec@file,authentik@file
       - traefik.http.services.prometheus.loadbalancer.server.port=9090
-      - kuma.prometheus.type=http
-      - kuma.prometheus.url=http://prometheus:9090/-/healthy
-      - kuma.prometheus.name=Prometheus
-      - kuma.prometheus.interval=60
-      - kuma.prometheus.keyword=Prometheus is Healthy
-      - kuma.prometheus.tags=monitoring,metrics
+      - kuma.prometheus.keyword.name=Prometheus
+      - kuma.prometheus.keyword.url=http://prometheus:9090/-/healthy
+      - kuma.prometheus.keyword.keyword=Prometheus is Healthy
+      - kuma.prometheus.keyword.interval=60
+      - 'kuma.prometheus.keyword.tag_names=[{"name":"tag_monitoring"},{"name":"tag_metrics"}]'
       - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/prometheus-icon.png
       - net.unraid.docker.webui=http://prometheus.${DOMAIN}
     networks:

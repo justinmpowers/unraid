@@ -24,12 +24,11 @@ services:
     - traefik.http.routers.dashy.entrypoints=web
     - traefik.http.routers.dashy.middlewares=crowdsec@file,authentik@file
     - traefik.http.services.dashy.loadbalancer.server.port=8080
-    - kuma.dashy.type=http
-    - kuma.dashy.url=http://dashy:8080
-    - kuma.dashy.name=Dashy Dashboard
-    - kuma.dashy.interval=60
-    - kuma.dashy.keyword=Dashy
-    - kuma.dashy.tags=utilities,dashboard
+    - kuma.dashy.keyword.name=Dashy Dashboard
+    - kuma.dashy.keyword.url=http://dashy:8080
+    - kuma.dashy.keyword.keyword=Dashy
+    - kuma.dashy.keyword.interval=60
+    - 'kuma.dashy.keyword.tag_names=[{"name":"tag_utilities"},{"name":"tag_dashboard"}]'
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/dashy-icon.png
     - net.unraid.docker.webui=http://dashy.${DOMAIN}
     volumes:
