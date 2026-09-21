@@ -42,9 +42,11 @@ services:
     - AUTOKUMA__KUMA__URL=http://UptimeKuma:3001
     - AUTOKUMA__KUMA__USERNAME=${UPTIME_KUMA_USERNAME:-}
     - AUTOKUMA__KUMA__PASSWORD=${UPTIME_KUMA_PASSWORD:-}
+    - AUTOKUMA__KUMA__AUTH_TOKEN=${UPTIME_KUMA_AUTH_TOKEN:-}
     labels:
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/autokuma-icon.png
     volumes:
+    - ${OBSERVABILITY_PATH}/autokuma:/data
     - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
     - monitoring_net
