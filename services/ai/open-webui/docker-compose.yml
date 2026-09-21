@@ -37,11 +37,10 @@ services:
       - traefik.http.routers.open-webui.entrypoints=web
       - traefik.http.routers.open-webui.middlewares=crowdsec@file
       - traefik.http.services.open-webui.loadbalancer.server.port=8080
-      - kuma.open_webui.type=http
-      - kuma.open_webui.url=http://open-webui:8080/health
-      - kuma.open_webui.name=Open WebUI
-      - kuma.open_webui.interval=60
-      - kuma.open_webui.tags=ai,chat
+      - kuma.open_webui.http.name=Open WebUI
+      - kuma.open_webui.http.url=http://open-webui:8080/health
+      - kuma.open_webui.http.interval=60
+      - 'kuma.open_webui.http.tag_names=[{"name":"tag_ai"},{"name":"tag_chat"}]'
       - net.unraid.docker.icon=https://raw.githubusercontent.com/open-webui/open-webui/main/static/favicon.png
       - net.unraid.docker.webui=http://chat.${DOMAIN}
     deploy:

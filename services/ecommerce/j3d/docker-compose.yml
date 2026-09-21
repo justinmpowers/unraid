@@ -37,11 +37,11 @@ services:
           cpus: "0.3"
           memory: 256M
     labels:
-      - kuma.postgres.type=http
-      - kuma.postgres.url=http://j3d-postgres:5432/j3d
-      - kuma.postgres.name=J3D PostgreSQL
-      - kuma.postgres.interval=60
-      - kuma.postgres.tags=j3d,database
+      - kuma.postgres.port.name=J3D PostgreSQL
+      - kuma.postgres.port.hostname=j3d-postgres
+      - kuma.postgres.port.port=5432
+      - kuma.postgres.port.interval=60
+      - 'kuma.postgres.port.tag_names=[{"name":"tag_j3d"},{"name":"tag_database"}]'
       - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png
 
   print-ops-backend:
@@ -91,11 +91,10 @@ services:
       - traefik.http.routers.print-ops-backend.entrypoints=web
       - traefik.http.routers.print-ops-backend.middlewares=crowdsec@file
       - traefik.http.services.print-ops-backend.loadbalancer.server.port=5000
-      - kuma.backend.type=http
-      - kuma.backend.url=http://print-ops-backend:5000/api/health
-      - kuma.backend.name=J3D Backend
-      - kuma.backend.interval=60
-      - kuma.backend.tags=j3d,api
+      - kuma.backend.http.name=J3D Backend
+      - kuma.backend.http.url=http://print-ops-backend:5000/api/health
+      - kuma.backend.http.interval=60
+      - 'kuma.backend.http.tag_names=[{"name":"tag_j3d"},{"name":"tag_api"}]'
       - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/flask-icon.png
       - net.unraid.docker.webui=http://j3d.${DOMAIN}
     networks:
@@ -120,11 +119,10 @@ services:
           cpus: "0.25"
           memory: 256M
     labels:
-      - kuma.frontend.type=http
-      - kuma.frontend.url=http://print-ops-frontend:4200/health
-      - kuma.frontend.name=Print Ops Frontend
-      - kuma.frontend.interval=60
-      - kuma.frontend.tags=print-ops,web
+      - kuma.frontend.http.name=Print Ops Frontend
+      - kuma.frontend.http.url=http://print-ops-frontend:4200/health
+      - kuma.frontend.http.interval=60
+      - 'kuma.frontend.http.tag_names=[{"name":"tag_print-ops"},{"name":"tag_web"}]'
       - traefik.enable=true
       - traefik.docker.network=internal_net
       - traefik.http.routers.print-ops-frontend.rule=Host(`j3d.${DOMAIN}`)

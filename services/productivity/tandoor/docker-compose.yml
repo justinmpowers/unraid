@@ -51,12 +51,11 @@ services:
     - traefik.http.routers.tandoor.entrypoints=web
     - traefik.http.routers.tandoor.middlewares=crowdsec@file
     - traefik.http.services.tandoor.loadbalancer.server.port=8080
-    - kuma.tandoor.type=http
-    - kuma.tandoor.url=http://tandoor:8080
-    - kuma.tandoor.name=Tandoor Recipes
-    - kuma.tandoor.interval=60
-    - kuma.tandoor.keyword=Tandoor
-    - kuma.tandoor.tags=productivity,recipes
+    - kuma.tandoor.keyword.name=Tandoor Recipes
+    - kuma.tandoor.keyword.url=http://tandoor:8080
+    - kuma.tandoor.keyword.keyword=Tandoor
+    - kuma.tandoor.keyword.interval=60
+    - 'kuma.tandoor.keyword.tag_names=[{"name":"tag_productivity"},{"name":"tag_recipes"}]'
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/tandoor-icon.png
     - net.unraid.docker.webui=http://tandoor.${DOMAIN}
   tandoor-postgres:

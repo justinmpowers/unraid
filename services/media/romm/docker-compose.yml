@@ -20,12 +20,11 @@ services:
     - traefik.http.routers.romm.entrypoints=web
     - traefik.http.routers.romm.middlewares=crowdsec@file
     - traefik.http.services.romm.loadbalancer.server.port=8080
-    - kuma.romm.type=http
-    - kuma.romm.url=http://romm:8080
-    - kuma.romm.name=ROMM Game Library
-    - kuma.romm.interval=60
-    - kuma.romm.keyword=ROMM
-    - kuma.romm.tags=media,gaming
+    - kuma.romm.keyword.name=ROMM Game Library
+    - kuma.romm.keyword.url=http://romm:8080
+    - kuma.romm.keyword.keyword=ROMM
+    - kuma.romm.keyword.interval=60
+    - 'kuma.romm.keyword.tag_names=[{"name":"tag_media"},{"name":"tag_gaming"}]'
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/romm-icon.png
     - net.unraid.docker.webui=http://romm.${DOMAIN}
     volumes:

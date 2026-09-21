@@ -28,8 +28,15 @@ services:
     - traefik.http.services.uptimekuma.loadbalancer.server.port=3001
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/uptimekuma-icon.png
     - net.unraid.docker.webui=http://[IP]:[PORT:3002]
+    # Uptime Kuma runs the checks, so it must share a network with every monitored service.
+    # host.docker.internal reaches host-network containers (music-assistant, ankerctl).
+    extra_hosts:
+    - host.docker.internal:host-gateway
     networks:
     - monitoring_net
+    - db_net
+    - internal_net
+    - iot_net
   autokuma:
     image: ghcr.io/bigboot/autokuma:2.0
     container_name: AutoKuma
@@ -45,6 +52,111 @@ services:
     - AUTOKUMA__KUMA__AUTH_TOKEN=${UPTIME_KUMA_AUTH_TOKEN:-}
     labels:
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/autokuma-icon.png
+    - kuma.local_docker.docker_host.name=Unraid Docker
+    - kuma.local_docker.docker_host.connection_type=socket
+    - kuma.local_docker.docker_host.path=/var/run/docker.sock
+    - kuma.tag_3d.tag.name=3d
+    - 'kuma.tag_3d.tag.color=#4B5563'
+    - kuma.tag_3dprinting.tag.name=3dprinting
+    - 'kuma.tag_3dprinting.tag.color=#4B5563'
+    - kuma.tag_ai.tag.name=ai
+    - 'kuma.tag_ai.tag.color=#7C3AED'
+    - kuma.tag_api.tag.name=api
+    - 'kuma.tag_api.tag.color=#4B5563'
+    - kuma.tag_auth.tag.name=auth
+    - 'kuma.tag_auth.tag.color=#4B5563'
+    - kuma.tag_automation.tag.name=automation
+    - 'kuma.tag_automation.tag.color=#D97706'
+    - kuma.tag_backblaze.tag.name=backblaze
+    - 'kuma.tag_backblaze.tag.color=#4B5563'
+    - kuma.tag_backup.tag.name=backup
+    - 'kuma.tag_backup.tag.color=#4B5563'
+    - kuma.tag_budget.tag.name=budget
+    - 'kuma.tag_budget.tag.color=#4B5563'
+    - kuma.tag_cache.tag.name=cache
+    - 'kuma.tag_cache.tag.color=#4B5563'
+    - kuma.tag_chat.tag.name=chat
+    - 'kuma.tag_chat.tag.color=#4B5563'
+    - kuma.tag_ci-cd.tag.name=ci-cd
+    - 'kuma.tag_ci-cd.tag.color=#4B5563'
+    - kuma.tag_cloud.tag.name=cloud
+    - 'kuma.tag_cloud.tag.color=#4B5563'
+    - kuma.tag_dashboard.tag.name=dashboard
+    - 'kuma.tag_dashboard.tag.color=#4B5563'
+    - kuma.tag_database.tag.name=database
+    - 'kuma.tag_database.tag.color=#4B5563'
+    - kuma.tag_docker-management.tag.name=docker-management
+    - 'kuma.tag_docker-management.tag.color=#4B5563'
+    - kuma.tag_files.tag.name=files
+    - 'kuma.tag_files.tag.color=#4B5563'
+    - kuma.tag_gaming.tag.name=gaming
+    - 'kuma.tag_gaming.tag.color=#DB2777'
+    - kuma.tag_govee.tag.name=govee
+    - 'kuma.tag_govee.tag.color=#4B5563'
+    - kuma.tag_infrastructure.tag.name=infrastructure
+    - 'kuma.tag_infrastructure.tag.color=#4F46E5'
+    - kuma.tag_iot.tag.name=iot
+    - 'kuma.tag_iot.tag.color=#059669'
+    - kuma.tag_j3d.tag.name=j3d
+    - 'kuma.tag_j3d.tag.color=#DB2777'
+    - kuma.tag_library.tag.name=library
+    - 'kuma.tag_library.tag.color=#4B5563'
+    - kuma.tag_logs.tag.name=logs
+    - 'kuma.tag_logs.tag.color=#4B5563'
+    - kuma.tag_matter.tag.name=matter
+    - 'kuma.tag_matter.tag.color=#4B5563'
+    - kuma.tag_media.tag.name=media
+    - 'kuma.tag_media.tag.color=#DC2626'
+    - kuma.tag_metrics.tag.name=metrics
+    - 'kuma.tag_metrics.tag.color=#4B5563'
+    - kuma.tag_monitoring.tag.name=monitoring
+    - 'kuma.tag_monitoring.tag.color=#2563EB'
+    - kuma.tag_mqtt.tag.name=mqtt
+    - 'kuma.tag_mqtt.tag.color=#4B5563'
+    - kuma.tag_music.tag.name=music
+    - 'kuma.tag_music.tag.color=#4B5563'
+    - kuma.tag_networking.tag.name=networking
+    - 'kuma.tag_networking.tag.color=#4F46E5'
+    - kuma.tag_passwords.tag.name=passwords
+    - 'kuma.tag_passwords.tag.color=#4B5563'
+    - kuma.tag_photos.tag.name=photos
+    - 'kuma.tag_photos.tag.color=#4B5563'
+    - kuma.tag_print-ops.tag.name=print-ops
+    - 'kuma.tag_print-ops.tag.color=#4B5563'
+    - kuma.tag_productivity.tag.name=productivity
+    - 'kuma.tag_productivity.tag.color=#059669'
+    - kuma.tag_proxy.tag.name=proxy
+    - 'kuma.tag_proxy.tag.color=#4B5563'
+    - kuma.tag_recipes.tag.name=recipes
+    - 'kuma.tag_recipes.tag.color=#4B5563'
+    - kuma.tag_search.tag.name=search
+    - 'kuma.tag_search.tag.color=#4B5563'
+    - kuma.tag_security.tag.name=security
+    - 'kuma.tag_security.tag.color=#DC2626'
+    - kuma.tag_server.tag.name=server
+    - 'kuma.tag_server.tag.color=#4B5563'
+    - kuma.tag_smart-home.tag.name=smart-home
+    - 'kuma.tag_smart-home.tag.color=#4B5563'
+    - kuma.tag_social.tag.name=social
+    - 'kuma.tag_social.tag.color=#4B5563'
+    - kuma.tag_truenas.tag.name=truenas
+    - 'kuma.tag_truenas.tag.color=#4B5563'
+    - kuma.tag_tunnel.tag.name=tunnel
+    - 'kuma.tag_tunnel.tag.color=#4B5563'
+    - kuma.tag_utilities.tag.name=utilities
+    - 'kuma.tag_utilities.tag.color=#D97706'
+    - kuma.tag_visualization.tag.name=visualization
+    - 'kuma.tag_visualization.tag.color=#4B5563'
+    - kuma.tag_voice.tag.name=voice
+    - 'kuma.tag_voice.tag.color=#4B5563'
+    - kuma.tag_web.tag.name=web
+    - 'kuma.tag_web.tag.color=#4B5563'
+    - kuma.tag_wiki.tag.name=wiki
+    - 'kuma.tag_wiki.tag.color=#4B5563'
+    - kuma.tag_worker.tag.name=worker
+    - 'kuma.tag_worker.tag.color=#4B5563'
+    - kuma.tag_workflows.tag.name=workflows
+    - 'kuma.tag_workflows.tag.color=#4B5563'
     volumes:
     - ${OBSERVABILITY_PATH}/autokuma:/data
     - /var/run/docker.sock:/var/run/docker.sock:ro

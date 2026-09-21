@@ -26,12 +26,11 @@ services:
           cpus: '0.2'
           memory: 512M
     labels:
-    - kuma.loki.type=http
-    - kuma.loki.url=http://GrafanaLoki:3100/ready
-    - kuma.loki.name=Grafana Loki
-    - kuma.loki.interval=60
-    - kuma.loki.keyword=ready
-    - kuma.loki.tags=monitoring,logs
+    - kuma.loki.keyword.name=Grafana Loki
+    - kuma.loki.keyword.url=http://GrafanaLoki:3100/ready
+    - kuma.loki.keyword.keyword=ready
+    - kuma.loki.keyword.interval=60
+    - 'kuma.loki.keyword.tag_names=[{"name":"tag_monitoring"},{"name":"tag_logs"}]'
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/loki-icon.png
     - net.unraid.docker.webui=http://[IP]:[PORT:3100]
 networks:

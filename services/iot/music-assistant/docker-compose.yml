@@ -25,10 +25,9 @@ services:
           cpus: "0.2"
           memory: 256M
     labels:
-      - kuma.music_assistant.type=http
-      - kuma.music_assistant.url=http://localhost:8095
-      - kuma.music_assistant.name=Music Assistant
-      - kuma.music_assistant.interval=60
-      - kuma.music_assistant.tags=iot,smart-home,music
+      - kuma.music_assistant.http.name=Music Assistant
+      - kuma.music_assistant.http.url=http://host.docker.internal:8095
+      - kuma.music_assistant.http.interval=60
+      - 'kuma.music_assistant.http.tag_names=[{"name":"tag_iot"},{"name":"tag_smart-home"},{"name":"tag_music"}]'
       - net.unraid.docker.icon=https://raw.githubusercontent.com/music-assistant/server/main/music_assistant/server/helpers/images/logo.png
       - net.unraid.docker.webui=http://[IP]:8095

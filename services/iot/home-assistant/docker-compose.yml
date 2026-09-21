@@ -19,12 +19,11 @@ services:
     - traefik.http.routers.homeassistant.rule=Host(`homeassistant.${DOMAIN}`)
     - traefik.http.routers.homeassistant.entrypoints=web
     - traefik.http.services.homeassistant.loadbalancer.server.port=8123
-    - kuma.homeassistant.type=http
-    - kuma.homeassistant.url=http://Home-Assistant-Container:8123
-    - kuma.homeassistant.name=Home Assistant
-    - kuma.homeassistant.interval=60
-    - kuma.homeassistant.keyword=Home Assistant
-    - kuma.homeassistant.tags=iot,smart-home
+    - kuma.homeassistant.keyword.name=Home Assistant
+    - kuma.homeassistant.keyword.url=http://Home-Assistant-Container:8123
+    - kuma.homeassistant.keyword.keyword=Home Assistant
+    - kuma.homeassistant.keyword.interval=60
+    - 'kuma.homeassistant.keyword.tag_names=[{"name":"tag_iot"},{"name":"tag_smart-home"}]'
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/home-assistant-icon.png
     - net.unraid.docker.webui=http://homeassistant.${DOMAIN}
     deploy:
@@ -68,11 +67,10 @@ services:
           cpus: '0.1'
           memory: 256M
     labels:
-    - kuma.matter_server.type=http
-    - kuma.matter_server.url=http://matter-server:5540
-    - kuma.matter_server.name=Matter Server
-    - kuma.matter_server.interval=60
-    - kuma.matter_server.tags=iot,matter
+    - kuma.matter_server.http.name=Matter Server
+    - kuma.matter_server.http.url=http://matter-server:5540
+    - kuma.matter_server.http.interval=60
+    - 'kuma.matter_server.http.tag_names=[{"name":"tag_iot"},{"name":"tag_matter"}]'
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/matter-server-icon.png
   wyoming-whisper:
     image: rhasspy/wyoming-whisper:3.8.1
@@ -104,12 +102,11 @@ services:
           cpus: '0.1'
           memory: 256M
     labels:
-    - kuma.wyoming_whisper.type=tcp
-    - kuma.wyoming_whisper.hostname=wyoming-whisper
-    - kuma.wyoming_whisper.port=10300
-    - kuma.wyoming_whisper.name=Wyoming Whisper (STT)
-    - kuma.wyoming_whisper.interval=60
-    - kuma.wyoming_whisper.tags=iot,smart-home,voice
+    - kuma.wyoming_whisper.port.name=Wyoming Whisper (STT)
+    - kuma.wyoming_whisper.port.hostname=wyoming-whisper
+    - kuma.wyoming_whisper.port.port=10300
+    - kuma.wyoming_whisper.port.interval=60
+    - 'kuma.wyoming_whisper.port.tag_names=[{"name":"tag_iot"},{"name":"tag_smart-home"},{"name":"tag_voice"}]'
     networks:
     - iot_net
   wyoming-piper:
@@ -140,12 +137,11 @@ services:
           cpus: '0.1'
           memory: 128M
     labels:
-    - kuma.wyoming_piper.type=tcp
-    - kuma.wyoming_piper.hostname=wyoming-piper
-    - kuma.wyoming_piper.port=10200
-    - kuma.wyoming_piper.name=Wyoming Piper (TTS)
-    - kuma.wyoming_piper.interval=60
-    - kuma.wyoming_piper.tags=iot,smart-home,voice
+    - kuma.wyoming_piper.port.name=Wyoming Piper (TTS)
+    - kuma.wyoming_piper.port.hostname=wyoming-piper
+    - kuma.wyoming_piper.port.port=10200
+    - kuma.wyoming_piper.port.interval=60
+    - 'kuma.wyoming_piper.port.tag_names=[{"name":"tag_iot"},{"name":"tag_smart-home"},{"name":"tag_voice"}]'
     networks:
     - iot_net
 networks:

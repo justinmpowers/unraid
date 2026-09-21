@@ -28,12 +28,11 @@ services:
     - traefik.http.routers.zigbee2mqtt.entrypoints=web
     - traefik.http.routers.zigbee2mqtt.middlewares=crowdsec@file,authentik@file
     - traefik.http.services.zigbee2mqtt.loadbalancer.server.port=8080
-    - kuma.zigbee2mqtt.type=http
-    - kuma.zigbee2mqtt.url=http://zigbee2mqtt:8080
-    - kuma.zigbee2mqtt.name=Zigbee2MQTT
-    - kuma.zigbee2mqtt.interval=60
-    - kuma.zigbee2mqtt.keyword=Zigbee2MQTT
-    - kuma.zigbee2mqtt.tags=iot,smart-home
+    - kuma.zigbee2mqtt.keyword.name=Zigbee2MQTT
+    - kuma.zigbee2mqtt.keyword.url=http://zigbee2mqtt:8080
+    - kuma.zigbee2mqtt.keyword.keyword=Zigbee2MQTT
+    - kuma.zigbee2mqtt.keyword.interval=60
+    - 'kuma.zigbee2mqtt.keyword.tag_names=[{"name":"tag_iot"},{"name":"tag_smart-home"}]'
     - net.unraid.docker.webui=http://zigbee2mqtt.${DOMAIN}
     networks:
     - iot_net

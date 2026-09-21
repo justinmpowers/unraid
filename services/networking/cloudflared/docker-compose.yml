@@ -20,12 +20,11 @@ services:
           cpus: '0.1'
           memory: 64M
     labels:
-    - kuma.cloudflared.type=docker
-    - kuma.cloudflared.docker_container=Unraid-Cloudflared-Tunnel
-    - kuma.cloudflared.docker_host=unix:///var/run/docker.sock
-    - kuma.cloudflared.name=Cloudflared Tunnel
-    - kuma.cloudflared.interval=60
-    - kuma.cloudflared.tags=networking,tunnel
+    - kuma.cloudflared.docker.name=Cloudflared Tunnel
+    - kuma.cloudflared.docker.docker_container=Unraid-Cloudflared-Tunnel
+    - kuma.cloudflared.docker.docker_host_name=local_docker
+    - kuma.cloudflared.docker.interval=60
+    - 'kuma.cloudflared.docker.tag_names=[{"name":"tag_networking"},{"name":"tag_tunnel"}]'
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/cloudflared-icon.png
     networks:
     - public_net

@@ -33,11 +33,10 @@ services:
       - traefik.http.routers.searxng.entrypoints=web
       - traefik.http.routers.searxng.middlewares=crowdsec@file
       - traefik.http.services.searxng.loadbalancer.server.port=8080
-      - kuma.searxng.type=http
-      - kuma.searxng.url=http://searxng:8080/healthz
-      - kuma.searxng.name=SearXNG
-      - kuma.searxng.interval=60
-      - kuma.searxng.tags=ai,search
+      - kuma.searxng.http.name=SearXNG
+      - kuma.searxng.http.url=http://searxng:8080/healthz
+      - kuma.searxng.http.interval=60
+      - 'kuma.searxng.http.tag_names=[{"name":"tag_ai"},{"name":"tag_search"}]'
       - net.unraid.docker.icon=https://raw.githubusercontent.com/searxng/searxng/master/src/brand/searxng-wordmark.svg
       - net.unraid.docker.webui=http://search.${DOMAIN}
     deploy:

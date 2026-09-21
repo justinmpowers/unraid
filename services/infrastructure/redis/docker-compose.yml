@@ -31,12 +31,11 @@ services:
     command: redis-server --appendonly yes --auto-aof-rewrite-percentage 100 --auto-aof-rewrite-min-size
       64mb
     labels:
-    - kuma.redis.type=docker
-    - kuma.redis.docker_container=Redis
-    - kuma.redis.docker_host=unix:///var/run/docker.sock
-    - kuma.redis.name=Redis Cache
-    - kuma.redis.interval=60
-    - kuma.redis.tags=infrastructure,cache
+    - kuma.redis.docker.name=Redis Cache
+    - kuma.redis.docker.docker_container=Redis
+    - kuma.redis.docker.docker_host_name=local_docker
+    - kuma.redis.docker.interval=60
+    - 'kuma.redis.docker.tag_names=[{"name":"tag_infrastructure"},{"name":"tag_cache"}]'
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/redis-icon.png
 networks:
   db_net:
