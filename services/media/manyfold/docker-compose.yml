@@ -48,11 +48,10 @@ services:
     - traefik.http.routers.manyfold.entrypoints=web
     - traefik.http.routers.manyfold.middlewares=crowdsec@file
     - traefik.http.services.manyfold.loadbalancer.server.port=3214
-    - kuma.manyfold.keyword.name=Manyfold
-    - kuma.manyfold.keyword.url=http://manyfold:3214
-    - kuma.manyfold.keyword.keyword=Manyfold
-    - kuma.manyfold.keyword.interval=60
-    - 'kuma.manyfold.keyword.tag_names=[{"name":"tag_media"},{"name":"tag_3d"},{"name":"tag_library"}]'
+    - kuma.manyfold.http.name=Manyfold
+    - kuma.manyfold.http.url=http://manyfold:3214/health
+    - kuma.manyfold.http.interval=60
+    - 'kuma.manyfold.http.tag_names=[{"name":"tag_media"},{"name":"tag_3d"},{"name":"tag_library"}]'
     - net.unraid.docker.webui=http://manyfold.${DOMAIN}
 
   manyfold-postgres:

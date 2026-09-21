@@ -104,11 +104,10 @@ services:
     - traefik.http.routers.obico.rule=Host(`obico.${DOMAIN}`)
     - traefik.http.routers.obico.entrypoints=web
     - traefik.http.services.obico.loadbalancer.server.port=3334
-    - kuma.obico.keyword.name=Obico
-    - kuma.obico.keyword.url=http://obico:3334/hc/
-    - kuma.obico.keyword.keyword=ok
-    - kuma.obico.keyword.interval=60
-    - 'kuma.obico.keyword.tag_names=[{"name":"tag_iot"},{"name":"tag_3dprinting"}]'
+    - kuma.obico.http.name=Obico
+    - kuma.obico.http.url=http://obico:3334/hc/
+    - kuma.obico.http.interval=60
+    - 'kuma.obico.http.tag_names=[{"name":"tag_iot"},{"name":"tag_3dprinting"}]'
     - net.unraid.docker.icon=https://raw.githubusercontent.com/TheSpaghettiDetective/obico-server/release/frontend/src/assets/img/logo-compact.svg
     - net.unraid.docker.webui=http://obico.${DOMAIN}
     networks:

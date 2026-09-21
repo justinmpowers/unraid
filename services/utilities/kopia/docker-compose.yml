@@ -71,11 +71,11 @@ services:
     - traefik.http.routers.kopia-b2.entrypoints=web
     - traefik.http.routers.kopia-b2.middlewares=crowdsec@file,authentik@file
     - traefik.http.services.kopia-b2.loadbalancer.server.port=51515
-    - kuma.kopia-backblaze.keyword.name=Kopia Backup (Backblaze)
-    - kuma.kopia-backblaze.keyword.url=http://kopia-backblaze:51515
-    - kuma.kopia-backblaze.keyword.keyword=Kopia
-    - kuma.kopia-backblaze.keyword.interval=60
-    - 'kuma.kopia-backblaze.keyword.tag_names=[{"name":"tag_utilities"},{"name":"tag_backup"},{"name":"tag_backblaze"}]'
+    - kuma.kopia-backblaze.http.name=Kopia Backup (Backblaze)
+    - kuma.kopia-backblaze.http.url=http://kopia-backblaze:51515
+    - 'kuma.kopia-backblaze.http.accepted_statuscodes=["200-299","401"]'
+    - kuma.kopia-backblaze.http.interval=60
+    - 'kuma.kopia-backblaze.http.tag_names=[{"name":"tag_utilities"},{"name":"tag_backup"},{"name":"tag_backblaze"}]'
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/kopia-icon.png
     - net.unraid.docker.webui=http://kopia-b2.${DOMAIN}
     networks:
@@ -152,11 +152,11 @@ services:
           cpus: '0.5'
           memory: 1G
     labels:
-    - kuma.kopia-truenas.keyword.name=Kopia Backup (Local)
-    - kuma.kopia-truenas.keyword.url=http://kopia-truenas:51515
-    - kuma.kopia-truenas.keyword.keyword=Kopia
-    - kuma.kopia-truenas.keyword.interval=60
-    - 'kuma.kopia-truenas.keyword.tag_names=[{"name":"tag_utilities"},{"name":"tag_backup"},{"name":"tag_truenas"}]'
+    - kuma.kopia-truenas.http.name=Kopia Backup (Local)
+    - kuma.kopia-truenas.http.url=http://kopia-truenas:51515
+    - 'kuma.kopia-truenas.http.accepted_statuscodes=["200-299","401"]'
+    - kuma.kopia-truenas.http.interval=60
+    - 'kuma.kopia-truenas.http.tag_names=[{"name":"tag_utilities"},{"name":"tag_backup"},{"name":"tag_truenas"}]'
     - traefik.enable=true
     - traefik.docker.network=internal_net
     - traefik.http.routers.kopia-local.rule=Host(`kopia-local.${DOMAIN}`)

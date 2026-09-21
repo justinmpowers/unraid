@@ -20,11 +20,10 @@ services:
     - traefik.http.routers.jenkins.entrypoints=web
     - traefik.http.routers.jenkins.middlewares=crowdsec@file,authentik@file
     - traefik.http.services.jenkins.loadbalancer.server.port=8080
-    - kuma.jenkins.keyword.name=Jenkins
-    - kuma.jenkins.keyword.url=http://jenkins:8080
-    - kuma.jenkins.keyword.keyword=Jenkins
-    - kuma.jenkins.keyword.interval=60
-    - 'kuma.jenkins.keyword.tag_names=[{"name":"tag_automation"},{"name":"tag_ci-cd"}]'
+    - kuma.jenkins.http.name=Jenkins
+    - kuma.jenkins.http.url=http://jenkins:8080/login
+    - kuma.jenkins.http.interval=60
+    - 'kuma.jenkins.http.tag_names=[{"name":"tag_automation"},{"name":"tag_ci-cd"}]'
     networks:
     - docker_proxy_net
     - internal_net
