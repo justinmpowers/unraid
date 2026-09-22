@@ -23,11 +23,10 @@ services:
       - traefik.http.routers.wikijs.entrypoints=web
       - traefik.http.routers.wikijs.middlewares=crowdsec@file
       - traefik.http.services.wikijs.loadbalancer.server.port=3000
-      - kuma.wikijs.keyword.name=Wiki.js
-      - kuma.wikijs.keyword.url=http://wikijs:3000
-      - kuma.wikijs.keyword.keyword=Wiki.js
-      - kuma.wikijs.keyword.interval=60
-      - 'kuma.wikijs.keyword.tag_names=[{"name":"tag_productivity"},{"name":"tag_wiki"}]'
+      - kuma.wikijs.http.name=Wiki.js
+      - kuma.wikijs.http.url=http://wikijs:3000/healthz
+      - kuma.wikijs.http.interval=60
+      - 'kuma.wikijs.http.tag_names=[{"name":"tag_productivity"},{"name":"tag_wiki"}]'
       - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/wikijs-icon.png
       - net.unraid.docker.webui=http://wikijs.${DOMAIN}
     deploy:

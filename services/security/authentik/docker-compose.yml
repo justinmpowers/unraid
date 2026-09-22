@@ -111,11 +111,10 @@ services:
     - traefik.http.routers.authentik.entrypoints=web
     - traefik.http.routers.authentik.middlewares=force-https-scheme@file,default-headers@file
     - traefik.http.services.authentik.loadbalancer.server.port=9000
-    - kuma.authentik.keyword.name=Authentik Server
-    - kuma.authentik.keyword.url=http://authentik:9000/-/health/live/
-    - kuma.authentik.keyword.keyword=ok
-    - kuma.authentik.keyword.interval=60
-    - 'kuma.authentik.keyword.tag_names=[{"name":"tag_security"},{"name":"tag_auth"}]'
+    - kuma.authentik.http.name=Authentik Server
+    - kuma.authentik.http.url=http://authentik:9000/-/health/live/
+    - kuma.authentik.http.interval=60
+    - 'kuma.authentik.http.tag_names=[{"name":"tag_security"},{"name":"tag_auth"}]'
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/authentik-icon.png
     - net.unraid.docker.webui=https://auth.${DOMAIN}
     deploy:

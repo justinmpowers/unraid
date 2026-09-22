@@ -67,10 +67,11 @@ services:
           cpus: '0.1'
           memory: 256M
     labels:
-    - kuma.matter_server.http.name=Matter Server
-    - kuma.matter_server.http.url=http://matter-server:5540
-    - kuma.matter_server.http.interval=60
-    - 'kuma.matter_server.http.tag_names=[{"name":"tag_iot"},{"name":"tag_matter"}]'
+    - kuma.matter_server.port.name=Matter Server
+    - kuma.matter_server.port.hostname=matter-server
+    - kuma.matter_server.port.port=5580
+    - kuma.matter_server.port.interval=60
+    - 'kuma.matter_server.port.tag_names=[{"name":"tag_iot"},{"name":"tag_matter"}]'
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/matter-server-icon.png
   wyoming-whisper:
     image: rhasspy/wyoming-whisper:3.8.1
