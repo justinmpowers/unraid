@@ -44,6 +44,7 @@ services/
 ├── monitoring/          # Observability stack
 │   ├── grafana/         # Dashboard and visualization
 │   ├── loki/            # Log aggregation
+│   ├── ntfy/            # Push notifications
 │   ├── prometheus/      # Metrics collection
 │   ├── promtail/        # Log collector
 │   └── uptimekuma/      # Uptime monitoring
