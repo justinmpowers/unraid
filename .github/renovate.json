@@ -11,6 +11,7 @@
   ],
   "branchPrefix": "renovate/",
   "timezone": "UTC",
+  "platformCommit": "enabled",
   "prHourlyLimit": 0,
   "baseBranchPatterns": [
     "main"
