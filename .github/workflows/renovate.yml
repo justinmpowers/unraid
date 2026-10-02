@@ -5,24 +5,42 @@ on:
     - cron: '0 9 * * SUN'
   workflow_dispatch:
 
+# Renovate authenticates as our own GitHub App, not as GITHUB_TOKEN, so the
+# job token only needs enough access for actions/checkout.
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 jobs:
   renovate:
     runs-on: [self-hosted, unraid, docker-compose, automation]
     steps:
+      - name: Generate Renovate app token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ secrets.RENOVATE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.RENOVATE_APP_PRIVATE_KEY }}
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Run Renovate
-        uses: renovatebot/github-action@v46.1.19
+        uses: renovatebot/github-action@v46.3.4
         env:
           LOG_LEVEL: debug
-          RENOVATE_LOG_LEVEL: debug
           RENOVATE_REPOSITORIES: ${{ github.repository }}
-          RENOVATE_HOST_RULES: >-
-            [{"hostType":"docker","matchHost":"docker.io","username":"${{ secrets.DOCKER_HUB_USERNAME }}","password":"${{ secrets.DOCKER_HUB_PASSWORD }}"}]
+          DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+          DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
+          GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
         with:
-          token: ${{ secrets.RENOVATE_TOKEN || secrets.GH_TOKEN || github.token }}
+          token: ${{ steps.app-token.outputs.token }}
+          configurationFile: .github/renovate-config.mjs
+          # The action only forwards env vars matching its built-in regex
+          # (RENOVATE_*, LOG_LEVEL, ...). Registry credentials are named
+          # outside that pattern, so they have to be listed explicitly.
+          additional-env-list: |
+            DOCKER_HUB_USERNAME
+            DOCKER_HUB_PASSWORD
+            GHCR_USERNAME
+            GHCR_TOKEN
