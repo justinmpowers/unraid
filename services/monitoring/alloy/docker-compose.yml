@@ -1,0 +1,112 @@
+services:
+  alloy:
+    image: grafana/alloy:v1.20.1
+    container_name: GrafanaAlloy
+    restart: unless-stopped
+    environment:
+    - TZ=${TZ}
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=JP-Dell
+    - HOST_CONTAINERNAME=GrafanaAlloy
+    command:
+    - run
+    - --server.http.listen-addr=0.0.0.0:12345
+    - --storage.path=/var/lib/alloy/data
+    - /etc/alloy/config.alloy
+    # Copy config.alloy from this folder to ${OBSERVABILITY_PATH}/alloy/config/ before deploying.
+    volumes:
+    - ${OBSERVABILITY_PATH}/alloy/config:/etc/alloy:ro
+    - ${OBSERVABILITY_PATH}/alloy/data:/var/lib/alloy/data
+    - /var/log:/host/var/log:ro
+    - ${APPDATA_PATH}/traefik/logs:/host/traefik-logs:ro
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+    # node-exporter runs on the host network; reach it through the host gateway.
+    extra_hosts:
+    - host.docker.internal:host-gateway
+    labels:
+    - traefik.enable=true
+    - traefik.docker.network=monitoring_net
+    - traefik.http.routers.alloy.rule=Host(`alloy.${DOMAIN}`)
+    - traefik.http.routers.alloy.entrypoints=web
+    - traefik.http.routers.alloy.middlewares=crowdsec@file,authentik@file
+    - traefik.http.services.alloy.loadbalancer.server.port=12345
+    - kuma.alloy.http.name=Grafana Alloy
+    - kuma.alloy.http.url=http://GrafanaAlloy:12345/-/ready
+    - kuma.alloy.http.interval=60
+    - 'kuma.alloy.http.tag_names=[{"name":"tag_monitoring"},{"name":"tag_logs"},{"name":"tag_metrics"}]'
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/grafana/alloy/main/docs/sources/assets/alloy_icon_orange.svg
+    - net.unraid.docker.webui=http://alloy.${DOMAIN}
+    networks:
+    - monitoring_net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+
+  node-exporter:
+    image: prom/node-exporter:v1.12.1
+    container_name: node-exporter
+    restart: unless-stopped
+    # Host network + PID namespace so interface and process stats are the host's, not the container's.
+    network_mode: host
+    pid: host
+    command:
+    - --path.rootfs=/host
+    - --web.listen-address=:9100
+    volumes:
+    - /:/host:ro,rslave
+    labels:
+    - kuma.node_exporter.http.name=Node Exporter
+    - kuma.node_exporter.http.url=http://host.docker.internal:9100/metrics
+    - kuma.node_exporter.http.interval=60
+    - 'kuma.node_exporter.http.tag_names=[{"name":"tag_monitoring"},{"name":"tag_metrics"}]'
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/prometheus-icon.png
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 128M
+        reservations:
+          cpus: '0.05'
+          memory: 32M
+
+  cadvisor:
+    image: ghcr.io/google/cadvisor:v0.60.6
+    container_name: cadvisor
+    restart: unless-stopped
+    command:
+    - --docker_only=true
+    - --housekeeping_interval=30s
+    - --store_container_labels=false
+    - --disable_metrics=percpu,sched,tcp,udp,advtcp,hugetlb,referenced_memory,cpu_topology,resctrl,memory_numa,accelerator,perf_event
+    volumes:
+    - /:/rootfs:ro
+    - /var/run:/var/run:ro
+    - /sys:/sys:ro
+    - /var/lib/docker:/var/lib/docker:ro
+    - /dev/disk:/dev/disk:ro
+    devices:
+    - /dev/kmsg
+    labels:
+    - kuma.cadvisor.http.name=cAdvisor
+    - kuma.cadvisor.http.url=http://cadvisor:8080/healthz
+    - kuma.cadvisor.http.interval=60
+    - 'kuma.cadvisor.http.tag_names=[{"name":"tag_monitoring"},{"name":"tag_metrics"}]'
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/google/cadvisor/master/logo.png
+    networks:
+    - monitoring_net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
+networks:
+  monitoring_net:
+    external: true
