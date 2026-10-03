@@ -137,11 +137,10 @@ prometheus.scrape "crowdsec" {
 	forward_to      = [prometheus.remote_write.default.receiver]
 }
 
-prometheus.exporter.self "alloy" { }
-
+// Scrape Alloy's own /metrics directly; prometheus.exporter.self sets its own job label.
 prometheus.scrape "alloy" {
 	job_name        = "alloy"
-	targets         = prometheus.exporter.self.alloy.targets
+	targets         = [{"__address__" = "localhost:12345", "instance" = "JP-Dell"}]
 	scrape_interval = "60s"
 	forward_to      = [prometheus.remote_write.default.receiver]
 }
