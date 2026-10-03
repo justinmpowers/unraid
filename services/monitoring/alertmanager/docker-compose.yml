@@ -1,0 +1,46 @@
+services:
+  alertmanager:
+    image: prom/alertmanager:v0.34.1
+    container_name: alertmanager
+    restart: unless-stopped
+    environment:
+    - TZ=${TZ}
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=JP-Dell
+    - HOST_CONTAINERNAME=alertmanager
+    command:
+    - --config.file=/etc/alertmanager/alertmanager.yml
+    - --storage.path=/alertmanager
+    - --web.external-url=https://alertmanager.${DOMAIN}
+    # Copy alertmanager.yml from this folder to ${OBSERVABILITY_PATH}/alertmanager/config/,
+    # and put the ntfy access token in ${OBSERVABILITY_PATH}/alertmanager/config/ntfy_token.
+    volumes:
+    - ${OBSERVABILITY_PATH}/alertmanager/config:/etc/alertmanager:ro
+    - ${OBSERVABILITY_PATH}/alertmanager/data:/alertmanager
+    labels:
+    - traefik.enable=true
+    - traefik.docker.network=monitoring_net
+    - traefik.http.routers.alertmanager.rule=Host(`alertmanager.${DOMAIN}`)
+    - traefik.http.routers.alertmanager.entrypoints=web
+    - traefik.http.routers.alertmanager.middlewares=crowdsec@file,authentik@file
+    - traefik.http.services.alertmanager.loadbalancer.server.port=9093
+    - kuma.alertmanager.http.name=Alertmanager
+    - kuma.alertmanager.http.url=http://alertmanager:9093/-/healthy
+    - kuma.alertmanager.http.interval=60
+    - 'kuma.alertmanager.http.tag_names=[{"name":"tag_monitoring"},{"name":"tag_metrics"}]'
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/prometheus-icon.png
+    - net.unraid.docker.webui=http://alertmanager.${DOMAIN}
+    networks:
+    - monitoring_net
+    user: ${PUID}:${PGID}
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 128M
+        reservations:
+          cpus: '0.05'
+          memory: 32M
+networks:
+  monitoring_net:
+    external: true

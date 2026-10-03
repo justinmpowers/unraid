@@ -80,6 +80,8 @@ services:
     - net.unraid.docker.webui=http://kopia-b2.${DOMAIN}
     networks:
     - internal_net
+    # Reaches ntfy for snapshot failure notifications.
+    - monitoring_net
   kopia-local:
     image: kopia/kopia:20260927.0.53511
     container_name: kopia-truenas
@@ -167,6 +169,10 @@ services:
     - net.unraid.docker.webui=http://kopia-local.${DOMAIN}
     networks:
     - internal_net
+    # Reaches ntfy for snapshot failure notifications.
+    - monitoring_net
 networks:
   internal_net:
+    external: true
+  monitoring_net:
     external: true
