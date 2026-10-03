@@ -58,7 +58,8 @@ services:
     - --path.rootfs=/host
     - --web.listen-address=:9100
     volumes:
-    - /:/host:ro,rslave
+    # No rslave: Unraid's rootfs isn't a shared mount. Restart this container after stopping/starting the array.
+    - /:/host:ro
     labels:
     - kuma.node_exporter.http.name=Node Exporter
     - kuma.node_exporter.http.url=http://host.docker.internal:9100/metrics
