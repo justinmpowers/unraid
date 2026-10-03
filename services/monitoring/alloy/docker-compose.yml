@@ -83,7 +83,7 @@ services:
     - --docker_only=true
     - --housekeeping_interval=30s
     - --store_container_labels=false
-    - --disable_metrics=percpu,sched,tcp,udp,advtcp,hugetlb,referenced_memory,cpu_topology,resctrl,memory_numa,accelerator,perf_event
+    - --disable_metrics=advtcp,cpu_topology,cpuset,hugetlb,memory_numa,percpu,perf_event,process,referenced_memory,resctrl,sched,tcp,udp
     volumes:
     - /:/rootfs:ro
     - /var/run:/var/run:ro
