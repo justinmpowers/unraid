@@ -49,7 +49,9 @@ REPO_MAPPINGS = {
     'grafana/grafana': 'grafana/grafana',
     'prom/prometheus': 'prometheus/prometheus',
     'grafana/loki': 'grafana/loki',
-    'grafana/promtail': 'grafana/loki',
+    'grafana/alloy': 'grafana/alloy',
+    'prom/node-exporter': 'prometheus/node_exporter',
+    'ghcr.io/google/cadvisor': 'google/cadvisor',
     'louislam/uptime-kuma': 'louislam/uptime-kuma',
     'ghcr.io/bigboot/autokuma': 'BigBoot/AutoKuma',
     
@@ -109,7 +111,9 @@ VERSION_PATTERNS = {
     'grafana': r'^\d+\.\d+\.\d+$',
     'prometheus': r'^v\d+\.\d+\.\d+$',
     'loki': r'^\d+\.\d+\.\d+$',
-    'promtail': r'^\d+\.\d+\.\d+$',
+    'alloy': r'^v\d+\.\d+\.\d+$',
+    'node-exporter': r'^v\d+\.\d+\.\d+$',
+    'cadvisor': r'^v\d+\.\d+\.\d+$',
     'uptimekuma': r'^\d+\.\d+\.\d+$',
     'autokuma': r'^\d+\.\d+\.\d+$',
     

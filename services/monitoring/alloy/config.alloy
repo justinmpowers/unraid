@@ -1,0 +1,147 @@
+// Grafana Alloy — replaces Promtail and owns the scrape config.
+// Logs   → Loki:       Docker container logs, Unraid syslog, Traefik access logs
+// Metrics → Prometheus: node-exporter, cAdvisor, Traefik, CrowdSec, Alloy itself
+//
+// Deployed copy lives at ${OBSERVABILITY_PATH}/alloy/config/config.alloy.
+// After editing, reload with: curl -X POST http://GrafanaAlloy:12345/-/reload
+
+logging {
+	level  = "info"
+	format = "logfmt"
+}
+
+// ---------------------------------------------------------------------------
+// Destinations
+// ---------------------------------------------------------------------------
+
+loki.write "default" {
+	endpoint {
+		url = "http://GrafanaLoki:3100/loki/api/v1/push"
+	}
+	external_labels = {host = "JP-Dell"}
+}
+
+// Requires Prometheus to run with --web.enable-remote-write-receiver.
+prometheus.remote_write "default" {
+	endpoint {
+		url = "http://prometheus:9090/api/v1/write"
+	}
+	external_labels = {host = "JP-Dell"}
+}
+
+// ---------------------------------------------------------------------------
+// Logs: Docker containers
+// ---------------------------------------------------------------------------
+
+discovery.docker "containers" {
+	host             = "unix:///var/run/docker.sock"
+	refresh_interval = "30s"
+}
+
+discovery.relabel "containers" {
+	targets = []
+
+	rule {
+		target_label = "job"
+		replacement  = "docker"
+	}
+
+	rule {
+		source_labels = ["__meta_docker_container_name"]
+		regex         = "/(.*)"
+		target_label  = "container"
+	}
+
+	rule {
+		source_labels = ["__meta_docker_container_label_com_docker_compose_project"]
+		target_label  = "compose_project"
+	}
+
+	rule {
+		source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
+		target_label  = "compose_service"
+	}
+
+	rule {
+		source_labels = ["__meta_docker_container_log_stream"]
+		target_label  = "stream"
+	}
+}
+
+loki.source.docker "containers" {
+	host          = "unix:///var/run/docker.sock"
+	targets       = discovery.docker.containers.targets
+	relabel_rules = discovery.relabel.containers.rules
+	forward_to    = [loki.process.containers.receiver]
+}
+
+// Promote a log level label when the line carries one (logfmt or JSON style).
+loki.process "containers" {
+	stage.regex {
+		expression = `(?i)(?:level|lvl|severity)["=:\s]+"?(?P<level>trace|debug|info|warn|warning|error|err|fatal|critical|panic)`
+	}
+
+	stage.labels {
+		values = {level = ""}
+	}
+	forward_to = [loki.write.default.receiver]
+}
+
+// ---------------------------------------------------------------------------
+// Logs: host files
+// ---------------------------------------------------------------------------
+
+local.file_match "host" {
+	path_targets = [
+		{"__path__" = "/host/var/log/syslog", "job" = "syslog"},
+		{"__path__" = "/host/traefik-logs/*.log", "job" = "traefik-access"},
+	]
+	sync_period = "30s"
+}
+
+loki.source.file "host" {
+	targets    = local.file_match.host.targets
+	forward_to = [loki.write.default.receiver]
+}
+
+// ---------------------------------------------------------------------------
+// Metrics
+// ---------------------------------------------------------------------------
+
+prometheus.scrape "node" {
+	job_name        = "node-exporter"
+	targets         = [{"__address__" = "host.docker.internal:9100", "instance" = "JP-Dell"}]
+	scrape_interval = "30s"
+	forward_to      = [prometheus.remote_write.default.receiver]
+}
+
+prometheus.scrape "cadvisor" {
+	job_name        = "cadvisor"
+	targets         = [{"__address__" = "cadvisor:8080", "instance" = "JP-Dell"}]
+	scrape_interval = "30s"
+	forward_to      = [prometheus.remote_write.default.receiver]
+}
+
+// Traefik serves /metrics on its "traefik" entrypoint (:8080) once metrics.prometheus is enabled in traefik.yml.
+prometheus.scrape "traefik" {
+	job_name        = "traefik"
+	targets         = [{"__address__" = "traefik:8080"}]
+	scrape_interval = "30s"
+	forward_to      = [prometheus.remote_write.default.receiver]
+}
+
+prometheus.scrape "crowdsec" {
+	job_name        = "crowdsec"
+	targets         = [{"__address__" = "crowdsec:6060"}]
+	scrape_interval = "60s"
+	forward_to      = [prometheus.remote_write.default.receiver]
+}
+
+prometheus.exporter.self "alloy" { }
+
+prometheus.scrape "alloy" {
+	job_name        = "alloy"
+	targets         = prometheus.exporter.self.alloy.targets
+	scrape_interval = "60s"
+	forward_to      = [prometheus.remote_write.default.receiver]
+}

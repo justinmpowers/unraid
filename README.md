@@ -42,11 +42,11 @@ services/
 │   ├── immich/          # Photo and video management
 │   └── romm/            # Game library manager
 ├── monitoring/          # Observability stack
+│   ├── alloy/           # Log + metrics collector (node-exporter, cAdvisor)
 │   ├── grafana/         # Dashboard and visualization
 │   ├── loki/            # Log aggregation
 │   ├── ntfy/            # Push notifications
 │   ├── prometheus/      # Metrics collection
-│   ├── promtail/        # Log collector
 │   └── uptimekuma/      # Uptime monitoring
 ├── networking/          # Network services
 │   ├── cloudflared/     # Cloudflare Tunnel
@@ -75,7 +75,7 @@ services/
 - These are dashboards, analytics, and lightweight utilities
 
 ### Medium Services (0.5-1 CPU, 512MB-2GB RAM)
-- Redis, Prometheus, Loki, Promtail, Kopia, UptimeKuma, AutoKuma, FileBrowser
+- Redis, Prometheus, Loki, Alloy, Kopia, UptimeKuma, AutoKuma, FileBrowser
 - Database caches, monitoring collectors, and general utilities
 
 ### Heavy Services (0.75-2 CPU, 1-4GB RAM)
