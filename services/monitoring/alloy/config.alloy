@@ -1,6 +1,6 @@
 // Grafana Alloy — replaces Promtail and owns the scrape config.
 // Logs   → Loki:       Docker container logs, Unraid syslog, Traefik access logs
-// Metrics → Prometheus: node-exporter, cAdvisor, Traefik, CrowdSec, Alloy itself
+// Metrics → Prometheus: node-exporter, cAdvisor, Traefik, CrowdSec, Prometheus, Alertmanager, Alloy
 //
 // Deployed copy lives at ${OBSERVABILITY_PATH}/alloy/config/config.alloy.
 // After editing, reload with: curl -X POST http://GrafanaAlloy:12345/-/reload
@@ -133,6 +133,20 @@ prometheus.scrape "traefik" {
 prometheus.scrape "crowdsec" {
 	job_name        = "crowdsec"
 	targets         = [{"__address__" = "crowdsec:6060"}]
+	scrape_interval = "60s"
+	forward_to      = [prometheus.remote_write.default.receiver]
+}
+
+prometheus.scrape "prometheus" {
+	job_name        = "prometheus"
+	targets         = [{"__address__" = "prometheus:9090", "instance" = "JP-Dell"}]
+	scrape_interval = "60s"
+	forward_to      = [prometheus.remote_write.default.receiver]
+}
+
+prometheus.scrape "alertmanager" {
+	job_name        = "alertmanager"
+	targets         = [{"__address__" = "alertmanager:9093", "instance" = "JP-Dell"}]
 	scrape_interval = "60s"
 	forward_to      = [prometheus.remote_write.default.receiver]
 }

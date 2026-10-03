@@ -1,0 +1,52 @@
+groups:
+- name: monitoring
+  rules:
+  - alert: TargetDown
+    expr: up == 0
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Scrape target {{ $labels.job }} is down"
+      description: "Alloy has failed to scrape {{ $labels.job }} ({{ $labels.instance }}) for 5 minutes."
+
+  # Fires when no metrics arrive at all, i.e. Alloy or remote write is broken.
+  - alert: MetricsPipelineDown
+    expr: absent(up{job="node-exporter"})
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: "No metrics arriving from Alloy"
+      description: "Prometheus has received no node-exporter samples for 10 minutes. Check the GrafanaAlloy container."
+
+  - alert: PrometheusRuleFailures
+    expr: increase(prometheus_rule_evaluation_failures_total[10m]) > 0
+    labels:
+      severity: warning
+    annotations:
+      summary: "Prometheus rule group {{ $labels.rule_group }} is failing"
+      description: "Alert rules are failing to evaluate, so some alerts may not fire. See Status → Rule health in Prometheus."
+
+- name: traefik
+  rules:
+  - alert: TraefikHighServerErrorRate
+    expr: |
+      sum by (service, host) (rate(traefik_service_requests_total{code=~"5.."}[5m]))
+        / sum by (service, host) (rate(traefik_service_requests_total[5m])) > 0.10
+      and sum by (service, host) (rate(traefik_service_requests_total[5m])) > 0.05
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "{{ $labels.service }} returning {{ humanizePercentage $value }} 5xx errors"
+      description: "Over 10% of requests to {{ $labels.service }} through Traefik have failed with a 5xx for 10 minutes."
+
+  - alert: TraefikCertificateExpiring
+    expr: (traefik_tls_certs_not_after - time()) / 86400 < 14
+    for: 1h
+    labels:
+      severity: warning
+    annotations:
+      summary: "TLS certificate for {{ $labels.cn }} expires in {{ printf \"%.0f\" $value }} days"
+      description: "Let's Encrypt renewal may be failing. Check Traefik's logs for ACME errors."
