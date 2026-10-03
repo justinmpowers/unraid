@@ -22,7 +22,7 @@ Scrape targets and log sources live in [config.alloy](config.alloy), so they're 
 4. Deploy the `monitoring-alloy` stack. It needs `TZ`, `DOMAIN`, `OBSERVABILITY_PATH` and `APPDATA_PATH`.
 5. Check `https://alloy.${DOMAIN}`: every component should be healthy.
 
-Port `9100` (node-exporter) must be free on the host.
+Port `9101` (node-exporter) must be free on the host. 9100 is avoided because Unraid's Prometheus Node Exporter plugin uses it.
 
 ## Traefik metrics
 

@@ -110,7 +110,7 @@ loki.source.file "host" {
 
 prometheus.scrape "node" {
 	job_name        = "node-exporter"
-	targets         = [{"__address__" = "host.docker.internal:9100", "instance" = "JP-Dell"}]
+	targets         = [{"__address__" = "host.docker.internal:9101", "instance" = "JP-Dell"}]
 	scrape_interval = "30s"
 	forward_to      = [prometheus.remote_write.default.receiver]
 }
