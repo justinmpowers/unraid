@@ -57,6 +57,7 @@ services:
     command:
     - --path.rootfs=/host
     - --web.listen-address=:9100
+    - --path.udev.data=/host/run/udev/data
     volumes:
     # No rslave: Unraid's rootfs isn't a shared mount. Restart this container after stopping/starting the array.
     - /:/host:ro
