@@ -56,15 +56,14 @@ services:
     pid: host
     command:
     - --path.rootfs=/host
-    # 9101: Unraid's Prometheus Node Exporter plugin commonly holds 9100.
-    - --web.listen-address=:9101
+    - --web.listen-address=:9100
     - --path.udev.data=/host/run/udev/data
     volumes:
     # No rslave: Unraid's rootfs isn't a shared mount. Restart this container after stopping/starting the array.
     - /:/host:ro
     labels:
     - kuma.node_exporter.http.name=Node Exporter
-    - kuma.node_exporter.http.url=http://host.docker.internal:9101/metrics
+    - kuma.node_exporter.http.url=http://host.docker.internal:9100/metrics
     - kuma.node_exporter.http.interval=60
     - 'kuma.node_exporter.http.tag_names=[{"name":"tag_monitoring"},{"name":"tag_metrics"}]'
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/prometheus-icon.png
