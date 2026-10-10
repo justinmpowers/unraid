@@ -1,0 +1,38 @@
+# Routes Prometheus alerts to ntfy. ntfy's built-in "alertmanager" template formats the webhook.
+# Deployed copy lives at ${OBSERVABILITY_PATH}/alertmanager/config/alertmanager.yml.
+
+route:
+  receiver: ntfy
+  group_by: [alertname, host, name, mountpoint, service, job]
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 12h
+  routes:
+  - matchers: [severity="critical"]
+    receiver: ntfy-critical
+    repeat_interval: 2h
+
+# A critical alert silences the matching warning (e.g. disk <5% hides disk <15%).
+inhibit_rules:
+- source_matchers: [severity="critical"]
+  target_matchers: [severity="warning"]
+  equal: [alertname, host, mountpoint]
+
+receivers:
+- name: ntfy
+  webhook_configs:
+  - url: http://ntfy:80/homelab-alerts?template=alertmanager
+    send_resolved: true
+    http_config:
+      authorization:
+        type: Bearer
+        credentials_file: /etc/alertmanager/ntfy_token
+
+- name: ntfy-critical
+  webhook_configs:
+  - url: http://ntfy:80/homelab-alerts?template=alertmanager&priority=high
+    send_resolved: true
+    http_config:
+      authorization:
+        type: Bearer
+        credentials_file: /etc/alertmanager/ntfy_token

@@ -42,6 +42,7 @@ services/
 │   ├── immich/          # Photo and video management
 │   └── romm/            # Game library manager
 ├── monitoring/          # Observability stack
+│   ├── alertmanager/    # Routes Prometheus alerts to ntfy
 │   ├── alloy/           # Log + metrics collector (node-exporter, cAdvisor)
 │   ├── grafana/         # Dashboard and visualization
 │   ├── loki/            # Log aggregation

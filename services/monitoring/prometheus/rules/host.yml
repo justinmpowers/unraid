@@ -1,0 +1,84 @@
+groups:
+- name: host
+  rules:
+  - alert: HostDiskSpaceLow
+    expr: |
+      node_filesystem_avail_bytes{fstype!~"tmpfs|ramfs|rootfs|squashfs|overlay|nsfs"}
+        / node_filesystem_size_bytes * 100 < 15
+      and node_filesystem_readonly == 0
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Disk {{ $labels.mountpoint }} has {{ printf \"%.0f\" $value }}% free"
+      description: "{{ $labels.mountpoint }} ({{ $labels.device }}) on {{ $labels.host }} has {{ printf \"%.1f\" $value }}% free."
+
+  - alert: HostDiskSpaceLow
+    expr: |
+      node_filesystem_avail_bytes{fstype!~"tmpfs|ramfs|rootfs|squashfs|overlay|nsfs"}
+        / node_filesystem_size_bytes * 100 < 5
+      and node_filesystem_readonly == 0
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Disk {{ $labels.mountpoint }} is almost full"
+      description: "{{ $labels.mountpoint }} ({{ $labels.device }}) on {{ $labels.host }} has {{ printf \"%.1f\" $value }}% free."
+
+  - alert: HostDiskWillFillIn24h
+    expr: |
+      node_filesystem_avail_bytes{fstype!~"tmpfs|ramfs|rootfs|squashfs|overlay|nsfs"}
+        / node_filesystem_size_bytes * 100 < 25
+      and predict_linear(node_filesystem_avail_bytes{fstype!~"tmpfs|ramfs|rootfs|squashfs|overlay|nsfs"}[6h], 24 * 3600) < 0
+      and node_filesystem_readonly == 0
+    for: 1h
+    labels:
+      severity: warning
+    annotations:
+      summary: "Disk {{ $labels.mountpoint }} will fill within 24h"
+      description: "At the current write rate {{ $labels.mountpoint }} on {{ $labels.host }} runs out of space within a day."
+
+  # Unraid keeps /var/log in a small RAM disk; when it fills, logging and the web UI break.
+  - alert: HostVarLogFull
+    expr: node_filesystem_avail_bytes{mountpoint="/var/log"} / node_filesystem_size_bytes{mountpoint="/var/log"} * 100 < 20
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "/var/log has {{ printf \"%.0f\" $value }}% free"
+      description: "Unraid's /var/log RAM disk on {{ $labels.host }} is nearly full. Find the noisy log with: du -sh /var/log/*"
+
+  - alert: HostLowMemory
+    expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100 < 10
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Host memory low ({{ printf \"%.0f\" $value }}% available)"
+      description: "{{ $labels.host }} has had under 10% memory available for 10 minutes."
+
+  - alert: HostHighCpu
+    expr: 100 - avg by (host, instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100 > 90
+    for: 30m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Host CPU above 90% for 30 minutes"
+      description: "{{ $labels.host }} CPU usage is {{ printf \"%.0f\" $value }}%."
+
+  - alert: HostOomKill
+    expr: increase(node_vmstat_oom_kill[5m]) > 0
+    labels:
+      severity: warning
+    annotations:
+      summary: "Kernel OOM killer ran"
+      description: "The kernel on {{ $labels.host }} killed a process to free memory. Check ContainerOomKilled or dmesg for which one."
+
+  - alert: HostHighTemperature
+    expr: node_hwmon_temp_celsius > 85
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "{{ $labels.chip }} {{ $labels.sensor }} at {{ printf \"%.0f\" $value }}°C"
+      description: "Sensor {{ $labels.sensor }} on {{ $labels.chip }} ({{ $labels.host }}) has been above 85°C for 10 minutes."

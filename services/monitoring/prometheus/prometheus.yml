@@ -1,0 +1,14 @@
+# Prometheus stores metrics and evaluates alert rules. It does not scrape anything itself:
+# Alloy (services/monitoring/alloy/config.alloy) scrapes every target and remote-writes here.
+# Deployed copy lives at ${OBSERVABILITY_PATH}/prometheus/config/prometheus.yml.
+
+global:
+  evaluation_interval: 30s
+
+rule_files:
+- /etc/prometheus/rules/*.yml
+
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets: [alertmanager:9093]

@@ -1,0 +1,29 @@
+groups:
+- name: containers
+  rules:
+  - alert: ContainerRestartLoop
+    expr: changes(container_start_time_seconds{name!=""}[15m]) > 2
+    labels:
+      severity: warning
+    annotations:
+      summary: "{{ $labels.name }} is restarting repeatedly"
+      description: "{{ $labels.name }} restarted {{ $value }} times in 15 minutes. Check: docker logs {{ $labels.name }}"
+
+  - alert: ContainerOomKilled
+    expr: increase(container_oom_events_total{name!=""}[10m]) > 0
+    labels:
+      severity: warning
+    annotations:
+      summary: "{{ $labels.name }} was OOM-killed"
+      description: "{{ $labels.name }} hit its memory limit and was killed. Raise its memory limit or find the leak."
+
+  - alert: ContainerNearMemoryLimit
+    expr: |
+      container_memory_working_set_bytes{name!=""} / container_spec_memory_limit_bytes{name!=""} > 0.9
+      and container_spec_memory_limit_bytes{name!=""} > 0
+    for: 15m
+    labels:
+      severity: warning
+    annotations:
+      summary: "{{ $labels.name }} at {{ humanizePercentage $value }} of its memory limit"
+      description: "{{ $labels.name }} has used over 90% of its memory limit for 15 minutes and may be OOM-killed."
