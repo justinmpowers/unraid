@@ -27,18 +27,11 @@ docker exec ntfy ntfy access <your-user> 'homelab-*' read-only
 
 ## Deploy
 
-1. Copy the configs to the server and add the token:
+1. Sync the configs (see [../README.md](../README.md#config-files)) and add the token:
    ```bash
-   mkdir -p ${OBSERVABILITY_PATH}/alertmanager/config ${OBSERVABILITY_PATH}/alertmanager/data
-   cp alertmanager.yml ${OBSERVABILITY_PATH}/alertmanager/config/
+   mkdir -p ${OBSERVABILITY_PATH}/alertmanager/data
    echo -n 'tk_...' > ${OBSERVABILITY_PATH}/alertmanager/config/ntfy_token
-
-   mkdir -p ${OBSERVABILITY_PATH}/prometheus/config/rules
-   cp ../prometheus/prometheus.yml ${OBSERVABILITY_PATH}/prometheus/config/
-   cp ../prometheus/rules/*.yml ${OBSERVABILITY_PATH}/prometheus/config/rules/
-   cp ../alloy/config.alloy ${OBSERVABILITY_PATH}/alloy/config/
    ```
-   Make sure the files are readable by `PUID:PGID`, since Alertmanager and Prometheus run as that user.
 2. Deploy the `monitoring-alertmanager` stack. It needs `TZ`, `DOMAIN`, `OBSERVABILITY_PATH`, `PUID` and `PGID`.
 3. Reload Prometheus (`docker restart prometheus`) and restart `GrafanaAlloy`.
 4. Add an Authentik Proxy Provider and Application for `https://alertmanager.${DOMAIN}`, the same way as Alloy, and add it to the embedded outpost.

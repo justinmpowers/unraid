@@ -8,6 +8,7 @@ services:
     - HOST_OS=Unraid
     - HOST_HOSTNAME=JP-Dell
     - HOST_CONTAINERNAME=GrafanaLoki
+    # Config comes from local-config.yaml in this folder, copied to ${OBSERVABILITY_PATH}/loki/config/.
     command: -config.file=/etc/loki/local-config.yaml
     volumes:
     - ${OBSERVABILITY_PATH}/loki/config:/etc/loki

@@ -12,11 +12,7 @@ Scrape targets and log sources live in [config.alloy](config.alloy), so they're 
 
 ## Deploy
 
-1. Copy the config to the server:
-   ```bash
-   mkdir -p ${OBSERVABILITY_PATH}/alloy/config ${OBSERVABILITY_PATH}/alloy/data
-   cp config.alloy ${OBSERVABILITY_PATH}/alloy/config/
-   ```
+1. Sync the configs (see [../README.md](../README.md#config-files)) and create `${OBSERVABILITY_PATH}/alloy/data`.
 2. Redeploy the `monitoring-prometheus` stack. It needs `--web.enable-remote-write-receiver`.
 3. Stop and delete the `monitoring-promtail` stack in Portainer.
 4. Deploy the `monitoring-alloy` stack. It needs `TZ`, `DOMAIN`, `OBSERVABILITY_PATH` and `APPDATA_PATH`.
