@@ -155,7 +155,18 @@ In Portainer → **Stacks → Add stack → Repository**:
 | **Repository URL** | `https://github.com/justinmpowers/unraid` |
 | **Branch** | `main` |
 | **Compose path** | `services/<category>/<name>/docker-compose.yml` |
-| **Env file** | `services/<category>/<name>/.env` |
+
+Then fill in the stack's **Environment variables** in the Portainer UI with whatever
+that compose file references as `${VAR}`. The `.env` files are gitignored (`*.env`),
+so they are **not** in the repo Portainer clones — a stack that needs variables and
+has none will silently substitute empty strings. To see what a given stack needs:
+
+```bash
+grep -oE '\$\{[A-Za-z0-9_]+\}' services/<category>/<name>/docker-compose.yml | sort -u
+```
+
+`./scripts/generate-stack-envs.sh` is for local or non-Git deployments; it writes to
+those same gitignored paths, so it does not feed a Git stack.
 
 Then **Deploy the stack**. Enable **automatic updates / re-pull** so Portainer redeploys on new commits.
 
