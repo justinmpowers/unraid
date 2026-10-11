@@ -135,9 +135,12 @@ CLI is used.
 ### Prerequisites (one-time)
 ```bash
 # Create the shared external networks the stacks attach to
-for net in internal_net monitoring_net db_net iot_net teslamate_net mc_net public_net; do
+for net in internal_net monitoring_net db_net iot_net teslamate_net mc_net public_net docker_proxy_net; do
   docker network create "$net"
 done
+
+# Home Assistant's Matter server also needs the `matter_vlan2` macvlan. That one
+# is created on the Unraid side (Settings → Docker → custom network), not here.
 
 # Generate the trimmed per-stack .env files from the root .env
 ./scripts/generate-stack-envs.sh
@@ -152,7 +155,18 @@ In Portainer → **Stacks → Add stack → Repository**:
 | **Repository URL** | `https://github.com/justinmpowers/unraid` |
 | **Branch** | `main` |
 | **Compose path** | `services/<category>/<name>/docker-compose.yml` |
-| **Env file** | `services/<category>/<name>/.env` |
+
+Then fill in the stack's **Environment variables** in the Portainer UI with whatever
+that compose file references as `${VAR}`. The `.env` files are gitignored (`*.env`),
+so they are **not** in the repo Portainer clones — a stack that needs variables and
+has none will silently substitute empty strings. To see what a given stack needs:
+
+```bash
+grep -oE '\$\{[A-Za-z0-9_]+\}' services/<category>/<name>/docker-compose.yml | sort -u
+```
+
+`./scripts/generate-stack-envs.sh` is for local or non-Git deployments; it writes to
+those same gitignored paths, so it does not feed a Git stack.
 
 Then **Deploy the stack**. Enable **automatic updates / re-pull** so Portainer redeploys on new commits.
 
