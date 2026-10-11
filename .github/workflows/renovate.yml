@@ -5,8 +5,7 @@ on:
     - cron: '0 9 * * SUN'
   workflow_dispatch:
 
-# Renovate authenticates as our own GitHub App, not as GITHUB_TOKEN, so the
-# job token only needs enough access for actions/checkout.
+# Renovate authenticates as our own GitHub App, so the job token is unused.
 permissions:
   contents: read
 
@@ -21,26 +20,37 @@ jobs:
           client-id: ${{ secrets.RENOVATE_APP_CLIENT_ID }}
           private-key: ${{ secrets.RENOVATE_APP_PRIVATE_KEY }}
 
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      # Host rules go in via env, not a config file. The runner is itself a
+      # container pointed at the host daemon through docker-socket-proxy, so
+      # any --volume the action builds is resolved on the HOST, where the
+      # runner's work dir does not exist. Docker would create an empty
+      # directory there and mount that instead of the file.
+      - name: Build registry host rules
+        env:
+          DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+          DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
+          GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+        run: |
+          # jq --arg escapes the values, so a credential containing a quote or
+          # backslash cannot corrupt the JSON. Entries without both a username
+          # and a password are dropped, leaving that registry on anonymous
+          # access rather than sending half a login.
+          rules=$(jq -c -n \
+            --arg dhu "${DOCKER_HUB_USERNAME:-}" --arg dhp "${DOCKER_HUB_PASSWORD:-}" \
+            --arg ghu "${GHCR_USERNAME:-}" --arg ghp "${GHCR_TOKEN:-}" \
+            '[
+               {hostType: "docker", matchHost: "docker.io", username: $dhu, password: $dhp},
+               {hostType: "docker", matchHost: "ghcr.io",   username: $ghu, password: $ghp}
+             ]
+             | map(select(.username != "" and .password != ""))')
+          echo "RENOVATE_HOST_RULES=${rules}" >> "$GITHUB_ENV"
+          echo "Authenticated registries: $(echo "${rules}" | jq -r 'if length == 0 then "none (all anonymous)" else [.[].matchHost] | join(", ") end')"
 
       - name: Run Renovate
         uses: renovatebot/github-action@v46.3.4
         env:
           LOG_LEVEL: debug
           RENOVATE_REPOSITORIES: ${{ github.repository }}
-          DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
-          DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
-          GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
-          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
         with:
           token: ${{ steps.app-token.outputs.token }}
-          configurationFile: .github/renovate-config.mjs
-          # The action only forwards env vars matching its built-in regex
-          # (RENOVATE_*, LOG_LEVEL, ...). Registry credentials are named
-          # outside that pattern, so they have to be listed explicitly.
-          additional-env-list: |
-            DOCKER_HUB_USERNAME
-            DOCKER_HUB_PASSWORD
-            GHCR_USERNAME
-            GHCR_TOKEN
