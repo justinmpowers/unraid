@@ -13,7 +13,13 @@ services:
       # Runner configuration
       - RUNNER_NAME=unraid-docker-compose-runner
       - RUNNER_LABELS=unraid,docker-compose,automation
-      - RUNNER_WORKDIR=/workspace
+      # Keep the runner's work tree OFF the bind mount below. The runner puts
+      # its action cache in $RUNNER_WORKDIR/_actions, so pointing this at
+      # /workspace made that cache survive every "ephemeral" run on a shfs
+      # share, where re-extracting an action fails with "Directory not empty".
+      # Container-local means it genuinely dies with the container. /_work is
+      # the image's own default root, already created and chowned to `runner`.
+      - RUNNER_WORKDIR=/_work
       - RUNNER_SCOPE=repo
       
       # EPHEMERAL: Fresh environment for each job (like GitHub hosted runners)
@@ -28,10 +34,13 @@ services:
       # Docker socket proxy configuration
       - DOCKER_HOST=tcp://docker-socket-proxy:2375
     volumes:
-      # Docker-compose workspace (read-only for deployments)
+      # Live docker-compose tree used by deployments. This is deliberately NOT
+      # the runner's work dir: workflows treat /workspace and $GITHUB_WORKSPACE
+      # as separate places and copy between them.
       - /mnt/user/appdata/renovate/unraid:/workspace:rw
-      
-      # NO persistent runner data - fresh container each time!
+
+      # Runner work dir is intentionally unmounted, so checkouts and the
+      # _actions cache are recreated from scratch for each ephemeral job.
       # NO direct docker socket - uses docker-socket-proxy for security
     networks:
       - monitoring_net
