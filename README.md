@@ -135,9 +135,12 @@ CLI is used.
 ### Prerequisites (one-time)
 ```bash
 # Create the shared external networks the stacks attach to
-for net in internal_net monitoring_net db_net iot_net teslamate_net mc_net public_net; do
+for net in internal_net monitoring_net db_net iot_net teslamate_net mc_net public_net docker_proxy_net; do
   docker network create "$net"
 done
+
+# Home Assistant's Matter server also needs the `matter_vlan2` macvlan. That one
+# is created on the Unraid side (Settings → Docker → custom network), not here.
 
 # Generate the trimmed per-stack .env files from the root .env
 ./scripts/generate-stack-envs.sh
