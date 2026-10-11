@@ -29,3 +29,22 @@ datasources:
   jsonData:
     implementation: prometheus
     handleGrafanaManagedAlerts: false
+
+# Redis plugin datasources (plugin installed via GF_PLUGINS_PREINSTALL_SYNC). Grafana reaches both over db_net.
+- name: redis-datasource
+  uid: eeo71m7p8oikgb
+  type: redis-datasource
+  access: proxy
+  url: redis://Redis:6379
+  jsonData:
+    client: standalone
+
+- name: redis-authentik
+  uid: beo71pstt7w8we
+  type: redis-datasource
+  access: proxy
+  url: redis://redis-authentik:6379
+  jsonData:
+    client: standalone
+  secureJsonData:
+    password: ${REDIS_AUTHENTIK_PASSWORD}

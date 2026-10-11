@@ -31,7 +31,7 @@ It reports what changed and which containers to restart. Pass a branch name as a
 
 ## Grafana
 
-- **Datasources** `prometheus`, `Loki` and `Alertmanager` come from [datasources.yml](grafana/provisioning/datasources/datasources.yml) and are read-only in the UI. Change them in git.
+- **Datasources** `prometheus`, `Loki`, `Alertmanager`, `redis-datasource` and `redis-authentik` come from [datasources.yml](grafana/provisioning/datasources/datasources.yml) and are read-only in the UI. Change them in git. The Redis plugin is installed by `GF_PLUGINS_PREINSTALL_SYNC`; `redis-authentik` needs `REDIS_AUTHENTIK_PASSWORD` in the Grafana stack.
 - **Dashboards** in [dashboards/json/](grafana/provisioning/dashboards/json/) appear in the **Homelab** folder. To change one, edit it in Grafana, use **Export → Export as JSON**, and replace the file in git. Saving in the UI is blocked for provisioned dashboards.
 - **Sign-in** through Authentik is configured by `GF_AUTH_GENERIC_OAUTH_*` env vars in [docker-compose.yml](grafana/docker-compose.yml). The stack needs `GRAFANA_OAUTH_CLIENT_ID` and `GRAFANA_OAUTH_CLIENT_SECRET` (from the Authentik `grafana` provider). Settings saved under **Administration → Authentication** override the env vars, so leave that page alone.
 

@@ -9,7 +9,10 @@ services:
     - HOST_HOSTNAME=JP-Dell
     - HOST_CONTAINERNAME=Grafana
     - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
-    - GF_INSTALL_PLUGINS=${GRAFANA_PLUGINS}
+    # Installed before provisioning runs, so provisioned datasources always find their plugin.
+    - GF_PLUGINS_PREINSTALL_SYNC=redis-datasource
+    # Used by provisioning/datasources/datasources.yml.
+    - REDIS_AUTHENTIK_PASSWORD=${REDIS_AUTHENTIK_PASSWORD}
     - GF_USERS_ALLOW_SIGN_UP=false
     - GF_SERVER_ROOT_URL=https://grafana.${DOMAIN}
     - GF_SECURITY_COOKIE_SECURE=true
