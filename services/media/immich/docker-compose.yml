@@ -1,6 +1,6 @@
 services:
   immich-server:
-    image: ghcr.io/immich-app/immich-server:v3.3.1
+    image: ghcr.io/immich-app/immich-server:v3.3.3
     container_name: immich
     restart: unless-stopped
     devices:
@@ -48,7 +48,7 @@ services:
     - immich-postgres
     - immich-redis
   immich-machine-learning:
-    image: ghcr.io/immich-app/immich-machine-learning:v3.3.1
+    image: ghcr.io/immich-app/immich-machine-learning:v3.3.3
     container_name: immich-ml
     restart: unless-stopped
     environment:
