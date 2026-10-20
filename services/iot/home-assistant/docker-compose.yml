@@ -18,6 +18,9 @@ services:
     - traefik.docker.network=iot_net
     - traefik.http.routers.homeassistant.rule=Host(`homeassistant.${DOMAIN}`)
     - traefik.http.routers.homeassistant.entrypoints=web
+    - traefik.http.routers.homeassistant-lan.rule=Host(`homeassistant.${DOMAIN}`)
+    - traefik.http.routers.homeassistant-lan.entrypoints=websecure
+    - traefik.http.routers.homeassistant-lan.service=homeassistant
     - traefik.http.services.homeassistant.loadbalancer.server.port=8123
     - kuma.homeassistant.keyword.name=Home Assistant
     - kuma.homeassistant.keyword.url=http://Home-Assistant-Container:8123

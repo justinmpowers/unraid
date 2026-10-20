@@ -32,6 +32,10 @@ services:
       - traefik.http.routers.searxng.rule=Host(`search.${DOMAIN}`)
       - traefik.http.routers.searxng.entrypoints=web
       - traefik.http.routers.searxng.middlewares=crowdsec@file
+      - traefik.http.routers.searxng-lan.rule=Host(`search.${DOMAIN}`)
+      - traefik.http.routers.searxng-lan.entrypoints=websecure
+      - traefik.http.routers.searxng-lan.service=searxng
+      - traefik.http.routers.searxng-lan.middlewares=crowdsec@file
       - traefik.http.services.searxng.loadbalancer.server.port=8080
       - kuma.searxng.http.name=SearXNG
       - kuma.searxng.http.url=http://searxng:8080/healthz

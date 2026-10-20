@@ -36,6 +36,10 @@ services:
       - traefik.http.routers.open-webui.rule=Host(`chat.${DOMAIN}`)
       - traefik.http.routers.open-webui.entrypoints=web
       - traefik.http.routers.open-webui.middlewares=crowdsec@file
+      - traefik.http.routers.open-webui-lan.rule=Host(`chat.${DOMAIN}`)
+      - traefik.http.routers.open-webui-lan.entrypoints=websecure
+      - traefik.http.routers.open-webui-lan.service=open-webui
+      - traefik.http.routers.open-webui-lan.middlewares=crowdsec@file
       - traefik.http.services.open-webui.loadbalancer.server.port=8080
       - kuma.open_webui.http.name=Open WebUI
       - kuma.open_webui.http.url=http://open-webui:8080/health

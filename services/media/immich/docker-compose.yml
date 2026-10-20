@@ -25,6 +25,10 @@ services:
     - traefik.http.routers.immich.rule=Host(`immich.${DOMAIN}`)
     - traefik.http.routers.immich.entrypoints=web
     - traefik.http.routers.immich.middlewares=crowdsec@file
+    - traefik.http.routers.immich-lan.rule=Host(`immich.${DOMAIN}`)
+    - traefik.http.routers.immich-lan.entrypoints=websecure
+    - traefik.http.routers.immich-lan.service=immich
+    - traefik.http.routers.immich-lan.middlewares=crowdsec@file
     - traefik.http.services.immich.loadbalancer.server.port=2283
     - kuma.immich.keyword.name=Immich Photos
     - kuma.immich.keyword.url=http://immich:2283/api/server/ping

@@ -50,6 +50,10 @@ services:
     - traefik.http.routers.tandoor.rule=Host(`tandoor.${DOMAIN}`)
     - traefik.http.routers.tandoor.entrypoints=web
     - traefik.http.routers.tandoor.middlewares=crowdsec@file
+    - traefik.http.routers.tandoor-lan.rule=Host(`tandoor.${DOMAIN}`)
+    - traefik.http.routers.tandoor-lan.entrypoints=websecure
+    - traefik.http.routers.tandoor-lan.service=tandoor
+    - traefik.http.routers.tandoor-lan.middlewares=crowdsec@file
     - traefik.http.services.tandoor.loadbalancer.server.port=8080
     - kuma.tandoor.keyword.name=Tandoor Recipes
     - kuma.tandoor.keyword.url=http://tandoor:8080

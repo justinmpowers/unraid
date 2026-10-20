@@ -37,6 +37,10 @@ services:
     - traefik.http.routers.nextcloud.rule=Host(`nextcloud.${DOMAIN}`)
     - traefik.http.routers.nextcloud.entrypoints=web
     - traefik.http.routers.nextcloud.middlewares=crowdsec@file
+    - traefik.http.routers.nextcloud-lan.rule=Host(`nextcloud.${DOMAIN}`)
+    - traefik.http.routers.nextcloud-lan.entrypoints=websecure
+    - traefik.http.routers.nextcloud-lan.service=nextcloud
+    - traefik.http.routers.nextcloud-lan.middlewares=crowdsec@file
     - traefik.http.services.nextcloud.loadbalancer.server.port=80
     - kuma.nextcloud.keyword.name=Nextcloud
     - kuma.nextcloud.keyword.url=http://Nextcloud:80/status.php

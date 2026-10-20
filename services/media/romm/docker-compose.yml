@@ -19,6 +19,10 @@ services:
     - traefik.http.routers.romm.rule=Host(`romm.${DOMAIN}`)
     - traefik.http.routers.romm.entrypoints=web
     - traefik.http.routers.romm.middlewares=crowdsec@file
+    - traefik.http.routers.romm-lan.rule=Host(`romm.${DOMAIN}`)
+    - traefik.http.routers.romm-lan.entrypoints=websecure
+    - traefik.http.routers.romm-lan.service=romm
+    - traefik.http.routers.romm-lan.middlewares=crowdsec@file
     - traefik.http.services.romm.loadbalancer.server.port=8080
     - kuma.romm.keyword.name=ROMM Game Library
     - kuma.romm.keyword.url=http://romm:8080

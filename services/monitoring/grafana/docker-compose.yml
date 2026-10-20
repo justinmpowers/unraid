@@ -41,6 +41,10 @@ services:
     - traefik.http.routers.grafana.rule=Host(`grafana.${DOMAIN}`)
     - traefik.http.routers.grafana.entrypoints=web
     - traefik.http.routers.grafana.middlewares=crowdsec@file
+    - traefik.http.routers.grafana-lan.rule=Host(`grafana.${DOMAIN}`)
+    - traefik.http.routers.grafana-lan.entrypoints=websecure
+    - traefik.http.routers.grafana-lan.service=grafana
+    - traefik.http.routers.grafana-lan.middlewares=crowdsec@file
     - traefik.http.services.grafana.loadbalancer.server.port=3000
     - kuma.grafana.http.name=Grafana
     - kuma.grafana.http.url=http://Grafana:3000/api/health

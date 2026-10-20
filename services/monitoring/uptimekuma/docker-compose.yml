@@ -25,6 +25,10 @@ services:
     - traefik.http.routers.uptimekuma.rule=Host(`uptime.${DOMAIN}`)
     - traefik.http.routers.uptimekuma.entrypoints=web
     - traefik.http.routers.uptimekuma.middlewares=crowdsec@file
+    - traefik.http.routers.uptimekuma-lan.rule=Host(`uptime.${DOMAIN}`)
+    - traefik.http.routers.uptimekuma-lan.entrypoints=websecure
+    - traefik.http.routers.uptimekuma-lan.service=uptimekuma
+    - traefik.http.routers.uptimekuma-lan.middlewares=crowdsec@file
     - traefik.http.services.uptimekuma.loadbalancer.server.port=3001
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/uptimekuma-icon.png
     - net.unraid.docker.webui=http://[IP]:[PORT:3002]

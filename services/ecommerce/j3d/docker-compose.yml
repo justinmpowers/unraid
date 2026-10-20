@@ -90,6 +90,10 @@ services:
       - traefik.http.routers.print-ops-backend.rule=Host(`j3d.${DOMAIN}`) && PathPrefix(`/api`)
       - traefik.http.routers.print-ops-backend.entrypoints=web
       - traefik.http.routers.print-ops-backend.middlewares=crowdsec@file
+      - traefik.http.routers.print-ops-backend-lan.rule=Host(`j3d.${DOMAIN}`) && PathPrefix(`/api`)
+      - traefik.http.routers.print-ops-backend-lan.entrypoints=websecure
+      - traefik.http.routers.print-ops-backend-lan.service=print-ops-backend
+      - traefik.http.routers.print-ops-backend-lan.middlewares=crowdsec@file
       - traefik.http.services.print-ops-backend.loadbalancer.server.port=5000
       - kuma.backend.http.name=J3D Backend
       - kuma.backend.http.url=http://print-ops-backend:5000/api/health
@@ -128,6 +132,10 @@ services:
       - traefik.http.routers.print-ops-frontend.rule=Host(`j3d.${DOMAIN}`)
       - traefik.http.routers.print-ops-frontend.entrypoints=web
       - traefik.http.routers.print-ops-frontend.middlewares=crowdsec@file
+      - traefik.http.routers.print-ops-frontend-lan.rule=Host(`j3d.${DOMAIN}`)
+      - traefik.http.routers.print-ops-frontend-lan.entrypoints=websecure
+      - traefik.http.routers.print-ops-frontend-lan.service=print-ops-frontend
+      - traefik.http.routers.print-ops-frontend-lan.middlewares=crowdsec@file
       - traefik.http.services.print-ops-frontend.loadbalancer.server.port=4200
     networks:
       - internal_net

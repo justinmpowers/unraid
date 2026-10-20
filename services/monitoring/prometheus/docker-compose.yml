@@ -27,6 +27,10 @@ services:
       - traefik.http.routers.prometheus.rule=Host(`prometheus.${DOMAIN}`)
       - traefik.http.routers.prometheus.entrypoints=web
       - traefik.http.routers.prometheus.middlewares=crowdsec@file,authentik@file
+      - traefik.http.routers.prometheus-lan.rule=Host(`prometheus.${DOMAIN}`)
+      - traefik.http.routers.prometheus-lan.entrypoints=websecure
+      - traefik.http.routers.prometheus-lan.service=prometheus
+      - traefik.http.routers.prometheus-lan.middlewares=crowdsec@file,authentik@file
       - traefik.http.services.prometheus.loadbalancer.server.port=9090
       - kuma.prometheus.http.name=Prometheus
       - kuma.prometheus.http.url=http://prometheus:9090/-/healthy

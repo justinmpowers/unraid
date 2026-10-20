@@ -70,6 +70,10 @@ services:
     - traefik.http.routers.kopia-b2.rule=Host(`kopia-b2.${DOMAIN}`)
     - traefik.http.routers.kopia-b2.entrypoints=web
     - traefik.http.routers.kopia-b2.middlewares=crowdsec@file,authentik@file
+    - traefik.http.routers.kopia-b2-lan.rule=Host(`kopia-b2.${DOMAIN}`)
+    - traefik.http.routers.kopia-b2-lan.entrypoints=websecure
+    - traefik.http.routers.kopia-b2-lan.service=kopia-b2
+    - traefik.http.routers.kopia-b2-lan.middlewares=crowdsec@file,authentik@file
     - traefik.http.services.kopia-b2.loadbalancer.server.port=51515
     - kuma.kopia-backblaze.http.name=Kopia Backup (Backblaze)
     - kuma.kopia-backblaze.http.url=http://kopia-backblaze:51515
@@ -164,6 +168,10 @@ services:
     - traefik.http.routers.kopia-local.rule=Host(`kopia-local.${DOMAIN}`)
     - traefik.http.routers.kopia-local.entrypoints=web
     - traefik.http.routers.kopia-local.middlewares=crowdsec@file,authentik@file
+    - traefik.http.routers.kopia-local-lan.rule=Host(`kopia-local.${DOMAIN}`)
+    - traefik.http.routers.kopia-local-lan.entrypoints=websecure
+    - traefik.http.routers.kopia-local-lan.service=kopia-local
+    - traefik.http.routers.kopia-local-lan.middlewares=crowdsec@file,authentik@file
     - traefik.http.services.kopia-local.loadbalancer.server.port=51515
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/kopia-icon.png
     - net.unraid.docker.webui=http://kopia-local.${DOMAIN}

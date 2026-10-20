@@ -103,6 +103,9 @@ services:
     - traefik.docker.network=iot_net
     - traefik.http.routers.obico.rule=Host(`obico.${DOMAIN}`)
     - traefik.http.routers.obico.entrypoints=web
+    - traefik.http.routers.obico-lan.rule=Host(`obico.${DOMAIN}`)
+    - traefik.http.routers.obico-lan.entrypoints=websecure
+    - traefik.http.routers.obico-lan.service=obico
     - traefik.http.services.obico.loadbalancer.server.port=3334
     - kuma.obico.http.name=Obico
     - kuma.obico.http.url=http://obico:3334/hc/
@@ -206,6 +209,9 @@ services:
     - traefik.docker.network=iot_net
     - traefik.http.routers.octoprint.rule=Host(`octoprint.${DOMAIN}`)
     - traefik.http.routers.octoprint.entrypoints=web
+    - traefik.http.routers.octoprint-lan.rule=Host(`octoprint.${DOMAIN}`)
+    - traefik.http.routers.octoprint-lan.entrypoints=websecure
+    - traefik.http.routers.octoprint-lan.service=octoprint
     - traefik.http.services.octoprint.loadbalancer.server.port=5000
     - kuma.octoprint.http.name=OctoPrint
     - kuma.octoprint.http.url=http://octoprint:5000

@@ -27,6 +27,10 @@ services:
     - traefik.http.routers.zigbee2mqtt.rule=Host(`zigbee2mqtt.${DOMAIN}`)
     - traefik.http.routers.zigbee2mqtt.entrypoints=web
     - traefik.http.routers.zigbee2mqtt.middlewares=crowdsec@file,authentik@file
+    - traefik.http.routers.zigbee2mqtt-lan.rule=Host(`zigbee2mqtt.${DOMAIN}`)
+    - traefik.http.routers.zigbee2mqtt-lan.entrypoints=websecure
+    - traefik.http.routers.zigbee2mqtt-lan.service=zigbee2mqtt
+    - traefik.http.routers.zigbee2mqtt-lan.middlewares=crowdsec@file,authentik@file
     - traefik.http.services.zigbee2mqtt.loadbalancer.server.port=8080
     - kuma.zigbee2mqtt.keyword.name=Zigbee2MQTT
     - kuma.zigbee2mqtt.keyword.url=http://zigbee2mqtt:8080

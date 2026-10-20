@@ -47,6 +47,10 @@ services:
     - traefik.http.routers.manyfold.rule=Host(`manyfold.${DOMAIN}`)
     - traefik.http.routers.manyfold.entrypoints=web
     - traefik.http.routers.manyfold.middlewares=crowdsec@file
+    - traefik.http.routers.manyfold-lan.rule=Host(`manyfold.${DOMAIN}`)
+    - traefik.http.routers.manyfold-lan.entrypoints=websecure
+    - traefik.http.routers.manyfold-lan.service=manyfold
+    - traefik.http.routers.manyfold-lan.middlewares=crowdsec@file
     - traefik.http.services.manyfold.loadbalancer.server.port=3214
     - kuma.manyfold.http.name=Manyfold
     - kuma.manyfold.http.url=http://manyfold:3214/health

@@ -28,6 +28,10 @@ services:
     - traefik.http.routers.traefik.entrypoints=web
     - traefik.http.routers.traefik.service=api@internal
     - traefik.http.routers.traefik.middlewares=traefik-auth@file
+    - traefik.http.routers.traefik-lan.rule=Host(`traefik.${DOMAIN}`)
+    - traefik.http.routers.traefik-lan.entrypoints=websecure
+    - traefik.http.routers.traefik-lan.service=api@internal
+    - traefik.http.routers.traefik-lan.middlewares=traefik-auth@file
     - kuma.traefik.keyword.name=Traefik Proxy
     - kuma.traefik.keyword.url=http://traefik:8080/ping
     - kuma.traefik.keyword.keyword=OK
