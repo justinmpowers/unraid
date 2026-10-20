@@ -14,8 +14,8 @@ services:
     - TRAEFIK_DASHBOARD_AUTH=${TRAEFIK_DASHBOARD_AUTH}
     - BOUNCER_TOKEN=${CROWDSEC_BOUNCER_TOKEN}
     ports:
-    - 8090:80
-    - 8443:443
+    - 80:80
+    - 443:443
     volumes:
     - ${APPDATA_PATH}/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
     - ${APPDATA_PATH}/traefik/dynamic.yml:/etc/traefik/dynamic.yml:ro
