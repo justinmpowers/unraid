@@ -23,6 +23,10 @@ services:
     - traefik.http.routers.dashy.rule=Host(`dashy.${DOMAIN}`)
     - traefik.http.routers.dashy.entrypoints=web
     - traefik.http.routers.dashy.middlewares=crowdsec@file,authentik@file
+    - traefik.http.routers.dashy-lan.rule=Host(`dashy.${DOMAIN}`)
+    - traefik.http.routers.dashy-lan.entrypoints=websecure
+    - traefik.http.routers.dashy-lan.service=dashy
+    - traefik.http.routers.dashy-lan.middlewares=crowdsec@file,authentik@file
     - traefik.http.services.dashy.loadbalancer.server.port=8080
     - kuma.dashy.keyword.name=Dashy Dashboard
     - kuma.dashy.keyword.url=http://dashy:8080

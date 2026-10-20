@@ -28,6 +28,10 @@ services:
     - traefik.http.routers.actualserver.rule=Host(`actual.${DOMAIN}`)
     - traefik.http.routers.actualserver.entrypoints=web
     - traefik.http.routers.actualserver.middlewares=crowdsec@file
+    - traefik.http.routers.actualserver-lan.rule=Host(`actual.${DOMAIN}`)
+    - traefik.http.routers.actualserver-lan.entrypoints=websecure
+    - traefik.http.routers.actualserver-lan.service=actualserver
+    - traefik.http.routers.actualserver-lan.middlewares=crowdsec@file
     - traefik.http.services.actualserver.loadbalancer.server.port=5006
     - kuma.actualserver.keyword.name=Actual Budget Server
     - kuma.actualserver.keyword.url=http://ActualServer:5006

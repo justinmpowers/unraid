@@ -29,6 +29,10 @@ services:
     - traefik.http.routers.alloy.rule=Host(`alloy.${DOMAIN}`)
     - traefik.http.routers.alloy.entrypoints=web
     - traefik.http.routers.alloy.middlewares=crowdsec@file,authentik@file
+    - traefik.http.routers.alloy-lan.rule=Host(`alloy.${DOMAIN}`)
+    - traefik.http.routers.alloy-lan.entrypoints=websecure
+    - traefik.http.routers.alloy-lan.service=alloy
+    - traefik.http.routers.alloy-lan.middlewares=crowdsec@file,authentik@file
     - traefik.http.services.alloy.loadbalancer.server.port=12345
     - kuma.alloy.http.name=Grafana Alloy
     - kuma.alloy.http.url=http://GrafanaAlloy:12345/-/ready

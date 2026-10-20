@@ -33,6 +33,10 @@ services:
     - traefik.http.routers.vaultwarden.rule=Host(`vaultwarden.${DOMAIN}`)
     - traefik.http.routers.vaultwarden.entrypoints=web
     - traefik.http.routers.vaultwarden.middlewares=crowdsec@file
+    - traefik.http.routers.vaultwarden-lan.rule=Host(`vaultwarden.${DOMAIN}`)
+    - traefik.http.routers.vaultwarden-lan.entrypoints=websecure
+    - traefik.http.routers.vaultwarden-lan.service=vaultwarden
+    - traefik.http.routers.vaultwarden-lan.middlewares=crowdsec@file
     - traefik.http.services.vaultwarden.loadbalancer.server.port=80
     - kuma.vaultwarden.http.name=Vaultwarden
     - kuma.vaultwarden.http.url=http://vaultwarden:80/alive

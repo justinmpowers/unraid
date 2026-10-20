@@ -29,6 +29,10 @@ services:
     - traefik.http.routers.portainer.rule=Host(`portainer.${DOMAIN}`)
     - traefik.http.routers.portainer.entrypoints=web
     - traefik.http.routers.portainer.middlewares=crowdsec@file
+    - traefik.http.routers.portainer-lan.rule=Host(`portainer.${DOMAIN}`)
+    - traefik.http.routers.portainer-lan.entrypoints=websecure
+    - traefik.http.routers.portainer-lan.service=portainer
+    - traefik.http.routers.portainer-lan.middlewares=crowdsec@file
     - traefik.http.services.portainer.loadbalancer.server.port=9000
     - kuma.portainer.keyword.name=Portainer
     - kuma.portainer.keyword.url=http://portainer:9000

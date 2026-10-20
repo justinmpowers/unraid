@@ -19,6 +19,10 @@ services:
     - traefik.http.routers.jenkins.rule=Host(`jenkins.${DOMAIN}`)
     - traefik.http.routers.jenkins.entrypoints=web
     - traefik.http.routers.jenkins.middlewares=crowdsec@file,authentik@file
+    - traefik.http.routers.jenkins-lan.rule=Host(`jenkins.${DOMAIN}`)
+    - traefik.http.routers.jenkins-lan.entrypoints=websecure
+    - traefik.http.routers.jenkins-lan.service=jenkins
+    - traefik.http.routers.jenkins-lan.middlewares=crowdsec@file,authentik@file
     - traefik.http.services.jenkins.loadbalancer.server.port=8080
     - kuma.jenkins.http.name=Jenkins
     - kuma.jenkins.http.url=http://jenkins:8080/login

@@ -42,6 +42,10 @@ services:
     - traefik.http.routers.ntfy.rule=Host(`ntfy.${DOMAIN}`)
     - traefik.http.routers.ntfy.entrypoints=web
     - traefik.http.routers.ntfy.middlewares=crowdsec@file
+    - traefik.http.routers.ntfy-lan.rule=Host(`ntfy.${DOMAIN}`)
+    - traefik.http.routers.ntfy-lan.entrypoints=websecure
+    - traefik.http.routers.ntfy-lan.service=ntfy
+    - traefik.http.routers.ntfy-lan.middlewares=crowdsec@file
     - traefik.http.services.ntfy.loadbalancer.server.port=80
     - kuma.ntfy.http.name=ntfy
     - kuma.ntfy.http.url=http://ntfy:80/v1/health

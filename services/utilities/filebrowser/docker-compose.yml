@@ -30,6 +30,10 @@ services:
     - traefik.http.routers.filebrowser.rule=Host(`filebrowser.${DOMAIN}`)
     - traefik.http.routers.filebrowser.entrypoints=web
     - traefik.http.routers.filebrowser.middlewares=crowdsec@file,authentik@file
+    - traefik.http.routers.filebrowser-lan.rule=Host(`filebrowser.${DOMAIN}`)
+    - traefik.http.routers.filebrowser-lan.entrypoints=websecure
+    - traefik.http.routers.filebrowser-lan.service=filebrowser
+    - traefik.http.routers.filebrowser-lan.middlewares=crowdsec@file,authentik@file
     - traefik.http.services.filebrowser.loadbalancer.server.port=80
     - kuma.filebrowser.keyword.name=File Browser
     - kuma.filebrowser.keyword.url=http://FileBrowser:80

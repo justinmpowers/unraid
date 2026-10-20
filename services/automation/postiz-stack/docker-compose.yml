@@ -117,6 +117,10 @@ services:
       - traefik.http.routers.postiz.rule=Host(`postiz.${DOMAIN}`)
       - traefik.http.routers.postiz.entrypoints=web
       - traefik.http.routers.postiz.middlewares=crowdsec@file
+      - traefik.http.routers.postiz-lan.rule=Host(`postiz.${DOMAIN}`)
+      - traefik.http.routers.postiz-lan.entrypoints=websecure
+      - traefik.http.routers.postiz-lan.service=postiz
+      - traefik.http.routers.postiz-lan.middlewares=crowdsec@file
       - traefik.http.services.postiz.loadbalancer.server.port=5000
       - kuma.postiz.http.name=Postiz
       - kuma.postiz.http.url=http://postiz:5000
@@ -168,6 +172,10 @@ services:
       - traefik.http.routers.n8n-postiz.rule=Host(`n8n.${DOMAIN}`)
       - traefik.http.routers.n8n-postiz.entrypoints=web
       - traefik.http.routers.n8n-postiz.middlewares=crowdsec@file
+      - traefik.http.routers.n8n-postiz-lan.rule=Host(`n8n.${DOMAIN}`)
+      - traefik.http.routers.n8n-postiz-lan.entrypoints=websecure
+      - traefik.http.routers.n8n-postiz-lan.service=n8n-postiz
+      - traefik.http.routers.n8n-postiz-lan.middlewares=crowdsec@file
       - traefik.http.services.n8n-postiz.loadbalancer.server.port=5678
       - kuma.n8n_postiz.http.name=n8n Postiz
       - kuma.n8n_postiz.http.url=http://n8n:5678/healthz

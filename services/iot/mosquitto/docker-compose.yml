@@ -28,6 +28,9 @@ services:
       - traefik.docker.network=iot_net
       - traefik.http.routers.mosquitto.rule=Host(`mosquitto.${DOMAIN}`)
       - traefik.http.routers.mosquitto.entrypoints=web
+      - traefik.http.routers.mosquitto-lan.rule=Host(`mosquitto.${DOMAIN}`)
+      - traefik.http.routers.mosquitto-lan.entrypoints=websecure
+      - traefik.http.routers.mosquitto-lan.service=mosquitto
       - traefik.http.services.mosquitto.loadbalancer.server.port=9001
       - kuma.mosquitto.port.name=Mosquitto MQTT
       - kuma.mosquitto.port.hostname=mosquitto
