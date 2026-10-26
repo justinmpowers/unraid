@@ -132,7 +132,7 @@
         "ghcr.io/justinmpowers/obico-web",
         "ghcr.io/justinmpowers/obico-ml-api"
       ],
-      "versioning": "calver:YYYY.0M.0D"
+      "versioning": "regex:^(?<major>\\d{4})\\.(?<minor>\\d{2})\\.(?<patch>\\d{2})$"
     },
     {
       "matchUpdateTypes": [
