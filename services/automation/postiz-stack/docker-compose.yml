@@ -72,7 +72,7 @@ services:
       - internal_net
 
   postiz:
-    image: ghcr.io/gitroomhq/postiz-app:v2.25.1
+    image: ghcr.io/gitroomhq/postiz-app:v2.25.3
     container_name: postiz
     restart: unless-stopped
     security_opt:
@@ -131,7 +131,7 @@ services:
       - internal_net
 
   n8n:
-    image: docker.n8n.io/n8nio/n8n:2.44.3
+    image: docker.n8n.io/n8nio/n8n:2.45.3
     container_name: n8n-postiz
     restart: unless-stopped
     security_opt:
