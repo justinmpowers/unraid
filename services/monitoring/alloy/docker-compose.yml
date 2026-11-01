@@ -1,6 +1,6 @@
 services:
   alloy:
-    image: grafana/alloy:v1.21.2
+    image: grafana/alloy:v1.21.3
     container_name: GrafanaAlloy
     restart: unless-stopped
     environment:
