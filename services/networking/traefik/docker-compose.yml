@@ -1,6 +1,6 @@
 services:
   traefik:
-    image: traefik:v3.7.16
+    image: traefik:v3.7.17
     container_name: traefik
     restart: always
     command:
@@ -50,7 +50,7 @@ services:
         max-size: 10m
         max-file: '3'
   crowdsec:
-    image: crowdsecurity/crowdsec:v1.8.1
+    image: crowdsecurity/crowdsec:v1.8.2
     container_name: crowdsec
     restart: always
     environment:
