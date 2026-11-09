@@ -1,6 +1,6 @@
 services:
   portainer:
-    image: portainer/portainer-ce:2.45.3
+    image: portainer/portainer-ee:2.45.3
     container_name: portainer
     restart: unless-stopped
     environment:
@@ -8,6 +8,8 @@ services:
     - HOST_OS=Unraid
     - HOST_HOSTNAME=JP-Dell
     - HOST_CONTAINERNAME=portainer
+    ports:
+    - 8000:8000 # Edge Agent tunnel server
     volumes:
     - ${APPDATA_PATH}/portainer:/data
     - /var/run/docker.sock:/var/run/docker.sock:ro
