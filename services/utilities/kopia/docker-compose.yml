@@ -1,6 +1,6 @@
 services:
   kopia-backblaze:
-    image: kopia/kopia:20261031.0.35233
+    image: kopia/kopia:20261103.0.2044
     container_name: kopia-backblaze
     restart: unless-stopped
     environment:
@@ -87,7 +87,7 @@ services:
     # Reaches ntfy for snapshot failure notifications.
     - monitoring_net
   kopia-local:
-    image: kopia/kopia:20261031.0.35233
+    image: kopia/kopia:20261103.0.2044
     container_name: kopia-truenas
     restart: unless-stopped
     environment:
