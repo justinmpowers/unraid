@@ -1,6 +1,6 @@
 services:
   home-assistant:
-    image: ghcr.io/home-assistant/home-assistant:2026.10.4
+    image: ghcr.io/home-assistant/home-assistant:2026.11.1
     container_name: Home-Assistant-Container
     restart: unless-stopped
     environment:
@@ -114,7 +114,7 @@ services:
     networks:
     - iot_net
   wyoming-piper:
-    image: rhasspy/wyoming-piper:2.5.2
+    image: rhasspy/wyoming-piper:2.5.3
     container_name: wyoming-piper
     restart: unless-stopped
     command:
