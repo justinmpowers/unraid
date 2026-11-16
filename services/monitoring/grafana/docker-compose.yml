@@ -64,11 +64,13 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.75'
-          memory: 512M
+          # Grafana 13 runs an embedded API server and in-memory search indexes; at
+          # 0.75 CPU / 512M it starved and SQLite queries hit "context deadline exceeded".
+          cpus: '2'
+          memory: 1536M
         reservations:
-          cpus: '0.2'
-          memory: 256M
+          cpus: '0.25'
+          memory: 512M
 networks:
   monitoring_net:
     external: true
