@@ -1,0 +1,93 @@
+<!--
+  UniFi OS (UDM Pro) CEF syslog, sent by Settings > Control Plane > Integrations > Activity Logging (SIEM Server).
+  Example:
+    Nov 19 19:36:15 UDM CEF:0|Ubiquiti|UniFi OS|6.0.17|1|Test Syslog|1|UNIFIhost=UDM UNIFIdeviceModel=UDMPRO ... msg=Test Syslog
+  The syslog pre-decoder takes "CEF" as the program name. Extension values may contain spaces, so each one runs
+  until the next " key=" or the end of the line.
+  Installed to /var/ossec/etc/decoders/ by scripts/setup-wazuh.sh.
+-->
+
+<decoder name="unifi-cef">
+  <program_name>^CEF$</program_name>
+  <prematch type="pcre2">\|Ubiquiti\|</prematch>
+</decoder>
+
+<!-- CEF header: Version|Vendor|Product|ProductVersion|SignatureID|Name|Severity| -->
+<decoder name="unifi-cef-fields">
+  <parent>unifi-cef</parent>
+  <regex type="pcre2">Ubiquiti\|([^|]*)\|([^|]*)\|([^|]*)\|([^|]*)\|(\d+)\|</regex>
+  <order>unifi.product,unifi.version,unifi.event_id,unifi.name,unifi.severity</order>
+</decoder>
+
+<!-- Extension keys. Siblings share a name so each one is tried independently. -->
+<decoder name="unifi-cef-fields">
+  <parent>unifi-cef</parent>
+  <regex type="pcre2">UNIFIcategory=(.+?)(?= \w+=|$)</regex>
+  <order>unifi.category</order>
+</decoder>
+
+<decoder name="unifi-cef-fields">
+  <parent>unifi-cef</parent>
+  <regex type="pcre2">UNIFIsubCategory=(.+?)(?= \w+=|$)</regex>
+  <order>unifi.subcategory</order>
+</decoder>
+
+<decoder name="unifi-cef-fields">
+  <parent>unifi-cef</parent>
+  <regex type="pcre2">UNIFIhost=(.+?)(?= \w+=|$)</regex>
+  <order>unifi.host</order>
+</decoder>
+
+<decoder name="unifi-cef-fields">
+  <parent>unifi-cef</parent>
+  <regex type="pcre2">(?:^| )src=(\S+)</regex>
+  <order>srcip</order>
+</decoder>
+
+<decoder name="unifi-cef-fields">
+  <parent>unifi-cef</parent>
+  <regex type="pcre2">(?:^| )spt=(\d+)</regex>
+  <order>srcport</order>
+</decoder>
+
+<decoder name="unifi-cef-fields">
+  <parent>unifi-cef</parent>
+  <regex type="pcre2">(?:^| )dst=(\S+)</regex>
+  <order>dstip</order>
+</decoder>
+
+<decoder name="unifi-cef-fields">
+  <parent>unifi-cef</parent>
+  <regex type="pcre2">(?:^| )dpt=(\d+)</regex>
+  <order>dstport</order>
+</decoder>
+
+<decoder name="unifi-cef-fields">
+  <parent>unifi-cef</parent>
+  <regex type="pcre2">(?:^| )proto=(\S+)</regex>
+  <order>protocol</order>
+</decoder>
+
+<decoder name="unifi-cef-fields">
+  <parent>unifi-cef</parent>
+  <regex type="pcre2">(?:^| )(?:suser|UNIFIadmin)=(.+?)(?= \w+=|$)</regex>
+  <order>srcuser</order>
+</decoder>
+
+<decoder name="unifi-cef-fields">
+  <parent>unifi-cef</parent>
+  <regex type="pcre2">UNIFIclientAlias=(.+?)(?= \w+=|$)</regex>
+  <order>unifi.client</order>
+</decoder>
+
+<decoder name="unifi-cef-fields">
+  <parent>unifi-cef</parent>
+  <regex type="pcre2">UNIFIclientMac=(\S+)</regex>
+  <order>unifi.client_mac</order>
+</decoder>
+
+<decoder name="unifi-cef-fields">
+  <parent>unifi-cef</parent>
+  <regex type="pcre2">(?:^| )msg=(.+?)(?= \w+=|$)</regex>
+  <order>unifi.msg</order>
+</decoder>

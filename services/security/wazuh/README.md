@@ -49,6 +49,16 @@ Don't use `$ | ' " \` or spaces in the passwords: the images write them into con
 
 - **Unraid host**: Settings → Syslog Server → *Remote syslog server* = the server's LAN IP, port `514` (or your `WAZUH_SYSLOG_PORT`), protocol UDP. SSH and web-UI logins, failures and array events then show up under *Threat Hunting*. Syslog is accepted only from private address ranges.
 - **Router, firewall, switches and APs**: point their remote syslog at the same address.
+- **UniFi (UDM Pro)**: Settings → Control Plane → Integrations → Activity Logging → *SIEM Server*, using the Unraid LAN IP and port 514. The UDM sends CEF, which [config/manager/unifi_decoders.xml](config/manager/unifi_decoders.xml) and [unifi_rules.xml](config/manager/unifi_rules.xml) decode. Every UDM event is stored (search `rule.groups: unifi`). These go to ntfy at level 10+:
+
+  | Rule | Event |
+  |---|---|
+  | 100510 / 100511 | IDS/IPS or threat detection |
+  | 100521 | 5 failed admin logins in 5 minutes |
+  | 100530 / 100531 | UniFi severity 9–10 / 7–8 |
+  | 100541 | 20 firewall blocks from one source in a minute |
+
+  The setup script installs these into the manager's `etc/` only after the stack has started once, because the image fills that directory only when it's empty. On a new install, deploy first, re-run the script, then `docker restart wazuh-manager`. To test a line, run `docker exec -it wazuh-manager /var/ossec/bin/wazuh-logtest`.
 - **PCs and servers**: install a Wazuh agent. In the dashboard, go to *Agents management → Deploy new agent*, set the server address to the Unraid LAN IP, and run the command it generates. Agents add file-integrity monitoring, vulnerability detection, inventory and CIS checks.
 
 The manager's own rootcheck, syscheck and SCA modules scan the manager container, not the Unraid host. For host-level checks, use syslog; Unraid's Slackware base isn't a supported agent platform.

@@ -71,6 +71,18 @@ if [ -f "$BASE/manager/integrations/ntfy_token" ]; then
   chmod 640 "$BASE/manager/integrations/ntfy_token"
 fi
 
+# Custom decoders/rules go into the manager's etc/, which the image only populates when that directory is
+# empty. So install them only after the stack has started once; before that, writing here would break it.
+if [ -f "$BASE/manager/etc/ossec.conf" ]; then
+  for f in unifi_decoders.xml:decoders unifi_rules.xml:rules; do
+    sync_file "$src/manager/${f%%:*}" "$BASE/manager/etc/${f#*:}/${f%%:*}" wazuh-manager
+    chown 999:999 "$BASE/manager/etc/${f#*:}/${f%%:*}"
+    chmod 660 "$BASE/manager/etc/${f#*:}/${f%%:*}"
+  done
+else
+  echo "  NOTE: start the security-wazuh stack once, then re-run this script to install the UniFi rules."
+fi
+
 # --- TLS certificates (first run only) ---
 if [ ! -f "$BASE/certs/root-ca.pem" ]; then
   echo "Generating TLS certificates..."
