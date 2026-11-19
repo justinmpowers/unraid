@@ -1,0 +1,88 @@
+<!--
+  Rules for UniFi OS CEF events (decoder: unifi_decoders.xml). IDs 100500-100599.
+  Level 10+ is pushed to ntfy by the custom-ntfy integration.
+  Child rules of 100500 are checked in file order and the first match wins, so the most specific come first.
+  Installed to /var/ossec/etc/rules/ by scripts/setup-wazuh.sh.
+-->
+<group name="unifi,">
+
+  <!-- Everything from the UDM, so it is indexed and searchable (rule.groups: unifi). -->
+  <rule id="100500" level="3">
+    <decoded_as>unifi-cef</decoded_as>
+    <description>UniFi: $(unifi.name)</description>
+  </rule>
+
+  <!-- IDS/IPS, honeypot and threat-management detections. -->
+  <rule id="100510" level="10">
+    <if_sid>100500</if_sid>
+    <field name="unifi.name" type="pcre2">(?i)intrusion|threat|\bip[sd]\b|honeypot|malware|botnet|exploit|attack|port ?scan</field>
+    <description>UniFi security detection: $(unifi.name)</description>
+    <group>ids,attack,</group>
+  </rule>
+
+  <rule id="100511" level="10">
+    <if_sid>100500</if_sid>
+    <field name="unifi.category" type="pcre2">(?i)secur|threat</field>
+    <description>UniFi security detection: $(unifi.name)</description>
+    <group>ids,attack,</group>
+  </rule>
+
+  <!-- Failed console/SSH logins; five within five minutes is escalated. -->
+  <!-- 2501 is Wazuh's generic "authentication failure" syslog rule, which can match these first. -->
+  <rule id="100520" level="7">
+    <if_sid>100500, 2501</if_sid>
+    <decoded_as>unifi-cef</decoded_as>
+    <field name="unifi.name" type="pcre2">(?i)(fail|invalid|denied|incorrect).*(log ?in|sign ?in|auth|password)|(log ?in|sign ?in|auth).*(fail|invalid|denied)</field>
+    <description>UniFi: failed admin login ($(unifi.name))</description>
+    <group>authentication_failed,</group>
+  </rule>
+
+  <rule id="100521" level="10" frequency="5" timeframe="300">
+    <if_matched_sid>100520</if_matched_sid>
+    <description>UniFi: multiple failed admin logins</description>
+    <group>authentication_failures,</group>
+  </rule>
+
+  <!-- Severity reported by UniFi (CEF 0-10). -->
+  <rule id="100530" level="12">
+    <if_sid>100500</if_sid>
+    <field name="unifi.severity" type="pcre2">^(9|10)$</field>
+    <description>UniFi critical event: $(unifi.name)</description>
+  </rule>
+
+  <rule id="100531" level="10">
+    <if_sid>100500</if_sid>
+    <field name="unifi.severity" type="pcre2">^[78]$</field>
+    <description>UniFi high-severity event: $(unifi.name)</description>
+  </rule>
+
+  <!-- Firewall blocks; twenty from one source within a minute is escalated. -->
+  <rule id="100540" level="4">
+    <if_sid>100500</if_sid>
+    <field name="unifi.name" type="pcre2">(?i)block|drop|deny|reject</field>
+    <description>UniFi firewall block: $(unifi.name)</description>
+    <group>firewall_drop,</group>
+  </rule>
+
+  <rule id="100541" level="10" frequency="20" timeframe="60">
+    <if_matched_sid>100540</if_matched_sid>
+    <same_srcip />
+    <description>UniFi: many firewall blocks from $(srcip)</description>
+    <group>firewall_drop,multiple_drops,</group>
+  </rule>
+
+  <!-- Successful admin access and config changes. -->
+  <rule id="100550" level="5">
+    <if_sid>100500</if_sid>
+    <field name="unifi.name" type="pcre2">(?i)log(ged)? ?in|sign(ed)? ?in|accessed|admin</field>
+    <description>UniFi admin activity: $(unifi.name)</description>
+    <group>authentication_success,</group>
+  </rule>
+
+  <rule id="100560" level="5">
+    <if_sid>100500</if_sid>
+    <field name="unifi.severity" type="pcre2">^[4-6]$</field>
+    <description>UniFi event: $(unifi.name)</description>
+  </rule>
+
+</group>
