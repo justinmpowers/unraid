@@ -139,6 +139,8 @@ services:
     - 'kuma.tag_security.tag.color=#DC2626'
     - kuma.tag_server.tag.name=server
     - 'kuma.tag_server.tag.color=#4B5563'
+    - kuma.tag_siem.tag.name=siem
+    - 'kuma.tag_siem.tag.color=#4B5563'
     - kuma.tag_smart-home.tag.name=smart-home
     - 'kuma.tag_smart-home.tag.color=#4B5563'
     - kuma.tag_social.tag.name=social
