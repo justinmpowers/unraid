@@ -1,0 +1,21 @@
+---
+# Template for the indexer's internal user database. scripts/setup-wazuh.sh fills in the bcrypt
+# hashes and writes ${APPDATA_PATH}/wazuh/config/indexer/internal_users.yml (never committed).
+# The upstream demo users (kibanaro, logstash, readall, snapshotrestore) are left out on purpose:
+# their passwords are public.
+
+_meta:
+  type: "internalusers"
+  config_version: 2
+
+admin:
+  hash: "__ADMIN_HASH__"
+  reserved: true
+  backend_roles:
+  - "admin"
+  description: "Indexer admin; also used by the manager's Filebeat"
+
+kibanaserver:
+  hash: "__KIBANASERVER_HASH__"
+  reserved: true
+  description: "Wazuh dashboard service account"
