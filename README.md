@@ -59,7 +59,8 @@ services/
 │   └── wikijs/          # Personal wiki
 ├── security/            # Security and authentication
 │   ├── authentik/       # Identity provider
-│   └── vaultwarden/     # Password manager
+│   ├── vaultwarden/     # Password manager
+│   └── wazuh/           # SIEM: manager, indexer, dashboard
 └── utilities/           # Utility services
     ├── dashy/           # Service dashboard
     ├── filebrowser/     # File browser and manager
@@ -80,7 +81,7 @@ services/
 - Database caches, monitoring collectors, and general utilities
 
 ### Heavy Services (0.75-2 CPU, 1-4GB RAM)
-- Nextcloud, Immich, Home Assistant, Jenkins, GitHub Runner, Minecraft Network, Grafana, Authentik
+- Nextcloud, Immich, Home Assistant, Jenkins, GitHub Runner, Minecraft Network, Grafana, Authentik, Wazuh
 - Full applications, media processing, and resource-intensive services
 
 ## 🚀 CI/CD & Automation
@@ -124,6 +125,7 @@ services/
 - **Environment Secrets**: Sensitive data in `.env` file
 - **Privilege Isolation**: Services run with minimal required privileges
 - **Database Isolation**: All databases only exposed to internal `db_net` - no host port exposure
+- **SIEM**: Wazuh collects agent and syslog events and pushes high-severity alerts to ntfy ([services/security/wazuh](services/security/wazuh/README.md))
 - **Network Segmentation**: Services isolated by function (internal_net, db_net, iot_net, monitoring_net, public_net)
 
 ## 🛠️ Usage

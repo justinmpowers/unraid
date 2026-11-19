@@ -1,0 +1,177 @@
+# Wazuh SIEM (single node): manager + indexer + dashboard.
+# Run scripts/setup-wazuh.sh on the server once before the first deploy; it syncs the config files
+# from ./config into ${APPDATA_PATH}/wazuh/config, generates the TLS certificates and the indexer users.
+# Service names keep the dots (wazuh.manager, ...) because the generated certificates are issued for them.
+services:
+  wazuh.manager:
+    image: wazuh/wazuh-manager:4.14.10
+    container_name: wazuh-manager
+    hostname: wazuh.manager
+    restart: unless-stopped
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 655360
+        hard: 655360
+    environment:
+    - TZ=${TZ}
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=${HOST_HOSTNAME}
+    - HOST_CONTAINERNAME=wazuh-manager
+    - INDEXER_URL="https://wazuh.indexer:9200"
+    - INDEXER_USERNAME=admin
+    - INDEXER_PASSWORD=${WAZUH_INDEXER_PASSWORD}
+    - FILEBEAT_SSL_VERIFICATION_MODE=full
+    - SSL_CERTIFICATE_AUTHORITIES=/etc/ssl/root-ca.pem
+    - SSL_CERTIFICATE=/etc/ssl/filebeat.pem
+    - SSL_KEY=/etc/ssl/filebeat.key
+    - API_USERNAME=wazuh-wui
+    - API_PASSWORD=${WAZUH_API_PASSWORD}
+    ports:
+    # Agent events and agent enrollment.
+    - 1514:1514
+    - 1515:1515
+    # Plain syslog (Unraid host, router, switches). Change WAZUH_SYSLOG_PORT if 514 is taken.
+    - ${WAZUH_SYSLOG_PORT:-514}:514/udp
+    volumes:
+    - ${APPDATA_PATH}/wazuh/manager/api-configuration:/var/ossec/api/configuration
+    - ${APPDATA_PATH}/wazuh/manager/etc:/var/ossec/etc
+    - ${APPDATA_PATH}/wazuh/manager/logs:/var/ossec/logs
+    - ${APPDATA_PATH}/wazuh/manager/queue:/var/ossec/queue
+    - ${APPDATA_PATH}/wazuh/manager/multigroups:/var/ossec/var/multigroups
+    - ${APPDATA_PATH}/wazuh/manager/integrations:/var/ossec/integrations
+    - ${APPDATA_PATH}/wazuh/manager/active-response:/var/ossec/active-response/bin
+    - ${APPDATA_PATH}/wazuh/manager/agentless:/var/ossec/agentless
+    - ${APPDATA_PATH}/wazuh/manager/wodles:/var/ossec/wodles
+    - ${APPDATA_PATH}/wazuh/manager/filebeat-etc:/etc/filebeat
+    - ${APPDATA_PATH}/wazuh/manager/filebeat-var:/var/lib/filebeat
+    - ${APPDATA_PATH}/wazuh/certs/root-ca-manager.pem:/etc/ssl/root-ca.pem:ro
+    - ${APPDATA_PATH}/wazuh/certs/wazuh.manager.pem:/etc/ssl/filebeat.pem:ro
+    - ${APPDATA_PATH}/wazuh/certs/wazuh.manager-key.pem:/etc/ssl/filebeat.key:ro
+    - ${APPDATA_PATH}/wazuh/config/manager/ossec.conf:/wazuh-config-mount/etc/ossec.conf:ro
+    networks:
+    - wazuh_net
+    # Reaches ntfy for alert notifications.
+    - monitoring_net
+    depends_on:
+    - wazuh.indexer
+    labels:
+    - kuma.wazuh_manager.port.name=Wazuh Manager (agents)
+    - kuma.wazuh_manager.port.hostname=wazuh-manager
+    - kuma.wazuh_manager.port.port=1514
+    - kuma.wazuh_manager.port.interval=60
+    - 'kuma.wazuh_manager.port.tag_names=[{"name":"tag_security"},{"name":"tag_siem"}]'
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/wazuh/wazuh-dashboard-plugins/main/plugins/main/public/assets/icon_blue.png
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 2G
+        reservations:
+          cpus: '0.25'
+          memory: 512M
+
+  wazuh.indexer:
+    image: wazuh/wazuh-indexer:4.14.10
+    container_name: wazuh-indexer
+    hostname: wazuh.indexer
+    restart: unless-stopped
+    environment:
+    - TZ=${TZ}
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=${HOST_HOSTNAME}
+    - HOST_CONTAINERNAME=wazuh-indexer
+    - OPENSEARCH_JAVA_OPTS=-Xms${WAZUH_INDEXER_HEAP:-1g} -Xmx${WAZUH_INDEXER_HEAP:-1g}
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    # No published port: only the manager and dashboard talk to the indexer, over wazuh_net.
+    volumes:
+    - ${APPDATA_PATH}/wazuh/indexer/data:/var/lib/wazuh-indexer
+    - ${APPDATA_PATH}/wazuh/certs/root-ca.pem:/usr/share/wazuh-indexer/config/certs/root-ca.pem:ro
+    - ${APPDATA_PATH}/wazuh/certs/wazuh.indexer-key.pem:/usr/share/wazuh-indexer/config/certs/wazuh.indexer.key:ro
+    - ${APPDATA_PATH}/wazuh/certs/wazuh.indexer.pem:/usr/share/wazuh-indexer/config/certs/wazuh.indexer.pem:ro
+    - ${APPDATA_PATH}/wazuh/certs/admin.pem:/usr/share/wazuh-indexer/config/certs/admin.pem:ro
+    - ${APPDATA_PATH}/wazuh/certs/admin-key.pem:/usr/share/wazuh-indexer/config/certs/admin-key.pem:ro
+    - ${APPDATA_PATH}/wazuh/config/indexer/opensearch.yml:/usr/share/wazuh-indexer/config/opensearch.yml:ro
+    - ${APPDATA_PATH}/wazuh/config/indexer/internal_users.yml:/usr/share/wazuh-indexer/config/opensearch-security/internal_users.yml:ro
+    networks:
+    - wazuh_net
+    labels:
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/wazuh/wazuh-dashboard-plugins/main/plugins/main/public/assets/icon_blue.png
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          # Keep this at roughly 2x WAZUH_INDEXER_HEAP.
+          memory: 3G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+
+  wazuh.dashboard:
+    image: wazuh/wazuh-dashboard:4.14.10
+    container_name: wazuh-dashboard
+    hostname: wazuh.dashboard
+    restart: unless-stopped
+    environment:
+    - TZ=${TZ}
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=${HOST_HOSTNAME}
+    - HOST_CONTAINERNAME=wazuh-dashboard
+    - INDEXER_USERNAME=admin
+    - INDEXER_PASSWORD=${WAZUH_INDEXER_PASSWORD}
+    - WAZUH_API_URL=https://wazuh.manager
+    - DASHBOARD_USERNAME=kibanaserver
+    - DASHBOARD_PASSWORD=${WAZUH_DASHBOARD_PASSWORD}
+    - API_USERNAME=wazuh-wui
+    - API_PASSWORD=${WAZUH_API_PASSWORD}
+    volumes:
+    - ${APPDATA_PATH}/wazuh/certs/root-ca.pem:/usr/share/wazuh-dashboard/certs/root-ca.pem:ro
+    - ${APPDATA_PATH}/wazuh/config/dashboard/opensearch_dashboards.yml:/usr/share/wazuh-dashboard/config/opensearch_dashboards.yml:ro
+    # wazuh.yml (API connection) is written here on first start from the API_* variables.
+    - ${APPDATA_PATH}/wazuh/dashboard/config:/usr/share/wazuh-dashboard/data/wazuh/config
+    - ${APPDATA_PATH}/wazuh/dashboard/custom:/usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom
+    networks:
+    - wazuh_net
+    - internal_net
+    depends_on:
+    - wazuh.indexer
+    - wazuh.manager
+    labels:
+    # LAN only (websecure). A SIEM console should not be reachable through the Cloudflare tunnel.
+    - traefik.enable=true
+    - traefik.docker.network=internal_net
+    - traefik.http.routers.wazuh-lan.rule=Host(`wazuh.${DOMAIN}`)
+    - traefik.http.routers.wazuh-lan.entrypoints=websecure
+    - traefik.http.routers.wazuh-lan.service=wazuh
+    - traefik.http.routers.wazuh-lan.middlewares=default-headers@file
+    - traefik.http.services.wazuh.loadbalancer.server.port=5601
+    - kuma.wazuh.http.name=Wazuh Dashboard
+    - kuma.wazuh.http.url=http://wazuh-dashboard:5601/app/login
+    - kuma.wazuh.http.interval=60
+    - 'kuma.wazuh.http.tag_names=[{"name":"tag_security"},{"name":"tag_siem"}]'
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/wazuh/wazuh-dashboard-plugins/main/plugins/main/public/assets/icon_blue.png
+    - net.unraid.docker.webui=https://wazuh.${DOMAIN}
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 384M
+
+networks:
+  wazuh_net:
+    name: wazuh_net
+  internal_net:
+    external: true
+  monitoring_net:
+    external: true

@@ -1,0 +1,63 @@
+#!/var/ossec/framework/python/bin/python3
+# Wazuh -> ntfy integration. Wazuh runs it as: custom-ntfy <alert_file> <api_key> <hook_url>
+# Enabled by the <integration> block in ossec.conf. Installed to /var/ossec/integrations/ by
+# scripts/setup-wazuh.sh. The bearer token is read from ntfy_token next to this script.
+import json
+import os
+import sys
+import urllib.request
+
+TOKEN_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ntfy_token")
+
+
+def priority(level):
+    if level >= 13:
+        return "urgent"
+    if level >= 12:
+        return "high"
+    return "default"
+
+
+def main():
+    alert_file, hook_url = sys.argv[1], sys.argv[3]
+    with open(alert_file) as f:
+        alert = json.loads(f.read().strip().splitlines()[-1])
+
+    rule = alert.get("rule", {})
+    level = int(rule.get("level", 0))
+    agent = alert.get("agent", {}).get("name", "unknown")
+    # Syslog senders show up as the manager itself (agent 000); name the sending host instead.
+    host = alert.get("predecoder", {}).get("hostname")
+    if alert.get("agent", {}).get("id") == "000" and host:
+        agent = f"{host} (syslog)"
+    src = alert.get("data", {}).get("srcip")
+    groups = ", ".join(rule.get("groups", []))
+
+    lines = [f"Agent: {agent}", f"Rule {rule.get('id', '?')} (level {level})"]
+    if src:
+        lines.append(f"Source IP: {src}")
+    if groups:
+        lines.append(f"Groups: {groups}")
+    if alert.get("full_log"):
+        lines.append("")
+        lines.append(alert["full_log"][:1500])
+
+    headers = {
+        "Title": f"Wazuh: {rule.get('description', 'alert')}"[:250],
+        "Priority": priority(level),
+        "Tags": "shield",
+    }
+    try:
+        with open(TOKEN_FILE) as f:
+            headers["Authorization"] = "Bearer " + f.read().strip()
+    except FileNotFoundError:
+        pass
+
+    # Header values must be latin-1; drop anything that isn't.
+    headers = {k: v.encode("latin-1", "ignore").decode("latin-1") for k, v in headers.items()}
+    req = urllib.request.Request(hook_url, data="\n".join(lines).encode(), headers=headers, method="POST")
+    urllib.request.urlopen(req, timeout=10).read()
+
+
+if __name__ == "__main__":
+    main()
