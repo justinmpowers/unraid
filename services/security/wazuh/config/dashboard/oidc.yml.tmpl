@@ -1,0 +1,11 @@
+
+# --- Single sign-on (appended by scripts/setup-wazuh.sh when OIDC is configured) ---
+opensearch_security.auth.type: ["basicauth", "openid"]
+opensearch_security.auth.multiple_auth_enabled: true
+opensearch_security.openid.connect_url: "__OIDC_DISCOVERY_URL__"
+opensearch_security.openid.client_id: "__OIDC_CLIENT_ID__"
+opensearch_security.openid.client_secret: '__OIDC_CLIENT_SECRET__'
+opensearch_security.openid.scope: "openid profile email"
+opensearch_security.openid.base_redirect_url: "__WAZUH_URL__"
+opensearch_security.openid.logout_url: "__OIDC_LOGOUT_URL__"
+opensearch_security.ui.openid.login.buttonname: "Log in with Authentik"

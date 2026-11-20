@@ -1,0 +1,20 @@
+{
+  "policy": {
+    "description": "Delete Wazuh indices after __DAYS__ days (managed by scripts/setup-wazuh.sh)",
+    "default_state": "hot",
+    "states": [
+      {
+        "name": "hot",
+        "actions": [],
+        "transitions": [{ "state_name": "delete", "conditions": { "min_index_age": "__DAYS__d" } }]
+      },
+      { "name": "delete", "actions": [{ "delete": {} }], "transitions": [] }
+    ],
+    "ism_template": [
+      {
+        "index_patterns": ["wazuh-alerts-*", "wazuh-archives-*", "wazuh-monitoring-*", "wazuh-statistics-*"],
+        "priority": 1
+      }
+    ]
+  }
+}
