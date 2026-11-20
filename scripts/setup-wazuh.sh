@@ -91,13 +91,13 @@ elif [ -n "${WAZUH_OIDC_CLIENT_ID:-}" ] || [ -n "${WAZUH_OIDC_CLIENT_SECRET:-}" 
       echo "WAZUH_OIDC_CLIENT_ID=$WAZUH_OIDC_CLIENT_ID"
       echo "WAZUH_OIDC_CLIENT_SECRET=$WAZUH_OIDC_CLIENT_SECRET"
       for v in WAZUH_URL WAZUH_OIDC_DISCOVERY_URL WAZUH_OIDC_LOGOUT_URL; do
-        [ -n "${!v:-}" ] && echo "$v=${!v}"
+        if [ -n "${!v:-}" ]; then echo "$v=${!v}"; fi
       done
     } > "$oidc_env" )
 fi
 declare -A oidc=()
 if [ -f "$oidc_env" ]; then
-  while IFS='=' read -r k v; do [ -n "$k" ] && oidc[$k]="$v"; done < "$oidc_env"
+  while IFS='=' read -r k v; do if [ -n "$k" ]; then oidc[$k]="$v"; fi; done < "$oidc_env"
   d="${oidc[DOMAIN]}"
   : "${oidc[WAZUH_URL]:=https://wazuh.$d}"
   : "${oidc[WAZUH_OIDC_DISCOVERY_URL]:=https://auth.$d/application/o/wazuh/.well-known/openid-configuration}"
@@ -274,5 +274,5 @@ if [ ${#changed[@]} -eq 0 ]; then
   echo "Config already up to date."
 else
   restart=$(printf '%s\n' "${changed[@]}" | grep -v '^-$' | sort -u | tr '\n' ' ')
-  [ -n "$restart" ] && echo "Restart to apply:  docker restart $restart"
+  if [ -n "$restart" ]; then echo "Restart to apply:  docker restart $restart"; fi
 fi
