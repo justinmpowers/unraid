@@ -1,0 +1,39 @@
+---
+# Indexer authentication domains (opensearch-security config.yml). scripts/setup-wazuh.sh renders this into
+# ${APPDATA_PATH}/wazuh/config/indexer/security_config.yml and loads it with securityadmin.sh.
+# Password login always works; single sign-on through Authentik is switched on when OIDC is configured.
+_meta:
+  type: "config"
+  config_version: 2
+
+config:
+  dynamic:
+    http:
+      anonymous_auth_enabled: false
+    authc:
+      basic_internal_auth_domain:
+        description: "Username/password against the internal users database"
+        http_enabled: true
+        transport_enabled: true
+        order: 0
+        http_authenticator:
+          type: basic
+          # false so the dashboard can offer both the password form and the SSO button.
+          challenge: false
+        authentication_backend:
+          type: intern
+      openid_auth_domain:
+        description: "Single sign-on through Authentik (OpenID Connect)"
+        http_enabled: __OIDC_ENABLED__
+        transport_enabled: __OIDC_ENABLED__
+        order: 1
+        http_authenticator:
+          type: openid
+          challenge: false
+          config:
+            subject_key: preferred_username
+            # Authentik group names arrive as backend roles; roles_mapping.yml maps wazuh-admins.
+            roles_key: groups
+            openid_connect_url: "__OIDC_DISCOVERY_URL__"
+        authentication_backend:
+          type: noop

@@ -1,0 +1,15 @@
+<!--
+  Unraid webGUI logins, forwarded by Unraid's remote syslog:
+    Nov 20 10:00:00 JP-Dell webGUI: Successful login user root from 10.10.1.20
+    Nov 20 10:00:00 JP-Dell webGUI: Unsuccessful login user root from 10.10.1.20
+  SSH logins are covered by Wazuh's built-in sshd rules.
+  Installed to /var/ossec/etc/decoders/ by scripts/setup-wazuh.sh.
+-->
+<!-- Wazuh's built-in Barracuda decoder (0045) already claims every program name starting with "web" and has
+     no rules of its own, so the Unraid decoder hangs under it. Rules select Unraid by program name. -->
+<decoder name="unraid-webgui-login">
+  <parent>barracuda-svf-admin</parent>
+  <prematch type="pcre2">^(?:Uns|S)uccessful login user </prematch>
+  <regex type="pcre2">^(Successful|Unsuccessful) login user (\S+) from (\S+)</regex>
+  <order>unraid.login_result,dstuser,srcip</order>
+</decoder>
