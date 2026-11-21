@@ -4,6 +4,12 @@ services:
     image: lscr.io/linuxserver/orcaslicer:v2.5.1-ls52
     container_name: orcaslicer
     restart: unless-stopped
+    # Nvidia GPU (shared with Ollama and Obico ML) renders the 3D preview and
+    # encodes the browser stream. Needs host driver >= 595.80 and
+    # /dev/nvidia-modeset on the host (run `nvidia-modprobe --modeset` if missing).
+    runtime: nvidia
+    devices:
+    - /dev/nvidia-modeset:/dev/nvidia-modeset
     environment:
     - TZ=${TZ}
     - PUID=${PUID}
@@ -12,6 +18,8 @@ services:
     - HOST_HOSTNAME=JP-Dell
     - HOST_CONTAINERNAME=orcaslicer
     - TITLE=OrcaSlicer
+    - NVIDIA_VISIBLE_DEVICES=GPU-6842393f-bba6-90d5-3a23-080b8836a794
+    - NVIDIA_DRIVER_CAPABILITIES=compute,video,graphics,utility
     volumes:
     # App profile: printer, filament and process presets live here
     - ${APPDATA_PATH}/orcaslicer:/config
@@ -19,11 +27,6 @@ services:
     - ${ORCASLICER_MODELS_PATH}:/models
     # The streamed desktop (browser + Qt/GTK) needs more than Docker's 64M default
     shm_size: 1gb
-    # Optional GPU acceleration for the 3D preview. Intel/AMD iGPU:
-    # devices:
-    # - /dev/dri:/dev/dri
-    # environment:
-    # - DRINODE=/dev/dri/renderD128
     deploy:
       resources:
         limits:
