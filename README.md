@@ -37,6 +37,7 @@ services/
 │   ├── govee2mqtt/      # Govee bridge to MQTT/Home Assistant
 │   ├── music-assistant/ # Music library manager for Home Assistant
 │   ├── mosquitto/       # MQTT message broker
+│   ├── orcaslicer/      # Browser-based OrcaSlicer (3D printing slicer)
 │   └── zigbee2mqtt/     # Zigbee to MQTT bridge
 ├── media/               # Media management
 │   ├── immich/          # Photo and video management
@@ -81,7 +82,7 @@ services/
 - Database caches, monitoring collectors, and general utilities
 
 ### Heavy Services (0.75-2 CPU, 1-4GB RAM)
-- Nextcloud, Immich, Home Assistant, Jenkins, GitHub Runner, Minecraft Network, Grafana, Authentik, Wazuh
+- Nextcloud, Immich, Home Assistant, Jenkins, GitHub Runner, Minecraft Network, Grafana, Authentik, Wazuh, OrcaSlicer
 - Full applications, media processing, and resource-intensive services
 
 ## 🚀 CI/CD & Automation

@@ -1,0 +1,56 @@
+services:
+  orcaslicer:
+    # Full OrcaSlicer desktop app streamed to the browser (LinuxServer.io Selkies base)
+    image: lscr.io/linuxserver/orcaslicer:v2.5.1-ls52
+    container_name: orcaslicer
+    restart: unless-stopped
+    environment:
+    - TZ=${TZ}
+    - PUID=${PUID}
+    - PGID=${PGID}
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=JP-Dell
+    - HOST_CONTAINERNAME=orcaslicer
+    - TITLE=OrcaSlicer
+    volumes:
+    # App profile: printer, filament and process presets live here
+    - ${APPDATA_PATH}/orcaslicer:/config
+    # Same library Manyfold indexes; sliced 3MF/G-code saved here shows up in Manyfold too
+    - ${ORCASLICER_MODELS_PATH}:/models
+    # The streamed desktop (browser + Qt/GTK) needs more than Docker's 64M default
+    shm_size: 1gb
+    # Optional GPU acceleration for the 3D preview. Intel/AMD iGPU:
+    # devices:
+    # - /dev/dri:/dev/dri
+    # environment:
+    # - DRINODE=/dev/dri/renderD128
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 4G
+        reservations:
+          cpus: '0.25'
+          memory: 512M
+    networks:
+    - iot_net
+    labels:
+    - traefik.enable=true
+    - traefik.docker.network=iot_net
+    - traefik.http.routers.orcaslicer.rule=Host(`orcaslicer.${DOMAIN}`)
+    - traefik.http.routers.orcaslicer.entrypoints=web
+    - traefik.http.routers.orcaslicer.middlewares=crowdsec@file,authentik@file
+    - traefik.http.routers.orcaslicer-lan.rule=Host(`orcaslicer.${DOMAIN}`)
+    - traefik.http.routers.orcaslicer-lan.entrypoints=websecure
+    - traefik.http.routers.orcaslicer-lan.service=orcaslicer
+    - traefik.http.routers.orcaslicer-lan.middlewares=crowdsec@file,authentik@file
+    - traefik.http.services.orcaslicer.loadbalancer.server.port=3000
+    - kuma.orcaslicer.http.name=OrcaSlicer
+    - kuma.orcaslicer.http.url=http://orcaslicer:3000
+    - kuma.orcaslicer.http.interval=60
+    - 'kuma.orcaslicer.http.tag_names=[{"name":"tag_iot"},{"name":"tag_3dprinting"}]'
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/linuxserver/docker-templates/master/linuxserver.io/img/orcaslicer-logo.png
+    - net.unraid.docker.webui=https://orcaslicer.${DOMAIN}
+networks:
+  iot_net:
+    external: true
