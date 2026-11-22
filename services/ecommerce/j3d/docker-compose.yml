@@ -4,7 +4,7 @@
 
 services:
   postgres:
-    image: postgres:18.7
+    image: postgres:19.0
     container_name: j3d-postgres
     restart: unless-stopped
     environment:
