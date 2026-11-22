@@ -5,6 +5,24 @@ services:
     restart: unless-stopped
     environment:
     - MCP_GATEWAY_TOKEN=${MCP_GATEWAY_TOKEN}
+    # LAN-only Traefik route. There is deliberately no `web` router: `web` is
+    # the entrypoint cloudflared forwards to, so adding one would publish an
+    # endpoint that grants filesystem writes, a GitHub PAT and Postgres access.
+    # Do NOT add authentik@file here either - forward-auth redirects to a login
+    # page and breaks bearer-token clients.
+    labels:
+    - traefik.enable=true
+    - traefik.docker.network=internal_net
+    - traefik.http.routers.mcp-lan.rule=Host(`mcp.${DOMAIN}`)
+    - traefik.http.routers.mcp-lan.entrypoints=websecure
+    - traefik.http.routers.mcp-lan.service=mcp
+    - traefik.http.routers.mcp-lan.middlewares=default-headers@file
+    - traefik.http.services.mcp.loadbalancer.server.port=8080
+    - kuma.mcp.keyword.name=MCP Gateway
+    - kuma.mcp.keyword.url=http://mcp-gateway:8080/healthz
+    - kuma.mcp.keyword.keyword=ok
+    - kuma.mcp.keyword.interval=60
+    - 'kuma.mcp.keyword.tag_names=[{"name":"tag_automation"},{"name":"tag_mcp"}]'
     volumes:
     - ${APPDATA_PATH}/mcp/nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
     depends_on:
@@ -15,7 +33,8 @@ services:
     - mcp-fetch
     networks:
     - internal_net
-    # Internal-only by default. If you need host access, uncomment and bind localhost.
+    # No host port needed: Traefik reaches the gateway over internal_net.
+    # For a local probe without Traefik, uncomment to bind loopback only.
     # ports:
     # - 127.0.0.1:8811:8080
     # Probe 127.0.0.1, not localhost: busybox wget resolves localhost to [::1],
