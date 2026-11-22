@@ -18,10 +18,13 @@ services:
     # Internal-only by default. If you need host access, uncomment and bind localhost.
     # ports:
     # - 127.0.0.1:8811:8080
+    # Probe 127.0.0.1, not localhost: busybox wget resolves localhost to [::1],
+    # and the rendered server block listens on IPv4 only, so a localhost probe
+    # is refused while nginx is healthy.
     healthcheck:
       test:
       - CMD-SHELL
-      - wget --no-verbose --tries=1 --spider http://localhost:8080/healthz || exit 1
+      - wget --no-verbose --tries=1 --spider http://127.0.0.1:8080/healthz || exit 1
       interval: 30s
       timeout: 5s
       retries: 3
