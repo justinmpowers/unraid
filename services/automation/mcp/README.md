@@ -31,6 +31,7 @@ Optional PostgreSQL fanout services (enabled with profile `postgres-all`):
 
 Copy values from `.env.example` into your root `.env`:
 
+- `APPDATA_PATH` (base for the gateway config mount, e.g. `/mnt/user/appdata`)
 - `MCP_GATEWAY_TOKEN`
 - `MCP_WORKSPACE_PATH`
 - `MCP_MODELS_PATH`
@@ -55,6 +56,29 @@ Recommended data root:
 - Example subfolders: `/mnt/user/appdata/mcp/workspace`, `/mnt/user/appdata/mcp/models`, `/mnt/user/appdata/mcp/sqlite`.
 
 ## Deploy
+
+The gateway's nginx config is mounted from an absolute path
+(`${APPDATA_PATH}/mcp/nginx/default.conf.template`), not a relative one. Copy it
+into place before deploying:
+
+```bash
+mkdir -p /mnt/user/appdata/mcp/nginx
+cp nginx/default.conf.template /mnt/user/appdata/mcp/nginx/default.conf.template
+```
+
+This matters for Portainer. A Git-backed stack is cloned inside the Portainer
+container, so a relative mount resolves to a `/data/compose/...` path that does
+not exist on the host; Docker then creates an empty directory there, nginx finds
+no template, and silently serves its stock config on port 80. The `:8080/healthz`
+healthcheck fails and the gateway shows as unhealthy with nothing in its log.
+`APPDATA_PATH` must also be set in the Portainer stack's environment, or the
+mount resolves to `/mcp/nginx/...` and fails the same way.
+
+Confirm the template was rendered after deploying:
+
+```bash
+docker logs mcp-gateway 2>&1 | grep envsubst
+```
 
 From this folder:
 

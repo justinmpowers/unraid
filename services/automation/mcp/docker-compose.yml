@@ -6,7 +6,7 @@ services:
     environment:
     - MCP_GATEWAY_TOKEN=${MCP_GATEWAY_TOKEN}
     volumes:
-    - ./nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
+    - ${APPDATA_PATH}/mcp/nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
     depends_on:
     - mcp-filesystem
     - mcp-git
