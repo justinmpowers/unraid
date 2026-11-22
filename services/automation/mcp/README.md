@@ -106,8 +106,21 @@ docker compose --profile optional --profile postgres-all up -d
 
 ## Access Pattern
 
-Gateway listens on port `8080` inside `internal_net`.
-If you need host-local access for testing, uncomment the `ports` binding in `docker-compose.yml`.
+Gateway listens on port `8080` inside `internal_net`. Containers on that
+network reach it directly at `http://mcp-gateway:8080`.
+
+From the LAN it is served over HTTPS at `https://mcp.${DOMAIN}` by Traefik,
+via a router on the `websecure` entrypoint only. There is deliberately no
+`web` router: `web` is the entrypoint cloudflared forwards to, so adding one
+would publish an endpoint that grants filesystem writes, a GitHub PAT and
+Postgres access to the internet.
+
+`mcp.${DOMAIN}` must resolve to the Unraid host's LAN address. Do not attach
+`authentik@file` to this router - forward-auth redirects to a login page and
+breaks bearer-token clients.
+
+No host port is published. To probe locally without Traefik, uncomment the
+loopback `ports` binding in `docker-compose.yml`.
 
 MCP endpoint format:
 
