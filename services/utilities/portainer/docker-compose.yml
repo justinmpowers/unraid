@@ -1,6 +1,6 @@
 services:
   portainer:
-    image: portainer/portainer-ee:3.0.1
+    image: portainer/portainer-ee:3.1.0
     container_name: portainer
     restart: unless-stopped
     environment:
