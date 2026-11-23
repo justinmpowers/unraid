@@ -52,7 +52,7 @@ services:
           memory: 128M
 
   node-exporter:
-    image: prom/node-exporter:v1.12.1
+    image: prom/node-exporter:v1.13.1
     container_name: node-exporter
     restart: unless-stopped
     # Host network + PID namespace so interface and process stats are the host's, not the container's.
@@ -81,7 +81,7 @@ services:
           memory: 32M
 
   cadvisor:
-    image: ghcr.io/google/cadvisor:v0.60.6
+    image: ghcr.io/google/cadvisor:v0.61.1
     container_name: cadvisor
     restart: unless-stopped
     command:
