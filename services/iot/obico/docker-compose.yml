@@ -267,7 +267,7 @@ services:
     - ${APPDATA_PATH}/ankerctl/logs:/logs
     labels:
     - kuma.ankerctl.http.name=AnkerMake
-    - kuma.ankerctl.http.url=http://host.docker.internal:4470/
+    - kuma.ankerctl.http.url=http://host.docker.internal:4470/api/health
     - kuma.ankerctl.http.interval=60
     - 'kuma.ankerctl.http.tag_names=[{"name":"tag_iot"},{"name":"tag_3dprinting"}]'
     - net.unraid.docker.webui=http://[IP]:4470
