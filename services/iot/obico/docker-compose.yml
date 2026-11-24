@@ -239,7 +239,10 @@ services:
           cpus: '0.1'
           memory: 128M
   ankerctl:
-    image: anselor/ankerctl:exile-latest
+    # Django1982 fork: actively maintained (Ankermgmt upstream is idle since Jan 2024,
+    # anselor/ankerctl since Nov 2024). Runs as uid/gid 1000 via gosu; the appdata
+    # config dir must be owned by 1000:1000 (entrypoint only chowns /captures and /logs).
+    image: ghcr.io/django1982/ankermake-m5-protocol:1.11.1
     container_name: ankerctl
     restart: unless-stopped
     # host networking is required for PPPP communication with the printer
@@ -252,11 +255,19 @@ services:
     - HOST_CONTAINERNAME=ankerctl
     - FLASK_HOST=${ANKERCTL_FLASK_HOST:-0.0.0.0}
     - FLASK_PORT=${ANKERCTL_FLASK_PORT:-4470}
+    # persistent session secret; without it every restart invalidates browser sessions
+    - FLASK_SECRET_KEY=${ANKERCTL_FLASK_SECRET_KEY}
+    # optional: protects write operations (POST/DELETE); empty disables auth
+    - ANKERCTL_API_KEY=${ANKERCTL_API_KEY:-}
+    - TIMELAPSE_CAPTURES_DIR=/captures
+    - ANKERCTL_LOG_DIR=/logs
     volumes:
-    - ${APPDATA_PATH}/ankerctl:/root/.config/ankerctl
+    - ${APPDATA_PATH}/ankerctl:/home/ankerctl/.config/ankerctl
+    - ${APPDATA_PATH}/ankerctl/captures:/captures
+    - ${APPDATA_PATH}/ankerctl/logs:/logs
     labels:
     - kuma.ankerctl.http.name=AnkerMake
-    - kuma.ankerctl.http.url=http://host.docker.internal:4470/
+    - kuma.ankerctl.http.url=http://host.docker.internal:4470/api/health
     - kuma.ankerctl.http.interval=60
     - 'kuma.ankerctl.http.tag_names=[{"name":"tag_iot"},{"name":"tag_3dprinting"}]'
     - net.unraid.docker.webui=http://[IP]:4470
@@ -266,7 +277,7 @@ services:
       - CMD
       - python3
       - -c
-      - import urllib.request; urllib.request.urlopen('http://127.0.0.1:4470/', timeout=5)
+      - import urllib.request; urllib.request.urlopen('http://127.0.0.1:4470/api/health', timeout=5)
       start_period: 30s
       interval: 30s
       timeout: 10s

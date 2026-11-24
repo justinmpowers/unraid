@@ -40,6 +40,7 @@ REPO_MAPPINGS = {
     'koenkk/zigbee2mqtt': 'Koenkk/zigbee2mqtt',
     'ghcr.io/wez/govee2mqtt': 'wez/govee2mqtt',
     'ghcr.io/home-assistant-libs/python-matter-server': 'home-assistant-libs/python-matter-server',
+    'ghcr.io/django1982/ankermake-m5-protocol': 'Django1982/ankermake-m5-protocol',
     
     # Media
     'ghcr.io/imagegenius/immich': 'imagegenius/docker-immich',
