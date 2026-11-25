@@ -268,7 +268,7 @@ services:
     restart: unless-stopped
     command:
     - --stdio
-    - npx -y @modelcontextprotocol/server-fetch
+    - uvx mcp-server-fetch
     - --outputTransport
     - streamableHttp
     - --streamableHttpPath
@@ -289,7 +289,7 @@ services:
     - optional
     command:
     - --stdio
-    - npx -y @modelcontextprotocol/server-sqlite ${MCP_SQLITE_PATH}
+    - uvx mcp-server-sqlite --db-path ${MCP_SQLITE_PATH}
     - --outputTransport
     - streamableHttp
     - --streamableHttpPath
