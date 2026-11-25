@@ -31,7 +31,6 @@ services:
     - ${APPDATA_PATH}/mcp/nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
     depends_on:
     - mcp-filesystem
-    - mcp-git
     - mcp-github
     - mcp-postgres
     - mcp-fetch
@@ -72,26 +71,6 @@ services:
     volumes:
     - ${MCP_WORKSPACE_PATH}:/workspace
     - ${MCP_MODELS_PATH}:/data/models
-    networks:
-    - internal_net
-
-  mcp-git:
-    image: supercorp/supergateway:uvx
-    container_name: mcp-git
-    restart: unless-stopped
-    command:
-    - --stdio
-    - uvx mcp-server-git --repository /workspace
-    - --outputTransport
-    - streamableHttp
-    - --streamableHttpPath
-    - /mcp
-    - --port
-    - '8000'
-    - --healthEndpoint
-    - /healthz
-    volumes:
-    - ${MCP_WORKSPACE_PATH}:/workspace:ro
     networks:
     - internal_net
 

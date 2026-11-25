@@ -19,7 +19,7 @@ server {
     add_header Content-Type text/plain;
   }
 
-  location ~ ^/(filesystem|git|github|postgres|postgres-manyfold|postgres-authentik|postgres-tandoor|postgres-wikijs|postgres-nextcloud|postgres-j3d|fetch|sqlite|docker|playwright|search)/mcp$ {
+  location ~ ^/(filesystem|github|postgres|postgres-manyfold|postgres-authentik|postgres-tandoor|postgres-wikijs|postgres-nextcloud|postgres-j3d|fetch|sqlite|docker|playwright|search)/mcp$ {
     if ($http_authorization != "Bearer ${MCP_GATEWAY_TOKEN}") {
       return 401;
     }
