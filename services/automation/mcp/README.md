@@ -8,7 +8,6 @@ All MCP endpoints require a bearer token and are intended for internal clients o
 Core services (enabled by default):
 - mcp-gateway
 - mcp-filesystem
-- mcp-git
 - mcp-github
 - mcp-postgres
 - mcp-fetch
@@ -26,6 +25,14 @@ Optional PostgreSQL fanout services (enabled with profile `postgres-all`):
 - mcp-postgres-wikijs
 - mcp-postgres-nextcloud
 - mcp-postgres-j3d
+
+> There is no git server in this stack. `mcp-server-git` depends on GitPython,
+> which needs the `git` binary, and the `supercorp/supergateway` images do not
+> ship one - the server exited with `Bad git executable` on every start.
+> `mcp-filesystem` already exposes the same workspace path and `mcp-github`
+> covers remote repositories. Note that `GIT_PYTHON_REFRESH=quiet`, which that
+> error suggests, only hides the import failure: the server would report healthy
+> and fail every git call.
 
 ## Required Environment Variables
 
@@ -130,7 +137,6 @@ MCP endpoint format:
 
 Examples:
 - `/filesystem/mcp`
-- `/git/mcp`
 - `/github/mcp`
 - `/postgres/mcp`
 - `/fetch/mcp`
