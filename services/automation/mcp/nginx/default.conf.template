@@ -2,6 +2,18 @@ server {
   listen 8080;
   server_name _;
 
+  # proxy_pass below interpolates a variable, so nginx resolves the backend
+  # per request rather than at startup and needs an explicit resolver. Without
+  # one every proxied request fails with 502 ("no resolver defined to resolve
+  # mcp-..."), while /healthz still answers because it never proxies.
+  # NGINX_LOCAL_RESOLVERS is exported by the image's 15-local-resolvers.envsh,
+  # which only runs when NGINX_ENTRYPOINT_LOCAL_RESOLVERS is set - see the
+  # gateway's environment in docker-compose.yml.
+  # Per-request resolution is deliberate: a static proxy_pass would make nginx
+  # resolve every backend at startup and refuse to start when the `optional`
+  # and `postgres-all` profiles are not deployed.
+  resolver ${NGINX_LOCAL_RESOLVERS} valid=10s ipv6=off;
+
   location = /healthz {
     return 200 'ok';
     add_header Content-Type text/plain;

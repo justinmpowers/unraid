@@ -5,6 +5,10 @@ services:
     restart: unless-stopped
     environment:
     - MCP_GATEWAY_TOKEN=${MCP_GATEWAY_TOKEN}
+    # Makes the image's 15-local-resolvers.envsh export NGINX_LOCAL_RESOLVERS
+    # from /etc/resolv.conf, which the nginx template needs for its `resolver`
+    # directive. The script is a no-op unless this is set.
+    - NGINX_ENTRYPOINT_LOCAL_RESOLVERS=1
     # LAN-only Traefik route. There is deliberately no `web` router: `web` is
     # the entrypoint cloudflared forwards to, so adding one would publish an
     # endpoint that grants filesystem writes, a GitHub PAT and Postgres access.
