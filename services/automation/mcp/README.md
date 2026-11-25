@@ -155,6 +155,29 @@ All requests must include:
 Authorization: Bearer <MCP_GATEWAY_TOKEN>
 ```
 
+## Troubleshooting
+
+**502 from every `/<service>/mcp` request, while `/healthz` returns 200.**
+`proxy_pass` interpolates a variable, so nginx resolves backends per request
+and needs a `resolver`. The template takes it from `NGINX_LOCAL_RESOLVERS`,
+which the image only exports when `NGINX_ENTRYPOINT_LOCAL_RESOLVERS` is set in
+the gateway's environment. Check for `no resolver defined to resolve mcp-...`
+in `docker logs mcp-gateway`. A 502 reading `connect() failed` or
+`Connection refused` instead means that backend container is down.
+
+**404 from `https://mcp.<domain>/...` on the LAN.** The hostname is resolving
+to Cloudflare, so the request arrives over the tunnel at the `web` entrypoint,
+where this stack deliberately has no router. Unlike every other service here,
+this one has no tunnel fallback, so the UDM Pro local DNS records are required,
+not just a faster path - see `services/networking/traefik/README.md`. Both A
+and AAAA are needed, or dual-stack clients prefer Cloudflare's IPv6 answer.
+Confirm the route independently of DNS with
+`curl --resolve mcp.<domain>:443:<lan-ip> https://mcp.<domain>/healthz`.
+
+**401 on every request.** `MCP_GATEWAY_TOKEN` is empty, so the check rendered
+as `"Bearer "`. Verify with
+`docker exec mcp-gateway grep -q '"Bearer "' /etc/nginx/conf.d/default.conf`.
+
 ## Security Notes
 
 - Keep this stack on `internal_net` only.
