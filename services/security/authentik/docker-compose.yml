@@ -1,6 +1,6 @@
 services:
   authentik-postgres:
-    image: postgres:18.7
+    image: postgres:19.0
     container_name: postgresql-authentik
     restart: unless-stopped
     environment:
