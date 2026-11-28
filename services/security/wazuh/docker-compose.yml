@@ -4,7 +4,7 @@
 # Service names keep the dots (wazuh.manager, ...) because the generated certificates are issued for them.
 services:
   wazuh.manager:
-    image: wazuh/wazuh-manager:4.14.10
+    image: wazuh/wazuh-manager:4.14.11
     container_name: wazuh-manager
     hostname: wazuh.manager
     restart: unless-stopped
@@ -74,7 +74,7 @@ services:
           memory: 512M
 
   wazuh.indexer:
-    image: wazuh/wazuh-indexer:4.14.10
+    image: wazuh/wazuh-indexer:4.14.11
     container_name: wazuh-indexer
     hostname: wazuh.indexer
     restart: unless-stopped
@@ -118,7 +118,7 @@ services:
           memory: 1G
 
   wazuh.dashboard:
-    image: wazuh/wazuh-dashboard:4.14.10
+    image: wazuh/wazuh-dashboard:4.14.11
     container_name: wazuh-dashboard
     hostname: wazuh.dashboard
     restart: unless-stopped
