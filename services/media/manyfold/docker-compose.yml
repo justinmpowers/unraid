@@ -59,7 +59,7 @@ services:
     - net.unraid.docker.webui=http://manyfold.${DOMAIN}
 
   manyfold-postgres:
-    image: postgres:18
+    image: postgres:19
     container_name: manyfold-postgres
     restart: unless-stopped
     environment:
