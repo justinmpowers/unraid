@@ -49,7 +49,7 @@ services:
     depends_on:
     - romm-mariadb
   romm-mariadb:
-    image: mariadb:13.0.2
+    image: mariadb:13.1.2
     container_name: romm-MariaDB-Official
     restart: unless-stopped
     environment:
