@@ -33,7 +33,7 @@ services:
           cpus: '0.3'
           memory: 256M
   authentik-redis:
-    image: redis:8.10.3-alpine
+    image: redis:8.12.0-alpine
     container_name: redis-authentik
     restart: unless-stopped
     environment:
